@@ -5,6 +5,12 @@ MASTER_module_fixed_anova_1_way_ui <- function(id) {
   
   # Contenido principal organizado en columnas para mantener los cards separados
   div(
+    # Usamos card() para envolver todo el contenido
+    card(
+      # Añadimos un card_header explícito
+      card_header(
+        h4("Rscience", class = "m-0")
+      ),
     layout_sidebar(
       sidebar = sidebar(
         p("HOLA", class = "text-center fs-4 fw-bold py-4")
@@ -53,6 +59,7 @@ MASTER_module_fixed_anova_1_way_ui <- function(id) {
       ""
       # quartoRendererUI(id = "quarto_doc")
     )
+  )
   )
   )
 }
