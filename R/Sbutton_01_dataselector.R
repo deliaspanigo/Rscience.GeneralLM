@@ -5,10 +5,14 @@ Sbutton_01_dataselector_ui <- function(id) {
   # Solo necesitamos el botón para activar el modal
   actionButton(
     ns("btn_dataset"),
-    "Elegir datos",
-    icon = icon("database"),
-    class = "btn-sm btn-primary"
+    HTML(paste0('<i class="fa fa-database" style="font-size: 75px; display: block; margin-bottom: 8px;"></i>', 
+                '<span></span>')),
+    class = "btn-primary",
+    style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
+    title = "Import dataset"
   )
+  
+
 }
 
 #' @export

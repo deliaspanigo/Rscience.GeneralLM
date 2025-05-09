@@ -3,13 +3,23 @@
 Sbutton_reset_ui <- function(id) {
   ns <- NS(id)
   
-  # Botón de reseteo
+  # Botón para elegir variables
   actionButton(
     ns("btn_update"),
-    "Resetear",
-    icon = icon("arrows-rotate"),
-    class = "btn-sm btn-warning"
+    HTML(paste0('<i class="fa fa-arrows-rotate" style="font-size: 75px; display: block; margin-bottom: 8px; transform: scaleX(-1);"></i>', 
+                '<span></span>')),
+    class = "btn-sm btn-warning",
+    style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
+    title = "Refresh!"
   )
+  
+  # # Botón de reseteo
+  # actionButton(
+  #   ns("btn_update"),
+  #   "Resetear",
+  #   icon = icon("arrows-rotate"),
+  #   class = "btn-sm btn-warning"
+  # )
 }
 
 #' @export

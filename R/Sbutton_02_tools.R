@@ -5,10 +5,14 @@ Sbutton_02_tools_ui <- function(id) {
   # Botón para elegir variables
   actionButton(
     ns("btn_tools"),
-    "Tools",
-    icon = icon("sliders"),
-    class = "btn-sm btn-primary"
+    HTML(paste0('<i class="fa fa-hammer" style="font-size: 75px; display: block; margin-bottom: 8px; transform: scaleX(-1);"></i>', 
+                '<span></span>')),
+    class = "btn-primary",
+    style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
+    title = "Statistic tools"
   )
+  
+  
 }
 
 #' @export

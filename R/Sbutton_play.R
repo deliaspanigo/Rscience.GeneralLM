@@ -3,13 +3,23 @@
 Sbutton_play_ui <- function(id) {
   ns <- NS(id)
   
-  # Botón PLAY
   actionButton(
     ns("btn_play"),
-    "PLAY",
-    icon = icon("play"),
-    class = "btn-sm btn-primary"
+    HTML(paste0('<i class="fa fa-play" style="font-size: 75px; display: block; margin-bottom: 8px; "></i>', 
+                '<span></span>')),
+    class = "btn-primary",
+    style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
+    title = "PLAY!"
   )
+  
+  # # Botón PLAY
+  # actionButton(
+  #   ns("btn_play"),
+  #   "PLAY",
+  #   icon = icon("play"),
+  #   class = "btn-sm btn-primary"
+  # )
+  
 }
 
 #' @export

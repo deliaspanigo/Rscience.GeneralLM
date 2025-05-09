@@ -13,15 +13,25 @@ MASTER_module_fixed_anova_1_way_ui <- function(id) {
     card(
       card_body(
         div(
-          class = "d-flex justify-content-start gap-2 mb-3",
-          Sbutton_01_dataselector_ui(ns("dataset_selector")),
-          Sbutton_02_tools_ui(ns("selector_tools")),
-          Sbutton_03_variable_selector_ui(ns("selector_variables")),
-          Sbutton_reset_ui(ns("reset_button")),
-          Sbutton_play_ui(ns("play_button"))
+          class = "d-flex justify-content-between mb-3", # justify-content-between para mejor distribución
+          # Div para los primeros 4 botones
+          div(
+            class = "d-flex gap-5",
+            Sbutton_01_dataselector_ui(ns("dataset_selector")),
+            Sbutton_02_tools_ui(ns("selector_tools")),
+            Sbutton_03_variable_selector_ui(ns("selector_variables")),
+            Sbutton_play_ui(ns("play_button"))
+          ),
+          # Botón reset en el extremo derecho
+          div(
+            class = "ms-auto", # Este es el truco para empujar a la derecha
+            Sbutton_reset_ui(ns("reset_button"))
+          )
         )
       )
-    ),
+    )
+    ,
+    
     
     uiOutput(ns("show_dev_full")),
     
