@@ -1,0 +1,8 @@
+[1,"Installing 'shinyjs' ...\n"]
+[1,"The following package(s) will be installed:\n"]
+[1,"- shinyjs [2.1.0]\n"]
+[1,"These packages will be installed into \"~/.cache/R/renv/library/Rscience.GeneralLM-47611c8e/linux-ubuntu-jammy/R-4.4/x86_64-pc-linux-gnu\".\n"]
+[1,"# Installing packages --------------------------------------------------------\n"]
+[1,"- Installing shinyjs ...                        OK [linked from cache]\n"]
+[1,"Successfully installed 1 package in 8.1 milliseconds.\n"]
+[2,"\n\n✔ Package 'shinyjs' successfully installed.\n"]

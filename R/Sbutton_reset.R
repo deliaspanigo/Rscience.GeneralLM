@@ -1,0 +1,56 @@
+
+#' @export
+Sbutton_reset_ui <- function(id) {
+  ns <- NS(id)
+  
+  # Botón de reseteo
+  actionButton(
+    ns("btn_update"),
+    "Resetear",
+    icon = icon("arrows-rotate"),
+    class = "btn-sm btn-warning"
+  )
+}
+
+#' @export
+Sbutton_reset_server <- function(id, valores_default, valores_internos, valores_activos, reset_callbacks) {
+  moduleServer(id, function(input, output, session) {
+    ns <- session$ns
+    
+    # Función de reseteo para el botón "Resetear"
+    observeEvent(input$btn_update, {
+      # Mostrar confirmación
+      showModal(modalDialog(
+        title = "Confirmar reseteo",
+        "¿Está seguro que desea resetear todas las selecciones?",
+        footer = tagList(
+          modalButton("Cancelar"),
+          actionButton(ns("confirmar_reset"), "Resetear", class = "btn-warning")
+        ),
+        easyClose = TRUE
+      ))
+    })
+    
+    # Confirmación de reseteo
+    observeEvent(input$confirmar_reset, {
+      # Restaurar todos los valores_internos a los predeterminados
+      for (nombre in names(valores_default)) {
+        valores_internos[[nombre]] <- valores_default[[nombre]]
+        valores_activos[[nombre]]  <- valores_default[[nombre]]
+      }
+      
+      # Llamar a todos los callbacks de reseteo
+      for (callback in reset_callbacks) {
+        callback()
+      }
+      
+      # Mostrar mensaje de éxito
+      showNotification(
+        "Todas las selecciones han sido reseteadas.",
+        type = "message"
+      )
+      
+      removeModal()
+    })
+  })
+}
