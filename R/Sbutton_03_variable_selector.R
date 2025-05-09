@@ -8,7 +8,7 @@ Sbutton_03_variable_selector_ui <- function(id) {
     ns("btn_variables"),
     HTML(paste0('<i class="fa fa-sliders" style="font-size: 75px; display: block; margin-bottom: 8px;"></i>', 
                 '<span></span>')),
-    class = "btn-sidebar", #"btn-primary",
+    class = "btn-special", #btn-primary", 
     style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
     title = "Variables Selection"
   )
