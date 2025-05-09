@@ -9,7 +9,7 @@ MASTER_module_fixed_anova_1_way_ui <- function(id) {
     card(
       # Añadimos un card_header explícito
       card_header(
-        h4("Rscience", class = "m-0")
+        h4("Rscience", class = "btn-sidebar")
       ),
     layout_sidebar(
       sidebar = sidebar(
