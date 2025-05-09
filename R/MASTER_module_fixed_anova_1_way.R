@@ -5,6 +5,10 @@ MASTER_module_fixed_anova_1_way_ui <- function(id) {
   
   # Contenido principal organizado en columnas para mantener los cards separados
   div(
+    layout_sidebar(
+      sidebar = sidebar(
+        p("HOLA", class = "text-center fs-4 fw-bold py-4")
+      ),
     # Encabezado con botones en una fila
     card(
       card_body(
@@ -40,10 +44,11 @@ MASTER_module_fixed_anova_1_way_ui <- function(id) {
       # quartoRendererUI(id = "quarto_doc")
     )
   )
+  )
 }
 
 #' @export
-MASTER_module_fixed_anova_1_way_server <- function(id) {
+MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
   moduleServer(id, function(input, output, session) {
     # Mostrar información sobre el dataset
     my_show_dev <- TRUE 
@@ -71,7 +76,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id) {
     # Inicializar los módulos y guardar los callbacks de reseteo
     reset_callbacks <- list()
     
-    dataset_module  <- Sbutton_01_dataselector_server("dataset_selector", valores_internos)
+    dataset_module  <- Sbutton_01_dataselector_server("dataset_selector", valores_internos, show_dev = show_dev)
     reset_callbacks <- c(reset_callbacks, dataset_module$reset)
     
     

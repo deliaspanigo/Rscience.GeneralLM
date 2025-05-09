@@ -86,20 +86,17 @@ ui <- page_fluid( # Cambiado de page_sidebar a page_fluid para más flexibilidad
   # ),
   
   # Layout con dos columnas - una para la barra lateral y otra para el contenido principal
-  layout_sidebar(
-    sidebar = sidebar(
-      p("HOLA", class = "text-center fs-4 fw-bold py-4")
-    ),
+  
     
     MASTER_module_fixed_anova_1_way_ui(id = "MASTER_fixed_anova_1_way") 
-  )
+  
 )
 
 # Definir el servidor
 server <- function(input, output, session) {
   # Valores predeterminados para reseteo
   
-  MASTER_module_fixed_anova_1_way_server(id = "MASTER_fixed_anova_1_way")
+  MASTER_module_fixed_anova_1_way_server(id = "MASTER_fixed_anova_1_way", show_dev = F)
   
 }
 

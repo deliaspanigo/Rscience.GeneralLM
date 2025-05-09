@@ -10,8 +10,8 @@ devtools::install()
 
 ######################################
 # Desinstalar el paquete
-remove.packages("Rscience2")
-remove.packages("Rscience.info")
+remove.packages("Rscience.GeneralLM")
+remove.packages("Rscience.import")
 
 # Limpiar el caché de devtools
 devtools::clean_dll()
