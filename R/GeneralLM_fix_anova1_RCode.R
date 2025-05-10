@@ -807,16 +807,16 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, a
   
   
   
-  # Capturar todos los objetos del entorno actual
+  #._ Capturar todos los objetos del entorno actual
   ._obj_names <- ls()
   
-  # Filtrar para excluir los parámetros de la función
+  #._ Filtrar para excluir los parámetros de la función
   ._obj_to_keep <- setdiff(._obj_names, names(formals(sys.function())))
   
   # Crear una lista con los objetos (excluyendo parámetros)
   ._result_list <- mget(._obj_to_keep)
   
-  # Devolver la lista ordenada según su definición
+  #._ Devolver la lista ordenada según su definición
   return(._result_list)
   
 }

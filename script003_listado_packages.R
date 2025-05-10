@@ -8,6 +8,7 @@ usethis::use_package("Rscience.import")
 usethis::use_package("openxlsx")
 usethis::use_package("colourpicker")
 usethis::use_package("readxl")
+usethis::use_package("shinyAce")
 
 usethis::use_package("dplyr")
 usethis::use_package("ggplot2")

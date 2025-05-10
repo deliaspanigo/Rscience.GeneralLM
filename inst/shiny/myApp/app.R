@@ -10,6 +10,7 @@ library(knitr)
 library(shiny)
 library(bslib)
 library(shinyjs)
+library(shinyAce)
 # 
 # source("global.R")
 # 

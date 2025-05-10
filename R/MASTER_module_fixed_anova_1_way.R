@@ -35,8 +35,8 @@ MASTER_module_fixed_anova_1_way_ui <- function(id) {
           )
         )
       )
-    )
-    ,
+    ),
+   
     uiOutput(ns("info_text2")),
     uiOutput(ns("mega_tabs")), br(),
     uiOutput(ns("show_dev_full")),
@@ -335,6 +335,87 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
       crear_outputs_y_ui2(list_vec03, "render_tab04_", mis_valores, output, ns)
     })
     
+    
+    output$menu01 <- renderUI({
+      req(mis_valores())
+    
+      vector_editor_values <- c("xcode", "monokai", "github", "eclipse", "tomorrow", 
+                                "solarized_light", "solarized_dark", "textmate", "twilight")
+      
+      selected_pos <- 1
+      
+      card(
+        card_header("Editor Options"),
+        card_body(
+          fluidRow(
+            column(3,     
+               selectInput(ns("theme"), "Editor Theme:", 
+                          choices = vector_editor_values,
+                        selected = vector_editor_values[selected_pos])
+               ),
+            column(3, 
+                sliderInput(ns("fontSize"), "Font Size:", min = 8, max = 24, value = 14, step = 1)
+                ),
+            #column(3, actionButton(ns("copy_btn"), "Copiar código", icon = icon("copy"))),
+            column(3, downloadButton(ns("download_btn"), "Descargar como .R", icon = icon("download")))
+            
+          )
+        )
+        )
+    })
+    
+    function_code <- GeneralLM_fix_anova1_take_code(my_fn=GeneralLM_fix_anova1_RCode)
+    
+    
+    
+    # Función para descargar el código como archivo .R
+    output$download_btn <- downloadHandler(
+      filename = function() {
+        "code_generalLM_fixed_anova_1way.R"
+      },
+      content = function(file) {
+        writeLines(function_code, file)
+      }
+    )
+  
+  
+    output$dynamic_tab05_ui <- renderUI({
+      req(mis_valores())
+      
+      #function_code <- GeneralLM_fix_anova1_take_code(my_fn=GeneralLM_fix_anova1_RCode)
+      # Calcular la altura adecuada para el editor basado en el número de líneas
+      line_count <- length(strsplit(function_code, "\n")[[1]])
+      line_count <- line_count + 5
+      # Asignar aproximadamente 20px por línea para el alto del editor
+      editor_height <- paste0(max(300, line_count * 20), "px")
+      
+      card(
+        card_header("Editor Options"),
+        card_body(
+          selectInput(ns("theme"), "Editor Theme:", 
+                      choices = c("xcode", "monokai", "github", "eclipse", "tomorrow", 
+                                  "solarized_light", "solarized_dark", "textmate", "twilight"),
+                      selected = "xcode"),
+          sliderInput(ns("fontSize"), "Font Size:", min = 8, max = 24, value = 14, step = 1)
+        )
+      )
+      
+      shinyAce::aceEditor(
+        outputId = "script_part1",
+        value = function_code,
+        mode = "r",
+        theme = input$"theme", #"chrome",
+        height = editor_height,#"200px",
+        fontSize = input$"fontSize", #14,
+        showLineNumbers = TRUE,
+        readOnly = TRUE,
+        autoScrollEditorIntoView = TRUE,
+        maxLines = 1000,  # Un número grande para evitar scroll
+        minLines = line_count 
+      )
+      
+    })
+    
     output$mega_tabs <- renderUI({
       req(mis_valores())
       
@@ -342,7 +423,8 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
         tabPanel(title = "Analysis", uiOutput(ns("dynamic_tab01_ui"))),
         tabPanel(title = "Requeriments", uiOutput(ns("dynamic_tab02_ui"))),
         tabPanel(title = "Plots - Raw Data", uiOutput(ns("dynamic_tab03_ui"))),
-        tabPanel(title = "Plots - Residuals", uiOutput(ns("dynamic_tab04_ui")))
+        tabPanel(title = "Plots - Residuals", uiOutput(ns("dynamic_tab04_ui"))),
+        tabPanel(title = "RCode", uiOutput(ns("menu01")), uiOutput(ns("dynamic_tab05_ui"))),
       )
       
     })

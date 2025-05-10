@@ -75,6 +75,9 @@
       "Encoding": "UTF-8",
       "Roxygen": "list(markdown = TRUE)",
       "RoxygenNote": "7.3.2",
+      "Depends": [
+        "R (>= 3.5.0)"
+      ],
       "LazyData": "true",
       "Imports": [
         "devtools",
@@ -87,13 +90,10 @@
       "RemoteRepo": "Rscience.import",
       "RemoteUsername": "deliaspanigo",
       "RemoteRef": "HEAD",
-      "RemoteSha": "07d3d8b1004e363aab4a5fd715447a0275c192a3",
+      "RemoteSha": "1dfb54df0b52379b1acb0c602add256aebaf1fce",
       "NeedsCompilation": "no",
       "Author": "First Last [aut, cre]",
-      "Maintainer": "First Last <first.last@example.com>",
-      "Depends": [
-        "R (>= 3.5.0)"
-      ]
+      "Maintainer": "First Last <first.last@example.com>"
     },
     "askpass": {
       "Package": "askpass",
@@ -2952,6 +2952,38 @@
       "NeedsCompilation": "no",
       "Author": "Winston Chang [aut, cre] (<https://orcid.org/0000-0002-1576-2126>), Joe Cheng [aut], JJ Allaire [aut], Carson Sievert [aut] (<https://orcid.org/0000-0002-4958-2844>), Barret Schloerke [aut] (<https://orcid.org/0000-0001-9986-114X>), Yihui Xie [aut], Jeff Allen [aut], Jonathan McPherson [aut], Alan Dipert [aut], Barbara Borges [aut], Posit Software, PBC [cph, fnd], jQuery Foundation [cph] (jQuery library and jQuery UI library), jQuery contributors [ctb, cph] (jQuery library; authors listed in inst/www/shared/jquery-AUTHORS.txt), jQuery UI contributors [ctb, cph] (jQuery UI library; authors listed in inst/www/shared/jqueryui/AUTHORS.txt), Mark Otto [ctb] (Bootstrap library), Jacob Thornton [ctb] (Bootstrap library), Bootstrap contributors [ctb] (Bootstrap library), Twitter, Inc [cph] (Bootstrap library), Prem Nawaz Khan [ctb] (Bootstrap accessibility plugin), Victor Tsaran [ctb] (Bootstrap accessibility plugin), Dennis Lembree [ctb] (Bootstrap accessibility plugin), Srinivasu Chakravarthula [ctb] (Bootstrap accessibility plugin), Cathy O'Connor [ctb] (Bootstrap accessibility plugin), PayPal, Inc [cph] (Bootstrap accessibility plugin), Stefan Petre [ctb, cph] (Bootstrap-datepicker library), Andrew Rowls [ctb, cph] (Bootstrap-datepicker library), Brian Reavis [ctb, cph] (selectize.js library), Salmen Bejaoui [ctb, cph] (selectize-plugin-a11y library), Denis Ineshin [ctb, cph] (ion.rangeSlider library), Sami Samhuri [ctb, cph] (Javascript strftime library), SpryMedia Limited [ctb, cph] (DataTables library), John Fraser [ctb, cph] (showdown.js library), John Gruber [ctb, cph] (showdown.js library), Ivan Sagalaev [ctb, cph] (highlight.js library), R Core Team [ctb, cph] (tar implementation from R)",
       "Maintainer": "Winston Chang <winston@posit.co>",
+      "Repository": "CRAN"
+    },
+    "shinyAce": {
+      "Package": "shinyAce",
+      "Version": "0.4.4",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "Ace Editor Bindings for Shiny",
+      "Date": "2025-2-2",
+      "Authors@R": "c( person(\"Vincent\", \"Nijs\", role = c(\"aut\", \"cre\"), email = \"radiant@rady.ucsd.edu\"), person(\"Forest\", \"Fang\", role = \"aut\", email = \"forest.fang@outlook.com\"), person(family = \"Trestle Technology, LLC\", role = \"aut\", email = \"cran@trestletechnology.net\"), person(\"Jeff\", \"Allen\", role = \"aut\", email = \"cran@trestletechnology.net\"), person(family = \"Institut de Radioprotection et de Surete Nucleaire\", role = c(\"cph\"), email = \"yann.richet@irsn.fr\"), person(family = \"Ajax.org B.V.\", role = c(\"ctb\", \"cph\"), comment = \"Ace\"))",
+      "Description": "Ace editor bindings to enable a rich text editing environment within Shiny.",
+      "License": "MIT + file LICENSE",
+      "Depends": [
+        "R (>= 3.3.0)"
+      ],
+      "Imports": [
+        "shiny (>= 1.0.5)",
+        "jsonlite",
+        "utils",
+        "tools"
+      ],
+      "Suggests": [
+        "testthat (>= 2.0.0)",
+        "dplyr (>= 0.8.3)"
+      ],
+      "BugReports": "https://github.com/trestletech/shinyAce/issues",
+      "Encoding": "UTF-8",
+      "RoxygenNote": "7.3.2",
+      "Language": "en-US",
+      "NeedsCompilation": "no",
+      "Author": "Vincent Nijs [aut, cre], Forest Fang [aut], Trestle Technology, LLC [aut], Jeff Allen [aut], Institut de Radioprotection et de Surete Nucleaire [cph], Ajax.org B.V. [ctb, cph] (Ace)",
+      "Maintainer": "Vincent Nijs <radiant@rady.ucsd.edu>",
       "Repository": "CRAN"
     },
     "shinyjs": {

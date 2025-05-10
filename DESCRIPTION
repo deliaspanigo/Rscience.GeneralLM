@@ -13,4 +13,5 @@ Imports:
     openxlsx,
     readxl,
     Rscience.import,
+    shinyAce,
     shinyjs
