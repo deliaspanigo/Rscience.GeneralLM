@@ -359,7 +359,8 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
             #column(3, actionButton(ns("copy_btn"), "Copiar código", icon = icon("copy"))),
             column(3, downloadButton(ns("download_btn"), "Descargar como .R", icon = icon("download")))
             
-          )
+          ),
+          uiOutput(ns("dynamic_tab05_ui"))
         )
         )
     })
@@ -424,7 +425,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
         tabPanel(title = "Requeriments", uiOutput(ns("dynamic_tab02_ui"))),
         tabPanel(title = "Plots - Raw Data", uiOutput(ns("dynamic_tab03_ui"))),
         tabPanel(title = "Plots - Residuals", uiOutput(ns("dynamic_tab04_ui"))),
-        tabPanel(title = "RCode", uiOutput(ns("menu01")), uiOutput(ns("dynamic_tab05_ui"))),
+        tabPanel(title = "RCode", uiOutput(ns("menu01"))),
       )
       
     })
