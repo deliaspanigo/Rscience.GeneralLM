@@ -364,7 +364,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
         )
     })
     
-    function_code <- GeneralLM_fix_anova1_take_code(my_fn=GeneralLM_fix_anova1_RCode)
+    function_code <- GeneralLM_fix_anova1_take_code(str_fn_name="GeneralLM_fix_anova1_RCode")
     
     
     

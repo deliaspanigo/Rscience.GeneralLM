@@ -3,31 +3,38 @@
 
 
 #' @export
-GeneralLM_fix_anova1_take_code <- function(my_fn){
+GeneralLM_fix_anova1_take_code <- function(str_fn_name){
   
-  # Obtener el código fuente de la función como texto
-  function_code <- capture.output(print(my_fn))
-  # Eliminar la primera y la última línea
+  str_fn_name <- "GeneralLM_fix_anova1_RCode"
+  fn_file <- paste0(str_fn_name, ".R")
+  the_package_path <- find.package("Rscience.GeneralLM")
+  #the_folder_path <- file.path(the_package_path, "inst", "copies")
+  the_folder_path <- file.path(the_package_path, "copies") # NO DETALLAR "inst"!!!!
+  
+  file_path <- file.path( the_folder_path, fn_file)
+  
+  function_code<- readLines(file_path)
+  linea_inicio <- which(grepl(" <- function\\(", function_code))[1]
+  
+  # Si se encontró, mantener desde esa línea en adelante
+  if (!is.na(linea_inicio)) {
+    function_code <- function_code[linea_inicio:length(function_code)]
+  } 
+  
+  # function_code <- function_code[!grepl("\\#'", function_code)]
   function_code <- function_code[-1]  # Eliminar primera línea
   function_code <- function_code[-length(function_code)]  # Eliminar última línea
   
-  # Encontrar la posición de la última aparición de "return"
-  function_code_text <- paste(function_code, collapse = "\n")
-  lines_vector <- strsplit(function_code_text, "\n")[[1]]
-  return_positions <- grep("return", lines_vector)
+  return_positions <- grep("return", function_code)
   
   if (length(return_positions) > 0) {
     last_return_position <- max(return_positions)
     # Mantener solo las líneas hasta antes de la posición del último return
-    lines_vector <- lines_vector[1:(last_return_position-1)]
+    function_code <- function_code[1:(last_return_position-1)]
   }
   
-  # Eliminar líneas que contienen objetos que comienzan con "._"
-  lines_vector <- lines_vector[!grepl("\\._", lines_vector)]
+  function_code <- function_code[!grepl("\\._", function_code)]
   
-  # Reconstruir el texto final
-  function_code <- paste(lines_vector, collapse = "\n")
-
 
     return(function_code)
 }
