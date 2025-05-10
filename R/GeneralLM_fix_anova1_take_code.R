@@ -5,6 +5,7 @@
 #' @export
 GeneralLM_fix_anova1_take_code <- function(my_fn){
   
+  # Obtener el código fuente de la función como texto
   function_code <- capture.output(print(my_fn))
   # Eliminar la primera y la última línea
   function_code <- function_code[-1]  # Eliminar primera línea
@@ -31,5 +32,4 @@ GeneralLM_fix_anova1_take_code <- function(my_fn){
     return(function_code)
 }
 
-GeneralLM_fix_anova1_take_code(my_fn=GeneralLM_fix_anova1_RCode)
 
