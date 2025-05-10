@@ -37,8 +37,8 @@ MASTER_module_fixed_anova_1_way_ui <- function(id) {
       )
     )
     ,
-    
-    
+    uiOutput(ns("info_text2")),
+    uiOutput(ns("mega_tabs")), br(),
     uiOutput(ns("show_dev_full")),
     
     
@@ -67,6 +67,8 @@ MASTER_module_fixed_anova_1_way_ui <- function(id) {
 #' @export
 MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
   moduleServer(id, function(input, output, session) {
+    ns <- session$ns
+    
     # Mostrar información sobre el dataset
     my_show_dev <- TRUE 
     
@@ -113,8 +115,242 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     # Inicializar el módulo de reseteo con los callbacks
     Sbutton_reset_server("reset_button", valores_default, valores_internos, valores_activos, reset_callbacks)
     
+    ############################################################################
+    # R
+    mis_valores <- reactive({
+      
+      valores_internos_list <- reactiveValuesToList(valores_activos)
+      req(valores_internos_list)
+      req(valores_internos_list$pack_import_dataset)
+      req(valores_internos_list$pack_import_dataset$"database")
+      database <- valores_internos_list$pack_import_dataset$"database"
+      var_name_factor <- valores_internos_list$pack_var_selection$"factor"
+      var_name_vr <- valores_internos_list$pack_var_selection$"respuesta"
+      alpha_value <- 0.05
+
+      the_results <- GeneralLM_fix_anova1_RCode(database, var_name_factor, var_name_vr, alpha_value)
+      vector_order_names <- GeneralLM_fix_anova1_objects_in_order(fn = GeneralLM_fix_anova1_RCode)
+      the_results <- the_results[vector_order_names]
+      the_results
+      
+    })
+    ############################################################################
+    
+    ##############################################################################
+    
+    vector_output_title <- c("render" = "renderPrint", "output" = "verbatimTextOutput")
+    vector_output_verbatim <- c("render" = "renderPrint", "output" = "verbatimTextOutput")
+    vector_info <- list("title" = NA, "objects" = NA)
+    
+    list_vec01 <- list()
+    list_vec01[[1]] <- list("title" = "1) References", "objects" = c("df_selected_vars"))
+    list_vec01[[2]] <- list("title" = "2) Factor resumen", "objects" = c("df_factor_info", "check_unbalanced_reps"))
+    list_vec01[[3]] <- list("title" = "3) Anova 1 way - Table", "objects" = c("df_table_anova"))
+    list_vec01[[4]] <- list("title" = "4) Multiple comparation test (Tukey)", "objects" = c("df_tukey_table"))
+    list_vec01[[5]] <- list("title" = "5) Model Error", "objects" = c("df_model_error"))
+    # Crear los outputs
+    
+    list_vec02 <- list()
+    list_vec02[[1]] <- list("title" = "1) Requeriment - Normaility test - Residuals", 
+                            "objects" = c("test_residuals_normality"))
+    
+    list_vec02[[2]] <- list("title" = "2) Requeriment - Homogeneity test - Residuals", 
+                            "objects" = c("test_residuals_homogeneity"))
+    list_vec02[[3]] <- list("title" = "3) Estimated variances - Residuals", 
+                            "objects" = c("df_residuals_variance_levels"))
+    
+    # Función para crear outputs dinámicos
+    crear_outputs_y_ui <- function(list_objetos, prefix, mis_valores_reactive, output, ns) {
+      # Crea los outputs en bucle, en ámbitos independientes para evitar sobrescrituras
+      for (i in seq_along(list_objetos)) {
+        id_output <- paste0(prefix, i)
+        obj_name <- list_objetos[[i]]$"objects"
+        
+        # Crear un ámbito local para que cada output sea independiente
+        local({
+          n <- i
+          id <- id_output
+          obj <- obj_name
+          output[[id]] <- renderPrint({
+            req(mis_valores_reactive())
+            mis_valores_reactive()[obj]
+          })
+        })
+      }
+      
+      # Crear UI dinámicamente
+      ui_list <- lapply(seq_along(list_objetos), function(i) {
+        id_output <- paste0(prefix, i)
+        list(
+          h4(list_objetos[[i]]$"title"),
+          verbatimTextOutput(ns(id_output)),
+          br()
+        )
+      })
+      
+      return(do.call(tagList, ui_list))
+    }
     
     
+    # Llamas a la función en tu server:
+    output$dynamic_tab01_ui <- renderUI({
+      req(mis_valores())
+      crear_outputs_y_ui(list_vec01, "render_tab01_", mis_valores, output, ns)
+    })
+    output$dynamic_tab02_ui <- renderUI({
+      req(mis_valores())
+      crear_outputs_y_ui(list_vec02, "render_tab02_", mis_valores, output, ns)
+    })
+    ##############################################################################
+    
+    
+    list_vec03 <- list()
+    list_vec03[[1]] <- list("title" = "", 
+                            "table" = "df_table_factor_plot001",
+                            "plot"  = "plot001_factor")
+    
+    list_vec03[[2]] <- list("title" = "", 
+                            "table" = "df_table_factor_plot002",
+                            "plot"  = "plot002_factor")
+    
+    list_vec03[[3]] <- list("title" = "", 
+                            "table" = "df_table_factor_plot003",
+                            "plot"  = "plot003_factor")
+    
+    list_vec03[[4]] <- list("title" = "", 
+                            "table" = "df_table_factor_plot004",
+                            "plot"  = "plot004_factor")
+    
+    list_vec03[[5]] <- list("title" = "", 
+                            "table" = "df_table_factor_plot005",
+                            "plot"  = "")
+    
+    list_vec03[[6]] <- list("title" = "", 
+                            "table" = "df_table_factor_plot006",
+                            "plot"  = "plot005_factor")
+    
+    list_vec03[[7]] <- list("title" = "", 
+                            "table" = "df_table_factor_plot007",
+                            "plot"  = "plot005_factor")
+    
+    ##############################################################################
+    
+    list_vec04 <- list()
+    list_vec04[[1]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot001",
+                            "plot"  = "plot001_residuals")
+    
+    list_vec04[[2]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot002",
+                            "plot"  = "plot002_residuals")
+    
+    list_vec04[[3]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot003",
+                            "plot"  = "plot003_residuals")
+    
+    list_vec04[[4]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot004",
+                            "plot"  = "plot004_residuals")
+    
+    list_vec04[[5]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot005",
+                            "plot"  = "plot005_residuals")
+    
+    list_vec04[[6]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot006",
+                            "plot"  = "plot006_residuals")
+    
+    list_vec04[[7]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot007",
+                            "plot"  = "plot007_residuals")
+    
+    list_vec04[[8]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot008",
+                            "plot"  = "plot008_residuals")
+    
+    list_vec04[[9]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot009",
+                            "plot"  = "plot009_residuals")
+    
+    list_vec04[[10]] <- list("title" = "", 
+                             "table" = "df_table_residuals_plot010",
+                             "plot"  = "plot010_residuals")
+    
+    crear_outputs_y_ui2 <- function(list_objetos, prefix, mis_valores_reactive, output, ns) {
+      # Crear los outputs en ámbitos independientes
+      for (i in seq_along(list_objetos)) {
+        id_output_table <- paste0(prefix, i, "_table")
+        id_output_plot <- paste0(prefix, i, "_plot")
+        
+        obj_name_table <- list_objetos[[i]]$"table"
+        obj_name_plot <- list_objetos[[i]]$"plot"
+        
+        local({
+          n <- i
+          id_table <- id_output_table
+          id_plot <- id_output_plot
+          obj_table <- obj_name_table
+          obj_plot <- obj_name_plot
+          
+          output[[id_plot]] <- plotly::renderPlotly({
+            req(mis_valores_reactive())
+            mis_valores_reactive()[[obj_plot]]
+          })
+          
+          output[[id_table]] <- renderPrint({
+            req(mis_valores_reactive())
+            mis_valores_reactive()[[obj_table]]
+          })
+        })
+      }
+      
+      # Crear UI dinámicamente
+      ui_list <- lapply(seq_along(list_objetos), function(i) {
+        id_output_table <- paste0(prefix, i, "_table")
+        id_output_plot <- paste0(prefix, i, "_plot")
+        list(
+          fluidRow(
+            h4(list_objetos[[i]]$"title"),
+            column(6, plotlyOutput(ns(id_output_plot))),
+            column(6, verbatimTextOutput(ns(id_output_table)))
+          ),
+          br(), br(), br()
+        )
+      })
+      
+      return(do.call(tagList, ui_list))
+    }
+    
+    
+    
+    
+    output$dynamic_tab03_ui <- renderUI({
+      req(mis_valores())
+      
+      crear_outputs_y_ui2(list_vec03, "render_tab03_", mis_valores, output, ns)
+    })
+    output$dynamic_tab04_ui <- renderUI({
+      req(mis_valores())
+      
+      crear_outputs_y_ui2(list_vec03, "render_tab04_", mis_valores, output, ns)
+    })
+    
+    output$mega_tabs <- renderUI({
+      req(mis_valores())
+      
+      tabsetPanel(
+        tabPanel(title = "Analysis", uiOutput(ns("dynamic_tab01_ui"))),
+        tabPanel(title = "Requeriments", uiOutput(ns("dynamic_tab02_ui"))),
+        tabPanel(title = "Plots - Raw Data", uiOutput(ns("dynamic_tab03_ui"))),
+        tabPanel(title = "Plots - Residuals", uiOutput(ns("dynamic_tab04_ui")))
+      )
+      
+    })
+    ############################################################################
+    # Shiny Clasic
+    
+
+    ############################################################################
     output$show_dev_full <- renderUI({
       ns <- NS(id)
       
@@ -123,7 +359,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
       # Fila separada para el contenido en otra tarjeta
       card(
         card_body(
-          fluidRow(uiOutput(ns("info_text2"))),
+          #fluidRow(uiOutput(ns("info_text2"))),
           fluidRow(verbatimTextOutput(ns("info_text"))),
           fluidRow(
             column(4, verbatimTextOutput(ns("debug_rv_default"))),
@@ -313,7 +549,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
       modelo_seleccionado <- valores_internos_list$pack_tool_selection$modelo_seleccionado
       print(paste0("selected_tool: ", selected_tool))
       print(paste0("acordeon: ", acordeon))
-      print(paste0("nodelo_seleccionado: ", modelo_seleccionado))
+      print(paste0("modelo_seleccionado: ", modelo_seleccionado))
       
       req(valores_internos_list$pack_var_selection)
       value_factor <- valores_internos_list$pack_var_selection$"factor"

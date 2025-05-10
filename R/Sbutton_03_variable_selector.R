@@ -114,7 +114,7 @@ Sbutton_03_variable_selector_server <- function(id, valores_default, valores_int
       
       variables_seleccionadas <- selected_vars_anova()
       
-      print(variables_seleccionadas)
+      # print(variables_seleccionadas)
       
       # Verificar que se hayan seleccionado exactamente 2 variables
       # if (length(variables_seleccionadas) != 2) {

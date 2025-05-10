@@ -1,0 +1,823 @@
+
+#' @export
+GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, alpha_value){
+  
+  
+  # # # # # Section 01 - Libraries -----------------------------------------------
+  library("plotly")
+  library("htmlwidgets")
+  library("knitr")
+  library("agricolae") # Tukey test
+  library("dplyr")     # Developing with %>%
+  library("openxlsx")  # Import files from xlsx
+  library("plotly")    # Advanced graphical functions
+  
+  # Cargamos mtcars
+  database <- database
+  var_name_factor <- var_name_factor
+  var_name_vr <- var_name_vr
+  
+  vector_selected_vars <- c(var_name_vr, var_name_factor)
+  alpha_value <- 0.05
+  confidence_value <- 1 - alpha_value
+  
+  database[,var_name_factor] <- as.factor(as.character(database[,var_name_factor]))
+  
+  
+  vector_all_var_names <- colnames(database)
+  vector_name_selected_vars <- c(var_name_vr, var_name_factor)
+  vector_rol_vars <- c("VR", "FACTOR")
+  
+  
+  # # # Selected vars info as dataframe
+  df_selected_vars <- data.frame(
+    "order" = 1:length(vector_name_selected_vars),
+    "var_name" = vector_name_selected_vars,
+    "var_number" = match(vector_name_selected_vars, vector_all_var_names),
+    "var_letter" = openxlsx::int2col(match(vector_name_selected_vars, vector_all_var_names)),
+    "var_role" = vector_rol_vars,
+    "doble_reference" = paste0(vector_rol_vars, "(", vector_name_selected_vars, ")")
+  )
+  df_selected_vars
+  
+  # # # # # Section 05 - minibase ------------------------------------------------
+  # Only selected vars. Only completed rows. Factor columns as factor object in R.
+  minibase <- na.omit(database[vector_name_selected_vars])
+  colnames(minibase) <- vector_rol_vars
+  minibase[,2] <- as.factor(minibase[,2])
+  
+  
+  
+  
+  # # # # # Section 05 - minibase ------------------------------------------------
+  # Only selected vars. Only completed rows. Factor columns as factor object in R.
+  minibase <- na.omit(database[vector_name_selected_vars])
+  colnames(minibase) <- vector_rol_vars
+  minibase[,2] <- as.factor(minibase[,2])
+  
+  
+  
+  # # # Anova control
+  # 'VR' must be numeric and 'FACTOR must be factor.
+  df_control_minibase <- data.frame(
+    "order" = 1:nrow(df_selected_vars),
+    "var_name" = df_selected_vars$var_name,
+    "var_role" = df_selected_vars$var_role,
+    "control" = c("is.numeric()", "is.factor()"),
+    "verify" = c(is.numeric(minibase[,1]), is.factor(minibase[,2]))
+  )
+  df_control_minibase
+  
+  
+  
+  # # # database and minibase reps
+  # Our 'n' is from minibase
+  df_show_n <- data.frame(
+    "object" = c("database", "minibase"),
+    "n_col" = c(ncol(database), ncol(minibase)),
+    "n_row" = c(nrow(database), nrow(minibase))
+  )
+  df_show_n
+  
+  
+  
+  # # # Factor info
+  # Default order for levels its alphabetic order.
+  df_factor_info <- data.frame(
+    "order" = 1:nlevels(minibase[,2]),
+    "level" = levels(minibase[,2]),
+    "n" = as.vector(table(minibase[,2])),
+    "mean" = tapply(minibase[,1], minibase[,2], mean),
+    "color" = rainbow(nlevels(minibase[,2]))
+  )
+  df_factor_info
+  
+  
+  
+  # # # Unbalanced reps for levels?
+  # Important information for Tukey.
+  # If reps its equal or not equal in all levels must be detailled
+  # on Tukey.
+  check_unbalanced_reps <- length(unique(df_factor_info$n)) > 1
+  check_unbalanced_reps
+  
+  
+  
+  
+  
+  # # # # # Section 06 - Anova Test ----------------------------------------------
+  # # # Anova test
+  lm_anova <- lm(VR ~ FACTOR, data = minibase)               # Linear model
+  aov_anova <- aov(lm_anova)                                 # R results for anova
+  df_table_anova <- as.data.frame(summary(aov_anova)[[1]])   # Common anova table
+  df_table_anova
+  
+  
+  
+  # # # Standard error from model for each level
+  model_error_var <- df_table_anova$`Mean Sq`[2]
+  model_error_sd <- sqrt(model_error_var)
+  
+  df_model_error <- data.frame(
+    "order" = df_factor_info$order,
+    "level" = df_factor_info$level,
+    "n" = df_factor_info$n,
+    "model_error_var" = model_error_var,
+    "model_error_sd" = model_error_sd
+  )
+  df_model_error["model_error_se"] <- df_model_error["model_error_sd"]/sqrt(df_model_error$n)
+  df_model_error
+  
+  
+  
+  
+  
+  # # # # # Section 07 - minibase_mod --------------------------------------------
+  # # # Detect rows on database there are on minibase
+  dt_rows_database_ok <- rowSums(!is.na(database[vector_name_selected_vars])) == ncol(minibase)
+  
+  
+  
+  # # # Object minibase_mod and new cols
+  minibase_mod <- minibase
+  minibase_mod$"lvl_order_number" <- as.numeric(minibase_mod[,2])
+  minibase_mod$"lvl_color" <- df_factor_info$color[minibase_mod$"lvl_order_number"]
+  minibase_mod$"fitted.values" <- df_factor_info$"mean"[minibase_mod$"lvl_order_number"]
+  minibase_mod$"residuals" <- lm_anova$residuals
+  minibase_mod$"id_database" <- c(1:nrow(database))[dt_rows_database_ok]
+  minibase_mod$"id_minibase" <- 1:nrow(minibase)
+  minibase_mod$"studres" <- minibase_mod$"residuals"/model_error_sd
+  
+  
+  
+  
+  
+  # # # # # Section 08 - Requeriments for residuals-------------------------------
+  # # # Normality test (Shapiro-Wilk)
+  test_residuals_normality <- shapiro.test(minibase_mod$residuals)
+  test_residuals_normality
+  
+  
+  
+  
+  # # # Homogeinidy test (Bartlett)
+  test_residuals_homogeneity <- bartlett.test(residuals ~ FACTOR, data = minibase_mod)
+  test_residuals_homogeneity
+  
+  
+  
+  # # # Residuals variance from levels from original residuals
+  df_residuals_variance_levels <- data.frame(
+    "order" = 1:nlevels(minibase_mod[,2]),
+    "level" = levels(minibase_mod[,2]),
+    "variance" = tapply(minibase_mod$residuals, minibase_mod[,2], var),
+    "n" = tapply(minibase_mod$residuals, minibase_mod[,2], length)
+  )
+  df_residuals_variance_levels
+  
+  
+  
+  # # # Sum for residuals
+  sum_residuals <- sum(minibase_mod$residuals)
+  sum_residuals
+  
+  
+  
+  # # # Mean for residuals
+  mean_residuals <- mean(minibase_mod$residuals)
+  mean_residuals
+  
+  
+  tukey01_full_groups <- agricolae::HSD.test(y = lm_anova,
+                                             trt = colnames(minibase)[2],
+                                             alpha = alpha_value,
+                                             group = TRUE,
+                                             console = FALSE,
+                                             unbalanced = check_unbalanced_reps)
+  
+  
+  
+  # # # Tukey test - Tukey pairs comparation - Full version
+  tukey02_full_pairs <- agricolae::HSD.test(y = lm_anova,
+                                            trt = colnames(minibase)[2],
+                                            alpha = alpha_value,
+                                            group = FALSE,
+                                            console = FALSE,
+                                            unbalanced = check_unbalanced_reps)
+  
+  
+  
+  # # Original table from R about Tukey
+  df_tukey_original_table <- tukey01_full_groups$groups
+  df_tukey_original_table
+  
+  
+  
+  # # # New table about Tukey
+  df_tukey_table <- data.frame(
+    "level" = rownames(tukey01_full_groups$groups),
+    "mean" = tukey01_full_groups$groups[,1],
+    "group" = tukey01_full_groups$groups[,2]
+  )
+  df_tukey_table
+  
+  
+  
+  
+  
+  # # # # # Section 10 - Partitioned Measures (VR)--------------------------------
+  # # # Partitioned Measures of Position (VR)
+  df_vr_position_levels <- data.frame(
+    "order" = 1:nlevels(minibase[,2]),
+    "level" = levels(minibase[,2]),
+    "min" = tapply(minibase[,1], minibase[,2], min),
+    "mean" = tapply(minibase[,1], minibase[,2], mean),
+    "Q1" = tapply(minibase[,1], minibase[,2], quantile, 0.25),
+    "median" = tapply(minibase[,1], minibase[,2], median),
+    "Q3" = tapply(minibase[,1], minibase[,2], quantile, 0.75),
+    "max" = tapply(minibase[,1], minibase[,2], max),
+    "n" = tapply(minibase[,1], minibase[,2], length)
+  )
+  
+  
+  
+  # # # Partitioned Measures of Dispersion (VR)
+  df_vr_dispersion_levels <- data.frame(
+    "order" = 1:nlevels(minibase[,2]),
+    "level" = levels(minibase[,2]),
+    "range" = tapply(minibase[,1], minibase[,2], function(x){max(x) - min(x)}),
+    "variance" = tapply(minibase[,1], minibase[,2], var),
+    "standard_deviation" = tapply(minibase[,1], minibase[,2], sd),
+    "standard_error" = tapply(minibase[,1], minibase[,2], function(x){sd(x)/sqrt(length(x))}),
+    "n" = tapply(minibase[,1], minibase[,2], length)
+  )
+  df_vr_dispersion_levels
+  
+  
+  
+  # # # General Measures of Position (VR)
+  df_vr_position_general <- data.frame(
+    "min" = min(minibase[,1]),
+    "mean" = mean(minibase[,1]),
+    "median" = median(minibase[,1]),
+    "max" = max(minibase[,1]),
+    "n" = length(minibase[,1])
+  )
+  df_vr_position_general
+  
+  
+  
+  # # # General Measures of Dispersion (VR)
+  df_vr_dispersion_general <- data.frame(
+    "range" = max(minibase[,1]) - min(minibase[,1]),
+    "variance" = var(minibase[,1]),
+    "standard_deviation" = sd(minibase[,1]),
+    "standard_error" = sd(minibase[,1])/(sqrt(length(minibase[,1]))),
+    "n" = length(minibase[,1])
+  )
+  df_vr_dispersion_general
+  
+  
+  
+  
+  
+  # # # # # Section 11 - Partitioned Measures (Residuals)-------------------------
+  # # # Partitioned Measures of Position (residuals)
+  df_residuals_position_levels <- data.frame(
+    "order" = 1:nlevels(minibase_mod[,2]),
+    "level" = levels(minibase_mod[,2]),
+    "min" = tapply(minibase_mod$residuals, minibase_mod[,2], min),
+    "mean" = tapply(minibase_mod$residuals, minibase_mod[,2], mean),
+    "median" = tapply(minibase_mod$residuals, minibase_mod[,2], median),
+    "max" = tapply(minibase_mod$residuals, minibase_mod[,2], max),
+    "n" = tapply(minibase_mod$residuals, minibase_mod[,2], length)
+  )
+  df_residuals_position_levels
+  
+  
+  
+  # # # Partitioned Measures of Dispersion (residuals)
+  df_residual_dispersion_levels <- data.frame(
+    "order" = 1:nlevels(minibase_mod[,2]),
+    "level" = levels(minibase_mod[,2]),
+    "range" = tapply(minibase_mod$residuals, minibase_mod[,2], function(x){max(x) - min(x)}),
+    "variance" = tapply(minibase_mod$residuals, minibase_mod[,2], var),
+    "standard_deviation" = tapply(minibase_mod$residuals, minibase_mod[,2], sd),
+    "standard_error" = tapply(minibase_mod$residuals, minibase_mod[,2], function(x){sd(x)/sqrt(length(x))}),
+    "n" = tapply(minibase_mod$residuals, minibase_mod[,2], length)
+  )
+  df_residual_dispersion_levels
+  
+  
+  
+  # # # General Measures of Position (residuals)
+  df_residuals_position_general <- data.frame(
+    "min" = min(minibase_mod$residuals),
+    "mean" = mean(minibase_mod$residuals),
+    "median" = median(minibase_mod$residuals),
+    "max" = max(minibase_mod$residuals),
+    "n" = length(minibase_mod$residuals)
+  )
+  df_residuals_position_general
+  
+  
+  
+  # # # General Measures of Dispersion (residuals)
+  df_residuals_dispersion_general <- data.frame(
+    "range" = max(minibase_mod$residuals) - min(minibase_mod$residuals),
+    "variance" = var(minibase_mod$residuals),
+    "standard_deviation" = sd(minibase_mod$residuals),
+    "standard_error" = sd(minibase_mod$residuals)/(sqrt(length(minibase_mod$residuals))),
+    "n" = length(minibase_mod$residuals)
+  )
+  df_residuals_dispersion_general
+  
+  
+  
+  
+  
+  # # # # # Section 12 - Model estimators ----------------------------------------
+  # # # Means for each level
+  vector_est_mu_i <- df_vr_position_levels$mean
+  vector_est_mu_i
+  
+  
+  
+  # # # Mean of means
+  est_mu <- mean(vector_est_mu_i)
+  vector_est_mu <- rep(est_mu, length(vector_est_mu_i))
+  vector_est_mu
+  
+  
+  
+  # # # Tau efects
+  vector_est_tau_i <- vector_est_mu_i - vector_est_mu
+  vector_est_tau_i
+  
+  
+  
+  # # # Sum of tau efects
+  sum_est_tau_i <- sum(vector_est_tau_i)
+  sum_est_tau_i
+  
+  
+  
+  # # # Long model information on dataframe
+  df_anova1way_model_long <- data.frame(
+    "order" = df_factor_info$order,
+    "level" = df_factor_info$level,
+    "n" = df_factor_info$n,
+    "est_mu" = vector_est_mu,
+    "est_tau_i" = vector_est_tau_i
+  )
+  df_anova1way_model_long
+  
+  
+  
+  # # # Short model information on dataframe
+  df_anova1way_model_short <- data.frame(
+    "order" = df_factor_info$order,
+    "level" = df_factor_info$level,
+    "n" = df_factor_info$n,
+    "est_mu_i" = vector_est_mu_i
+  )
+  df_anova1way_model_short
+  
+  
+  
+  
+  
+  # # # # # Section 13 - Special table to plots ----------------------------------
+  
+  # # # Table for plot001
+  df_table_factor_plot001 <- data.frame(
+    "order" = df_factor_info$order,
+    "level" = df_factor_info$level,
+    "n" = df_factor_info$n,
+    "mean" = tapply(minibase[,1], minibase[,2], mean),
+    "min" = tapply(minibase[,1], minibase[,2], min),
+    "max" = tapply(minibase[,1], minibase[,2], max),
+    "sd" = tapply(minibase[,1], minibase[,2], sd),
+    "var" = tapply(minibase[,1], minibase[,2], var)
+  )
+  
+  df_table_factor_plot002 <- data.frame(
+    "order" = df_factor_info$order,
+    "level" = df_factor_info$level,
+    "n" = df_factor_info$n,
+    "mean" = tapply(minibase[,1], minibase[,2], mean),
+    "model_error_sd" = df_model_error$model_error_sd
+  )
+  df_table_factor_plot002["lower_limit"] <- df_table_factor_plot002$mean - df_table_factor_plot002$model_error_sd
+  df_table_factor_plot002["upper_limmit"] <- df_table_factor_plot002$mean + df_table_factor_plot002$model_error_sd
+  df_table_factor_plot002["color"] <- df_factor_info$color
+  df_table_factor_plot002
+  
+  
+  
+  df_table_factor_plot003 <- data.frame(
+    "order" = df_factor_info$order,
+    "level" = df_factor_info$level,
+    "n" = df_factor_info$n,
+    "mean" = tapply(minibase[,1], minibase[,2], mean),
+    "model_error_se" = df_model_error$model_error_se
+  )
+  df_table_factor_plot003["lower_limit"] <- df_table_factor_plot003$mean - df_table_factor_plot003$model_error_se
+  df_table_factor_plot003["upper_limmit"] <- df_table_factor_plot003$mean + df_table_factor_plot003$model_error_se
+  df_table_factor_plot003["color"] <- df_factor_info$color
+  df_table_factor_plot003
+  
+  
+  
+  # # # Table for plot004
+  df_table_factor_plot004 <- df_vr_position_levels
+  df_table_factor_plot004["color"] <- df_factor_info$color
+  
+  # # # Table for plot005
+  df_table_factor_plot005 <- df_table_factor_plot004
+  
+  # # # Table for plot006
+  df_table_factor_plot006 <- df_table_factor_plot004
+  
+  
+  df_table_factor_plot007 <- df_table_factor_plot003
+  correct_pos_letters <- order(df_tukey_table$level)
+  vector_letters <- df_tukey_table$group[correct_pos_letters]
+  df_table_factor_plot007["group"] <- vector_letters
+  
+  # # # Table for plot006
+  df_table_residuals_plot001 <- data.frame(
+    "order" = 1:nlevels(minibase_mod[,2]),
+    "level" = levels(minibase_mod[,2]),
+    "n" = tapply(minibase_mod$residuals, minibase_mod[,2], length),
+    "min" = tapply(minibase_mod$residuals, minibase_mod[,2], min),
+    "mean" = tapply(minibase_mod$residuals, minibase_mod[,2], mean),
+    "max" = tapply(minibase_mod$residuals, minibase_mod[,2], max),
+    "var" = tapply(minibase_mod$residuals, minibase_mod[,2], var),
+    "sd" = tapply(minibase_mod$residuals, minibase_mod[,2], sd),
+    "color" = df_factor_info$color
+  )
+  df_table_residuals_plot001
+  
+  # # # Table for plot006
+  df_table_residuals_plot002 <- df_table_residuals_plot001
+  
+  # # # Table for plot006
+  df_table_residuals_plot003 <- df_table_residuals_plot001
+  
+  # # # Table for plot006
+  df_table_residuals_plot004 <- data.frame(
+    "variable" = "residuals",
+    "n" = length(minibase_mod$residuals),
+    "min" = min(minibase_mod$residuals),
+    "mean" = mean(minibase_mod$residuals),
+    "max" = max(minibase_mod$residuals),
+    "var" = var(minibase_mod$residuals),
+    "sd" = sd(minibase_mod$residuals),
+    "model_error_var" = model_error_var,
+    "model_error_sd" = model_error_sd
+  )
+  
+  # # # Table for plot006
+  df_table_residuals_plot005  <- df_table_residuals_plot004
+  
+  # # # Table for plot006
+  df_table_residuals_plot006 <- data.frame(
+    "order" = 1:nlevels(minibase_mod[,2]),
+    "level" = levels(minibase_mod[,2]),
+    "n" = tapply(minibase_mod$studres, minibase_mod[,2], length),
+    "min" = tapply(minibase_mod$studres, minibase_mod[,2], min),
+    "mean" = tapply(minibase_mod$studres, minibase_mod[,2], mean),
+    "max" = tapply(minibase_mod$studres, minibase_mod[,2], max),
+    "var" = tapply(minibase_mod$studres, minibase_mod[,2], var),
+    "sd" = tapply(minibase_mod$studres, minibase_mod[,2], sd),
+    "color" = df_factor_info$color
+  )
+  
+  
+  # # # Table for plot006
+  df_table_residuals_plot007 <- df_table_residuals_plot006
+  
+  
+  df_table_residuals_plot008 <- data.frame(
+    "variable" = "studres",
+    "n" = length(minibase_mod$studres),
+    "min" = min(minibase_mod$studres),
+    "mean" = mean(minibase_mod$studres),
+    "max" = max(minibase_mod$studres),
+    "var" = var(minibase_mod$studres),
+    "sd" = sd(minibase_mod$studres)
+  )
+  
+  
+  df_table_residuals_plot009 <- df_table_residuals_plot008
+  
+  df_table_residuals_plot010 <- df_table_residuals_plot008
+  
+  #############################################################
+  # # # Create a new plot...
+  plot001_factor <- plotly::plot_ly()
+  
+  # # # Plot001 - Scatter plot for VR and FACTOR on minibase_mod *****************
+  plot001_factor <- plotly::add_trace(p = plot001_factor,
+                                      type = "scatter",
+                                      mode = "markers",
+                                      x = minibase_mod$FACTOR,
+                                      y = minibase_mod$VR,
+                                      color = minibase_mod$FACTOR,
+                                      colors = df_factor_info$color,
+                                      marker = list(size = 15, opacity = 0.7))
+  
+  # # # Title and settings...
+  plot001_factor <-   plotly::layout(p = plot001_factor,
+                                     title = "Plot 001 - Scatterplot",
+                                     font = list(size = 20),
+                                     margin = list(t = 100))
+  
+  
+  # # # Without zerolines
+  plot001_factor <-   plotly::layout(p = plot001_factor,
+                                     xaxis = list(zeroline = FALSE),
+                                     yaxis = list(zeroline = FALSE))
+  
+  
+  # # # Plot output
+  plot001_factor
+  
+  
+  ##############################################################################
+  
+  # # # Create a new plot...
+  plot002_factor <- plot_ly()
+  
+  
+  # # # Adding errors...
+  plot002_factor <-   add_trace(p = plot002_factor,
+                                type = "scatter",
+                                mode = "markers",
+                                x = df_table_factor_plot002$level,
+                                y = df_table_factor_plot002$mean,
+                                color = df_table_factor_plot002$level,
+                                colors = df_table_factor_plot002$color,
+                                marker = list(symbol = "line-ew-open",
+                                              size = 50,
+                                              opacity = 1,
+                                              line = list(width = 5)),
+                                error_y = list(type = "data", array = df_table_factor_plot002$model_error_sd)
+  )
+  
+  
+  # # # Title and settings...
+  plot002_factor <- plotly::layout(p = plot002_factor,
+                                   title = "Plot 002 - Mean and model standard deviation",
+                                   font = list(size = 20),
+                                   margin = list(t = 100))
+  
+  # # # Without zerolines
+  plot002_factor <-plotly::layout(p = plot002_factor,
+                                  xaxis = list(zeroline = FALSE),
+                                  yaxis = list(zeroline = FALSE))
+  
+  # # # Plot output
+  plot002_factor
+  
+  ##############################################################################
+  
+  
+  # # # Create a new plot...
+  plot003_factor <- plotly::plot_ly()
+  
+  
+  # # # Adding errors...
+  plot003_factor <-   plotly::add_trace(p = plot003_factor,
+                                        type = "scatter",
+                                        mode = "markers",
+                                        x = df_table_factor_plot003$level,
+                                        y = df_table_factor_plot003$mean,
+                                        color = df_table_factor_plot003$level,
+                                        colors = df_table_factor_plot003$color,
+                                        marker = list(symbol = "line-ew-open",
+                                                      size = 50,
+                                                      opacity = 1,
+                                                      line = list(width = 5)),
+                                        error_y = list(type = "data", array = df_table_factor_plot003$model_error_se)
+  )
+  
+  
+  # # # Title and settings...
+  plot003_factor <- plotly::layout(p = plot003_factor,
+                                   title = "Plot 003 - Mean y model standard error",
+                                   font = list(size = 20),
+                                   margin = list(t = 100))
+  
+  # # # Without zerolines
+  plot003_factor <-plotly::layout(p = plot003_factor,
+                                  xaxis = list(zeroline = FALSE),
+                                  yaxis = list(zeroline = FALSE))
+  
+  # # # Plot output
+  plot003_factor
+  
+  ##############################################################################
+  
+  
+  # # # New plotly...
+  plot004_factor <- plotly::plot_ly()
+  
+  # # # Boxplot and info...
+  plot004_factor <- plotly::add_trace(p = plot004_factor,
+                                      type = "box",
+                                      x = df_table_factor_plot004$level ,
+                                      color = df_table_factor_plot004$level,
+                                      colors = df_table_factor_plot004$color,
+                                      lowerfence = df_table_factor_plot004$min,
+                                      q1 = df_table_factor_plot004$Q1,
+                                      median = df_table_factor_plot004$median,
+                                      q3 = df_table_factor_plot004$Q3,
+                                      upperfence = df_table_factor_plot004$max,
+                                      boxmean = TRUE,
+                                      boxpoints = FALSE,
+                                      line = list(color = "black", width = 3)
+  )
+  
+  # # # Title and settings...
+  plot004_factor <- plotly::layout(p = plot004_factor,
+                                   title = "Plot 004 - Boxplot and means",
+                                   font = list(size = 20),
+                                   margin = list(t = 100))
+  
+  
+  # # # Without zerolines...
+  plot004_factor <- plotly::layout(p = plot004_factor,
+                                   xaxis = list(zeroline = FALSE),
+                                   yaxis = list(zeroline = FALSE))
+  
+  # # # Output plot004_anova...
+  plot004_factor
+  
+  ##############################################################################
+  
+  all_levels <- levels(minibase_mod[,2])
+  n_levels <- length(all_levels)
+  all_color <- rainbow(length(all_levels))
+  
+  
+  
+  plot005_factor <- plot_ly()
+  
+  # Violinplot
+  for (k in 1:n_levels){
+    
+    # Selected values
+    selected_level <- all_levels[k]
+    selected_color <- all_color[k]
+    dt_filas <- minibase_mod[,2] == selected_level
+    
+    # Plotting selected violinplot
+    plot005_factor <- plot005_factor %>%
+      add_trace(x = minibase_mod[,2][dt_filas],
+                y = minibase_mod[,1][dt_filas],
+                type = "violin",
+                name = paste0("violin", k),
+                points = "all",
+                marker = list(color = selected_color),
+                line = list(color = selected_color),
+                fillcolor = I(selected_color)
+                
+      )
+    
+    
+  }
+  
+  
+  
+  
+  # Boxplot
+  plot005_factor <- plotly::add_trace(p = plot005_factor,
+                                      type = "box",
+                                      name = "boxplot",
+                                      x = df_table_factor_plot005$level ,
+                                      color = df_table_factor_plot005$level ,
+                                      lowerfence = df_table_factor_plot005$min,
+                                      q1 = df_table_factor_plot005$Q1,
+                                      median = df_table_factor_plot005$median,
+                                      q3 = df_table_factor_plot005$Q3,
+                                      upperfence = df_table_factor_plot005$max,
+                                      boxmean = TRUE,
+                                      boxpoints = TRUE,
+                                      fillcolor = df_table_factor_plot005$color,
+                                      line = list(color = "black", width = 3),
+                                      opacity = 0.5,
+                                      width = 0.2)
+  
+  
+  # # # Title and settings...
+  plot005_factor <- plotly::layout(p = plot005_factor,
+                                   title = "Plot 005 - Violinplot",
+                                   font = list(size = 20),
+                                   margin = list(t = 100))
+  
+  
+  # # # Without zerolines...
+  plot005_factor <- plotly::layout(p = plot005_factor,
+                                   xaxis = list(zeroline = FALSE),
+                                   yaxis = list(zeroline = FALSE))
+  
+  # # # Output plot003_anova...
+  plot005_factor
+  
+  ##############################################################################
+  
+  
+  #library(plotly)
+  plot006_factor <- plotly::plot_ly()
+  
+  # Add traces
+  plot006_factor <- plotly::add_trace(p = plot006_factor,
+                                      type = "violin",
+                                      y = minibase_mod$VR,
+                                      x = minibase_mod$FACTOR,
+                                      showlegend = TRUE,
+                                      side = "positive",
+                                      points = "all",
+                                      name = "Violinplot",
+                                      color = minibase_mod$FACTOR,
+                                      colors = df_table_factor_plot006$color)
+  
+  
+  
+  # # # Title and settings...
+  plot006_factor <- plotly::layout(p = plot006_factor,
+                                   title = "Plot 006 - Scatterplot + Jitter +  Smoothed",
+                                   font = list(size = 20),
+                                   margin = list(t = 100))
+  
+  
+  # # # Without zerolines...
+  plot006_factor <- plotly::layout(p = plot006_factor,
+                                   xaxis = list(zeroline = FALSE),
+                                   yaxis = list(zeroline = FALSE))
+  
+  # # # Output plot003_anova...
+  plot006_factor
+  
+  ##############################################################################
+  
+  # # # Create a new plot...
+  plot007_factor <- plotly::plot_ly()
+  
+  
+  # # # Adding errors...
+  plot007_factor <-   plotly::add_trace(p = plot007_factor,
+                                        type = "scatter",
+                                        mode = "markers",
+                                        x = df_table_factor_plot007$level,
+                                        y = df_table_factor_plot007$mean,
+                                        color = df_table_factor_plot007$level,
+                                        colors = df_table_factor_plot007$color,
+                                        marker = list(symbol = "line-ew-open",
+                                                      size = 50,
+                                                      opacity = 1,
+                                                      line = list(width = 5)),
+                                        error_y = list(type = "data", array = df_table_factor_plot007$model_error_se)
+  )
+  
+  
+  
+  plot007_factor <-  add_text(p = plot007_factor,
+                              x = df_table_factor_plot007$level,
+                              y = df_table_factor_plot007$mean,
+                              text = df_table_factor_plot007$group, name = "Tukey Group",
+                              size = 20)
+  
+  # # # Title and settings...
+  plot007_factor <- plotly::layout(p = plot007_factor,
+                                   title = "Plot 007 - Mean y model standard error",
+                                   font = list(size = 20),
+                                   margin = list(t = 100))
+  
+  # # # Without zerolines
+  plot007_factor <-plotly::layout(p = plot007_factor,
+                                  xaxis = list(zeroline = FALSE),
+                                  yaxis = list(zeroline = FALSE))
+  
+  
+  # # # Plot output
+  plot007_factor
+  
+  
+  
+  # Capturar todos los objetos del entorno actual
+  ._obj_names <- ls()
+  
+  # Filtrar para excluir los parámetros de la función
+  ._obj_to_keep <- setdiff(._obj_names, names(formals(sys.function())))
+  
+  # Crear una lista con los objetos (excluyendo parámetros)
+  ._result_list <- mget(._obj_to_keep)
+  
+  # Devolver la lista ordenada según su definición
+  return(._result_list)
+  
+}
+
