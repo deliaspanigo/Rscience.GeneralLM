@@ -38,6 +38,7 @@ MASTER_module_fixed_anova_1_way_ui <- function(id) {
     ),
    
     uiOutput(ns("info_text2")),
+    uiOutput(ns("la_botonera")),
     uiOutput(ns("mega_tabs")), br(),
     uiOutput(ns("show_dev_full")),
     
@@ -116,6 +117,10 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     Sbutton_reset_server("reset_button", valores_default, valores_internos, valores_activos, reset_callbacks)
     
     ############################################################################
+    
+    
+    
+    ############################################################################
     # R
     mis_valores <- reactive({
       
@@ -134,33 +139,9 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
       the_results
       
     })
-    ############################################################################
+    function_code <- GeneralLM_fix_anova1_take_code(str_fn_name="GeneralLM_fix_anova1_RCode")
     
-    ##############################################################################
-    
-    vector_output_title <- c("render" = "renderPrint", "output" = "verbatimTextOutput")
-    vector_output_verbatim <- c("render" = "renderPrint", "output" = "verbatimTextOutput")
-    vector_info <- list("title" = NA, "objects" = NA)
-    
-    list_vec01 <- list()
-    list_vec01[[1]] <- list("title" = "1) References", "objects" = c("df_selected_vars"))
-    list_vec01[[2]] <- list("title" = "2) Factor resumen", "objects" = c("df_factor_info", "check_unbalanced_reps"))
-    list_vec01[[3]] <- list("title" = "3) Anova 1 way - Table", "objects" = c("df_table_anova"))
-    list_vec01[[4]] <- list("title" = "4) Multiple comparation test (Tukey)", "objects" = c("df_tukey_table"))
-    list_vec01[[5]] <- list("title" = "5) Model Error", "objects" = c("df_model_error"))
-    # Crear los outputs
-    
-    list_vec02 <- list()
-    list_vec02[[1]] <- list("title" = "1) Requeriment - Normaility test - Residuals", 
-                            "objects" = c("test_residuals_normality"))
-    
-    list_vec02[[2]] <- list("title" = "2) Requeriment - Homogeneity test - Residuals", 
-                            "objects" = c("test_residuals_homogeneity"))
-    list_vec02[[3]] <- list("title" = "3) Estimated variances - Residuals", 
-                            "objects" = c("df_residuals_variance_levels"))
-    
-    # Función para crear outputs dinámicos
-    crear_outputs_y_ui <- function(list_objetos, prefix, mis_valores_reactive, output, ns) {
+    crear_outputs_y_ui  <- function(list_objetos, prefix, mis_valores_reactive, output, ns) {
       # Crea los outputs en bucle, en ámbitos independientes para evitar sobrescrituras
       for (i in seq_along(list_objetos)) {
         id_output <- paste0(prefix, i)
@@ -190,91 +171,6 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
       
       return(do.call(tagList, ui_list))
     }
-    
-    
-    # Llamas a la función en tu server:
-    output$dynamic_tab01_ui <- renderUI({
-      req(mis_valores())
-      crear_outputs_y_ui(list_vec01, "render_tab01_", mis_valores, output, ns)
-    })
-    output$dynamic_tab02_ui <- renderUI({
-      req(mis_valores())
-      crear_outputs_y_ui(list_vec02, "render_tab02_", mis_valores, output, ns)
-    })
-    ##############################################################################
-    
-    
-    list_vec03 <- list()
-    list_vec03[[1]] <- list("title" = "", 
-                            "table" = "df_table_factor_plot001",
-                            "plot"  = "plot001_factor")
-    
-    list_vec03[[2]] <- list("title" = "", 
-                            "table" = "df_table_factor_plot002",
-                            "plot"  = "plot002_factor")
-    
-    list_vec03[[3]] <- list("title" = "", 
-                            "table" = "df_table_factor_plot003",
-                            "plot"  = "plot003_factor")
-    
-    list_vec03[[4]] <- list("title" = "", 
-                            "table" = "df_table_factor_plot004",
-                            "plot"  = "plot004_factor")
-    
-    list_vec03[[5]] <- list("title" = "", 
-                            "table" = "df_table_factor_plot005",
-                            "plot"  = "")
-    
-    list_vec03[[6]] <- list("title" = "", 
-                            "table" = "df_table_factor_plot006",
-                            "plot"  = "plot005_factor")
-    
-    list_vec03[[7]] <- list("title" = "", 
-                            "table" = "df_table_factor_plot007",
-                            "plot"  = "plot005_factor")
-    
-    ##############################################################################
-    
-    list_vec04 <- list()
-    list_vec04[[1]] <- list("title" = "", 
-                            "table" = "df_table_residuals_plot001",
-                            "plot"  = "plot001_residuals")
-    
-    list_vec04[[2]] <- list("title" = "", 
-                            "table" = "df_table_residuals_plot002",
-                            "plot"  = "plot002_residuals")
-    
-    list_vec04[[3]] <- list("title" = "", 
-                            "table" = "df_table_residuals_plot003",
-                            "plot"  = "plot003_residuals")
-    
-    list_vec04[[4]] <- list("title" = "", 
-                            "table" = "df_table_residuals_plot004",
-                            "plot"  = "plot004_residuals")
-    
-    list_vec04[[5]] <- list("title" = "", 
-                            "table" = "df_table_residuals_plot005",
-                            "plot"  = "plot005_residuals")
-    
-    list_vec04[[6]] <- list("title" = "", 
-                            "table" = "df_table_residuals_plot006",
-                            "plot"  = "plot006_residuals")
-    
-    list_vec04[[7]] <- list("title" = "", 
-                            "table" = "df_table_residuals_plot007",
-                            "plot"  = "plot007_residuals")
-    
-    list_vec04[[8]] <- list("title" = "", 
-                            "table" = "df_table_residuals_plot008",
-                            "plot"  = "plot008_residuals")
-    
-    list_vec04[[9]] <- list("title" = "", 
-                            "table" = "df_table_residuals_plot009",
-                            "plot"  = "plot009_residuals")
-    
-    list_vec04[[10]] <- list("title" = "", 
-                             "table" = "df_table_residuals_plot010",
-                             "plot"  = "plot010_residuals")
     
     crear_outputs_y_ui2 <- function(list_objetos, prefix, mis_valores_reactive, output, ns) {
       # Crear los outputs en ámbitos independientes
@@ -321,66 +217,220 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
       return(do.call(tagList, ui_list))
     }
     
+    ############################################################################
     
     
+    
+    botones_info <- list(
+      list(id = "boton_1", label = "Summary", class = "btn-primary"),
+      list(id = "boton_2", label = "Full Analysis", class = "btn-secondary"),
+      list(id = "boton_3", label = "Descriptive Statistics", class = "btn-success"),
+      list(id = "boton_4", label = "Script", class = "btn-danger"),
+      list(id = "boton_5", label = "Download", class = "btn-warning"),
+      list(id = "boton_6", label = "Hypotheses", class = "btn-info"),
+      list(id = "boton_7", label = "Theoretical Framework", class = "btn-light"),
+      list(id = "boton_8", label = "Bibliography", class = "btn-dark"),
+      list(id = "boton_9", label = "Stock", class = NULL),
+      list(id = "boton_10", label = "Catastrophic Errors", class = "btn-outline-primary"),
+      list(id = "boton_11", label = "Possible Cases", class = "btn-outline-primary"),
+      list(id = "boton_12", label = "Analysis Structure", class = "btn-outline-primary")
+    )
+    
+     # Generar los botones dinámicamente
+    output$botones_dinamicos <- renderUI({
+      # Crear una lista para almacenar los botones
+      lista_botones <- lapply(seq_along(botones_info), function(i) {
+        boton <- botones_info[[i]]
+        
+        # Obtener atributos del botón
+        nombre_interno <- boton$id
+        nombre_visible <- boton$label
+        clase <- boton$class
+        
+        # Crear el botón con los atributos correspondientes
+        # Incluir la clase si está definida
+        if (!is.null(clase)) {
+          actionButton(
+            inputId = ns(nombre_interno), 
+            label = nombre_visible,
+            class = clase
+          )
+        } else {
+          actionButton(
+            inputId = ns(nombre_interno), 
+            label = nombre_visible
+          )
+        }
+      })
+      # Organizar los botones en filas
+      div(
+        style = "display: flex; flex-wrap: wrap; gap: 10px;",
+        lista_botones
+      )
+    })
+    
+    # Detectar qué botón se ha pulsado y mostrar mensaje
+    observe({
+      for (boton in botones_info) {
+        nombre_interno <- boton$id
+        
+        if (!is.null(input[[nombre_interno]])) {
+          # Usar local para capturar el valor correcto en cada iteración
+          local({
+            local_boton <- boton
+            
+            observeEvent(input[[local_boton$id]], {
+              output$resultado <- renderText({
+                paste("Se ha pulsado el botón:", local_boton$label, 
+                      "(ID interno:", local_boton$id, ")",
+                      "- Clase:", ifelse(is.null(local_boton$class), "ninguna", local_boton$class),
+                      "- Número de clics:", input[[local_boton$id]])
+              })
+            })
+          })
+        }
+      }
+    })
+    
+    button_info <- reactive({
+      # Aquí puedes devolver información sobre botones presionados si lo necesitas
+      lapply(botones_info, function(id) input[[id]])
+    })
+    
+    
+    
+    output$la_botonera <- renderUI({
+      div(
+        card(
+          card_header("Resultado"),
+          uiOutput(ns("botones_dinamicos")),
+          textOutput(ns("resultado"))
+        )
+      )
+    })
+    ############################################################################
+    
+    
+    # Tab01 - Analysis
+    output$dynamic_tab01_ui <- renderUI({
+      req(mis_valores())
+      crear_outputs_y_ui(list_vec01, "render_tab01_", mis_valores, output, ns)
+    })
+    list_vec01 <- list()
+    list_vec01[[1]] <- list("title" = "1) References", "objects" = c("df_selected_vars"))
+    list_vec01[[2]] <- list("title" = "2) Factor resumen", "objects" = c("df_factor_info", "check_unbalanced_reps"))
+    list_vec01[[3]] <- list("title" = "3) Anova 1 way - Table", "objects" = c("df_table_anova"))
+    list_vec01[[4]] <- list("title" = "4) Multiple comparation test (Tukey)", "objects" = c("df_tukey_table"))
+    list_vec01[[5]] <- list("title" = "5) Model Error", "objects" = c("df_model_error"))
+
+    ############################################################################
+    
+    # Tab02 - Requeriments
+    list_vec02 <- list()
+    list_vec02[[1]] <- list("title" = "1) Requeriment - Normaility test - Residuals", 
+                            "objects" = c("test_residuals_normality"))
+    
+    list_vec02[[2]] <- list("title" = "2) Requeriment - Homogeneity test - Residuals", 
+                            "objects" = c("test_residuals_homogeneity"))
+    list_vec02[[3]] <- list("title" = "3) Estimated variances - Residuals", 
+                            "objects" = c("df_residuals_variance_levels"))
+    
+
+    output$dynamic_tab02_ui <- renderUI({
+      req(mis_valores())
+      crear_outputs_y_ui(list_vec02, "render_tab02_", mis_valores, output, ns)
+    })
+    ##############################################################################
+    
+    # Tab03 - Plots - Raw Data
+    list_vec03 <- list()
+    list_vec03[[1]] <- list("title" = "", 
+                            "table" = "df_table_factor_plot001",
+                            "plot"  = "plot001_factor")
+    
+    list_vec03[[2]] <- list("title" = "", 
+                            "table" = "df_table_factor_plot002",
+                            "plot"  = "plot002_factor")
+    
+    list_vec03[[3]] <- list("title" = "", 
+                            "table" = "df_table_factor_plot003",
+                            "plot"  = "plot003_factor")
+    
+    list_vec03[[4]] <- list("title" = "", 
+                            "table" = "df_table_factor_plot004",
+                            "plot"  = "plot004_factor")
+    
+    list_vec03[[5]] <- list("title" = "", 
+                            "table" = "df_table_factor_plot005",
+                            "plot"  = "")
+    
+    list_vec03[[6]] <- list("title" = "", 
+                            "table" = "df_table_factor_plot006",
+                            "plot"  = "plot005_factor")
+    
+    list_vec03[[7]] <- list("title" = "", 
+                            "table" = "df_table_factor_plot007",
+                            "plot"  = "plot005_factor")
     
     output$dynamic_tab03_ui <- renderUI({
       req(mis_valores())
       
       crear_outputs_y_ui2(list_vec03, "render_tab03_", mis_valores, output, ns)
     })
+    ##############################################################################
+    
+    # Tab04 - Plots - Residuals
+    list_vec04 <- list()
+    list_vec04[[1]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot001",
+                            "plot"  = "plot001_residuals")
+    
+    list_vec04[[2]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot002",
+                            "plot"  = "plot002_residuals")
+    
+    list_vec04[[3]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot003",
+                            "plot"  = "plot003_residuals")
+    
+    list_vec04[[4]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot004",
+                            "plot"  = "plot004_residuals")
+    
+    list_vec04[[5]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot005",
+                            "plot"  = "plot005_residuals")
+    
+    list_vec04[[6]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot006",
+                            "plot"  = "plot006_residuals")
+    
+    list_vec04[[7]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot007",
+                            "plot"  = "plot007_residuals")
+    
+    list_vec04[[8]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot008",
+                            "plot"  = "plot008_residuals")
+    
+    list_vec04[[9]] <- list("title" = "", 
+                            "table" = "df_table_residuals_plot009",
+                            "plot"  = "plot009_residuals")
+    
+    list_vec04[[10]] <- list("title" = "", 
+                             "table" = "df_table_residuals_plot010",
+                             "plot"  = "plot010_residuals")
+    
     output$dynamic_tab04_ui <- renderUI({
       req(mis_valores())
       
       crear_outputs_y_ui2(list_vec03, "render_tab04_", mis_valores, output, ns)
     })
+    ##############################################################################
     
-    
-    output$menu01 <- renderUI({
-      req(mis_valores())
-    
-      vector_editor_values <- c("xcode", "monokai", "github", "eclipse", "tomorrow", 
-                                "solarized_light", "solarized_dark", "textmate", "twilight")
-      
-      selected_pos <- 1
-      
-      card(
-        card_header("Editor Options"),
-        card_body(
-          fluidRow(
-            column(3,     
-               selectInput(ns("theme"), "Editor Theme:", 
-                          choices = vector_editor_values,
-                        selected = vector_editor_values[selected_pos])
-               ),
-            column(3, 
-                sliderInput(ns("fontSize"), "Font Size:", min = 8, max = 24, value = 14, step = 1)
-                ),
-            #column(3, actionButton(ns("copy_btn"), "Copiar código", icon = icon("copy"))),
-            column(3, downloadButton(ns("download_btn"), "Descargar como .R", icon = icon("download")))
-            
-          ),
-          uiOutput(ns("dynamic_tab05_ui"))
-        )
-        )
-    })
-    
-    function_code <- GeneralLM_fix_anova1_take_code(str_fn_name="GeneralLM_fix_anova1_RCode")
-    
-    
-    
-    # Función para descargar el código como archivo .R
-    output$download_btn <- downloadHandler(
-      filename = function() {
-        "code_generalLM_fixed_anova_1way.R"
-      },
-      content = function(file) {
-        writeLines(function_code, file)
-      }
-    )
-  
-  
-    output$dynamic_tab05_ui <- renderUI({
+    # Tab05 - RCode
+
+    output$shiny_ace_editor <- renderUI({
       req(mis_valores())
       
       #function_code <- GeneralLM_fix_anova1_take_code(my_fn=GeneralLM_fix_anova1_RCode)
@@ -417,15 +467,72 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
       
     })
     
+    # Función para descargar el código como archivo .R
+    output$download_btn <- downloadHandler(
+      filename = function() {
+        "code_generalLM_fixed_anova_1way.R"
+      },
+      content = function(file) {
+        writeLines(function_code, file)
+      }
+    )
+  
+    
+    output$dynamic_tab05_ui <- renderUI({
+      req(mis_valores())
+      
+      vector_editor_values <- c("xcode", "monokai", "github", "eclipse", "tomorrow", 
+                                "solarized_light", "solarized_dark", "textmate", "twilight")
+      
+      selected_pos <- 1
+      
+      card(
+        card_header("Editor Options"),
+        card_body(
+          fluidRow(
+            column(3,     
+                   selectInput(ns("theme"), "Editor Theme:", 
+                               choices = vector_editor_values,
+                               selected = vector_editor_values[selected_pos])
+            ),
+            column(3, 
+                   sliderInput(ns("fontSize"), "Font Size:", min = 8, max = 24, value = 14, step = 1)
+            ),
+            #column(3, actionButton(ns("copy_btn"), "Copiar código", icon = icon("copy"))),
+            column(3, downloadButton(ns("download_btn"), "Descargar como .R", icon = icon("download")))
+            
+          ),
+          uiOutput(ns("shiny_ace_editor"))
+        )
+      )
+    })
+    
+    ############################################################################
+    
+    # Tab06 - Quarto
+    the_quarto_file <- reactive({
+      req(mis_valores())
+      GeneralLM_fix_anova1_quarto_file_path()
+      })
+    
+    module_quartoRenderer_server(id="quarto_doc", documento = the_quarto_file())
+    
+    output$dynamic_tab06_ui <- renderUI({
+      req(mis_valores())
+      module_quartoRenderer_ui(id=ns("quarto_doc"))
+    })
+    
+    ############################################################################
     output$mega_tabs <- renderUI({
       req(mis_valores())
       
       tabsetPanel(
-        tabPanel(title = "Analysis", uiOutput(ns("dynamic_tab01_ui"))),
-        tabPanel(title = "Requeriments", uiOutput(ns("dynamic_tab02_ui"))),
-        tabPanel(title = "Plots - Raw Data", uiOutput(ns("dynamic_tab03_ui"))),
+        tabPanel(title = "Analysis",          uiOutput(ns("dynamic_tab01_ui"))),
+        tabPanel(title = "Requeriments",      uiOutput(ns("dynamic_tab02_ui"))),
+        tabPanel(title = "Plots - Raw Data",  uiOutput(ns("dynamic_tab03_ui"))),
         tabPanel(title = "Plots - Residuals", uiOutput(ns("dynamic_tab04_ui"))),
-        tabPanel(title = "RCode", uiOutput(ns("menu01"))),
+        tabPanel(title = "RCode",             uiOutput(ns("dynamic_tab05_ui"))),
+        tabPanel(title = "Quarto",            uiOutput(ns("dynamic_tab06_ui")))
       )
       
     })

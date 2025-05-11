@@ -9,6 +9,8 @@ usethis::use_package("openxlsx")
 usethis::use_package("colourpicker")
 usethis::use_package("readxl")
 usethis::use_package("shinyAce")
+usethis::use_package("quarto")
+usethis::use_package("car")
 
 usethis::use_package("dplyr")
 usethis::use_package("ggplot2")
