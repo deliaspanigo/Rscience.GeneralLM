@@ -11,57 +11,55 @@ MASTER_module_fixed_anova_1_way_ui <- function(id) {
       card_header(
         h4("Rscience", class = "btn-sidebar")
       ),
-    layout_sidebar(
-      sidebar = sidebar(
-        p("HOLA", class = "text-center fs-4 fw-bold py-4")
-      ),
-    # Encabezado con botones en una fila
-    card(
-      card_body(
+      layout_sidebar(
+        sidebar = sidebar(
+          p("HOLA", class = "text-center fs-4 fw-bold py-4"),
+          open = "closed"
+        ),
+        # Encabezado con botones en una fila
         div(
-          class = "d-flex justify-content-between mb-3", # justify-content-between para mejor distribución
-          # Div para los primeros 4 botones
+          class = "d-flex flex-wrap",
+          # Primer bloque - 3/12
           div(
-            class = "d-flex gap-5",
-            Sbutton_01_dataselector_ui(ns("dataset_selector")),
-            Sbutton_02_tools_ui(ns("selector_tools")),
-            Sbutton_03_variable_selector_ui(ns("selector_variables")),
-            Sbutton_play_ui(ns("play_button"))
+            style = "flex: 0 0 12.5%; max-width: 12.5%;",
+            uiOutput(ns("card01_botonera_inicial"))
           ),
-          # Botón reset en el extremo derecho
+          # Segundo bloque - 3/12
           div(
-            class = "ms-auto", # Este es el truco para empujar a la derecha
-            Sbutton_reset_ui(ns("reset_button"))
+            style = "flex: 0 0 25%; max-width: 25%;",
+            uiOutput(ns("card02_user_selection"))
+          ),
+          # Tercer bloque - 6/12
+          div(
+            style = "flex: 0 0 62.5%; max-width: 62.5%;",
+            uiOutput(ns("card03_botonera_output"))
           )
         )
+        ,
+        
+        uiOutput(ns("mega_tabs")), br(),
+        uiOutput(ns("show_dev_full")),
+        
+        
+        # Panel de resultados
+        card(
+          card_header("Resultados"),
+          card_body(
+            # Mensaje de estado
+            uiOutput(ns("mensaje_seleccion"))
+            # Mostrar datos simple
+            #tableOutput("tabla_datos"),
+          )
+        ),
+        
+        # Card separado para Quarto
+        div(
+          style = "margin-top: 20px; width: 100%;",
+          ""
+          # quartoRendererUI(id = "quarto_doc")
+        )
       )
-    ),
-   
-    uiOutput(ns("info_text2")),
-    uiOutput(ns("la_botonera")),
-    uiOutput(ns("mega_tabs")), br(),
-    uiOutput(ns("show_dev_full")),
-    
-    
-    # Panel de resultados
-    card(
-      card_header("Resultados"),
-      card_body(
-        # Mensaje de estado
-        uiOutput(ns("mensaje_seleccion"))
-        # Mostrar datos simple
-        #tableOutput("tabla_datos"),
-      )
-    ),
-    
-    # Card separado para Quarto
-    div(
-      style = "margin-top: 20px; width: 100%;",
-      ""
-      # quartoRendererUI(id = "quarto_doc")
     )
-  )
-  )
   )
 }
 
@@ -70,6 +68,174 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
+    
+    output$card01_botonera_inicial <- renderUI({
+      card(
+        card_header("Main menu"),
+        card_body(
+          div(
+              class = "d-flex flex-column align-items-center", # Para centrar horizontalmente
+              style = "gap: 20px;",
+              Sbutton_01_dataselector_ui(ns("dataset_selector")),
+              Sbutton_02_tools_ui(ns("selector_tools")),
+              Sbutton_03_variable_selector_ui(ns("selector_variables")),
+              Sbutton_play_ui(ns("play_button")),
+              Sbutton_reset_ui(ns("reset_button")),
+          )
+        )
+      )
+    })
+    
+    ############################################################################
+    output$tarjeta01_dataset <- renderUI({
+      valores_internos_list <- reactiveValuesToList(valores_internos)
+      req(valores_internos_list)
+      
+      req(valores_internos_list$pack_import_dataset)
+      #req(valores_internos_list$pack_import_dataset)
+      data_source <- valores_internos_list$pack_import_dataset$data_source
+      original_file_name <- valores_internos_list$pack_import_dataset$"original_file_name"
+      value_ncol <- ncol(valores_internos_list$pack_import_dataset$"database")
+      value_nrow <- nrow(valores_internos_list$pack_import_dataset$"database")
+      
+      div(
+        class = "mb-3 p-2 rounded",
+        style = "background-color: rgba(13, 110, 253, 0.05); border-left: 4px solid #0d6efd;",
+        
+        h5(class = "text-primary", icon("database", class = "me-2"), "Información de datos"),
+        
+        div(
+          div(
+            span(class = "fw-bold", "Source: "),
+            span(data_source, style = "font-family: monospace;")
+          ),
+          div(
+            span(class = "fw-bold", "File: "),
+            span(original_file_name, style = "font-family: monospace;")
+          ),
+          div(
+            span(class = "fw-bold", "Dimensiones: "),
+            span(paste0(value_nrow, " filas × ", value_ncol, " columnas"), 
+                 style = "font-family: monospace;")
+          )
+        )
+      )
+    })
+    
+    output$tarjeta02_tools <- renderUI({
+      valores_internos_list <- reactiveValuesToList(valores_internos)
+      req(valores_internos_list)
+      
+      req(valores_internos_list$pack_tool_selection)
+      selected_tool <-  valores_internos_list$pack_tool_selection$"tipo_modelo"
+      acordeon <- valores_internos_list$pack_tool_selection$acordeon
+      modelo_seleccionado <- valores_internos_list$pack_tool_selection$modelo_seleccionado
+      
+      div(
+        class = "mb-3 p-2 rounded",
+        style = "background-color: rgba(25, 135, 84, 0.05); border-left: 4px solid #198754;",
+        
+        h5(class = "text-success", icon("tools", class = "me-2"), "Modelo seleccionado"),
+        
+        div(
+          class = "d-flex flex-column",
+          div(
+            span(class = "fw-bold", "Tipo: "),
+            span(selected_tool, style = "font-family: monospace;")
+          ),
+          div(
+            span(class = "fw-bold", "Modelo: "),
+            span(modelo_seleccionado, style = "font-family: monospace;")
+          ),
+          div(
+            span(class = "fw-bold", "Panel: "),
+            span(acordeon, style = "font-family: monospace;")
+          )
+        )
+        
+      )
+      
+    })
+    
+    output$tarjeta03_vars <- renderUI({
+      valores_internos_list <- reactiveValuesToList(valores_internos)
+      req(valores_internos_list)
+      
+      req(valores_internos_list$pack_var_selection)
+      value_factor <- valores_internos_list$pack_var_selection$"factor"
+      value_rv <-     valores_internos_list$pack_var_selection$"respuesta"
+      vector_selected_vars <- valores_internos_list$pack_var_selection$"vector_selected_vars"
+      
+      div(
+        class = "p-2 rounded",
+        style = "background-color: rgba(255, 193, 7, 0.05); border-left: 4px solid #ffc107;",
+        
+        h5(class = "text-warning", icon("table-cells", class = "me-2"), "Variables seleccionadas"),
+        
+        div(class = "d-flex flex-wrap",
+            div(class = "me-4 mb-2",
+                span(class = "fw-bold", "Factor: "),
+                span(value_factor, style = "font-family: monospace;")),
+            
+            div(class = "me-4 mb-2",
+                span(class = "fw-bold", "Respuesta: "),
+                span(value_rv, style = "font-family: monospace;"))
+        ),
+        
+        div(
+          class = "mt-2",
+          span(class = "fw-bold", "Variables en el modelo: "),
+          div(
+            class = "mt-1",
+            lapply(vector_selected_vars, function(var) {
+              span(
+                class = "badge bg-light text-dark me-1 mb-1",
+                style = "border: 1px solid #dee2e6; padding: 5px;",
+                var
+              )
+            })
+          )
+        )
+      )
+      
+    })
+    
+    
+    output$card02_user_selection <- renderUI({
+      valores_internos_list <- reactiveValuesToList(valores_internos)
+      req(valores_internos_list)
+      
+      card(
+        card_header("User selection"),
+        card_body(
+          uiOutput(ns("tarjeta01_dataset")),
+          uiOutput(ns("tarjeta02_tools")),
+          uiOutput(ns("tarjeta03_vars"))
+        )
+      )
+      
+      
+      # # Contenedor principal
+      # div(
+      #   # class = "p-3 rounded shadow-sm",
+      #   # style = "background: linear-gradient(to right, #f8f9fa, #ffffff);",
+      #   
+      #   # Título principal
+      #   h4(
+      #     # class = "mb-3 pb-2",
+      #     # style = "border-bottom: 2px solid #0d6efd; color: #0d6efd;",
+      #     # icon("info-circle"), 
+      #     "Resumen de configuración"
+      #   ),
+      #  
+      #   
+      #   
+      # )
+      
+    })
+      
+      
+    ############################################################################
     # Mostrar información sobre el dataset
     my_show_dev <- TRUE 
     
@@ -132,7 +298,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
       var_name_factor <- valores_internos_list$pack_var_selection$"factor"
       var_name_vr <- valores_internos_list$pack_var_selection$"respuesta"
       alpha_value <- 0.05
-
+      
       the_results <- GeneralLM_fix_anova1_RCode(database, var_name_factor, var_name_vr, alpha_value)
       vector_order_names <- GeneralLM_fix_anova1_objects_in_order(fn = GeneralLM_fix_anova1_RCode)
       the_results <- the_results[vector_order_names]
@@ -221,52 +387,64 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     
     
     
-    botones_info <- list(
-      list(id = "boton_1", label = "Summary", class = "btn-primary"),
-      list(id = "boton_2", label = "Full Analysis", class = "btn-secondary"),
-      list(id = "boton_3", label = "Descriptive Statistics", class = "btn-success"),
-      list(id = "boton_4", label = "Script", class = "btn-danger"),
-      list(id = "boton_5", label = "Download", class = "btn-warning"),
-      list(id = "boton_6", label = "Hypotheses", class = "btn-info"),
-      list(id = "boton_7", label = "Theoretical Framework", class = "btn-light"),
-      list(id = "boton_8", label = "Bibliography", class = "btn-dark"),
-      list(id = "boton_9", label = "Stock", class = NULL),
-      list(id = "boton_10", label = "Catastrophic Errors", class = "btn-outline-primary"),
-      list(id = "boton_11", label = "Possible Cases", class = "btn-outline-primary"),
-      list(id = "boton_12", label = "Analysis Structure", class = "btn-outline-primary")
+    # Define la información de los botones con grupo y orden
+    botones_info <- list( 
+      list(id = "boton_1",  label = "Summary",                class = "btn-primary",         grupo = 1, orden = 1),
+      list(id = "boton_2",  label = "Full Analysis",          class = "btn-secondary",       grupo = 1, orden = 2),
+      list(id = "boton_3",  label = "Descriptive Statistics", class = "btn-success",         grupo = 1, orden = 3),
+      list(id = "boton_4",  label = "Script",                 class = "btn-danger",          grupo = 1, orden = 4),
+      list(id = "boton_5",  label = "Download",               class = "btn-warning",         grupo = 2, orden = 1),
+      list(id = "boton_6",  label = "Hypotheses",             class = "btn-info",            grupo = 3, orden = 1),
+      list(id = "boton_7",  label = "Theoretical Framework",  class = "btn-light",           grupo = 3, orden = 2),
+      list(id = "boton_8",  label = "Bibliography",           class = "btn-dark",            grupo = 3, orden = 3),
+      list(id = "boton_9",  label = "Stock",                  class = NULL,                  grupo = 3, orden = 4),
+      list(id = "boton_10", label = "Catastrophic Errors",    class = "btn-outline-primary", grupo = 3, orden = 5),
+      list(id = "boton_11", label = "Possible Cases",         class = "btn-outline-primary", grupo = 3, orden = 6),
+      list(id = "boton_12", label = "Analysis Structure",     class = "btn-outline-primary", grupo = 3, orden = 7)
     )
     
-     # Generar los botones dinámicamente
+    # En cuanto a renderUI, primero filtramos por grupo
     output$botones_dinamicos <- renderUI({
-      # Crear una lista para almacenar los botones
-      lista_botones <- lapply(seq_along(botones_info), function(i) {
-        boton <- botones_info[[i]]
+      grupos <- c(1, 2, 3)
+      ui_list <- lapply(grupos, function(g) {
+        # Filtrar y ordenar botones del grupo
+        botones_grupo <- Filter(function(b) b$grupo == g, botones_info)
+        botones_grupo <- botones_grupo[order(sapply(botones_grupo, function(b) b$orden))]
         
-        # Obtener atributos del botón
-        nombre_interno <- boton$id
-        nombre_visible <- boton$label
-        clase <- boton$class
+        # Crear los botones
+        lista_botones <- lapply(botones_grupo, function(boton) {
+          if (!is.null(boton$class)) {
+            actionButton(
+              inputId = ns(boton$id),
+              label = boton$label,
+              class = boton$class
+            )
+          } else {
+            actionButton(
+              inputId = ns(boton$id),
+              label = boton$label
+            )
+          }
+        })
         
-        # Crear el botón con los atributos correspondientes
-        # Incluir la clase si está definida
-        if (!is.null(clase)) {
-          actionButton(
-            inputId = ns(nombre_interno), 
-            label = nombre_visible,
-            class = clase
+        # Crear un div estilo tarjeta
+        div(
+          style = "
+        border: 1px solid #ccc; 
+        border-radius: 4px; 
+        padding: 10px; 
+        margin-bottom: 15px; 
+        background-color: #f9f9f9;",
+          # Título del grupo
+          tags$h3(paste("Grupo", g)),
+          div(
+            style = "display: flex; flex-wrap: wrap; gap: 10px;",
+            lista_botones
           )
-        } else {
-          actionButton(
-            inputId = ns(nombre_interno), 
-            label = nombre_visible
-          )
-        }
+        )
       })
-      # Organizar los botones en filas
-      div(
-        style = "display: flex; flex-wrap: wrap; gap: 10px;",
-        lista_botones
-      )
+      
+      do.call(tagList, ui_list)
     })
     
     # Detectar qué botón se ha pulsado y mostrar mensaje
@@ -298,11 +476,32 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     })
     
     
-    
-    output$la_botonera <- renderUI({
+    output$el_cartel <- renderUI({
+      div(
+        class = "row mb-4",
+        div(
+          class = "col-12",
+          div(
+            style = "background: linear-gradient(90deg, #2C3E50, #4CA1AF); color: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);",
+            div(
+              class = "d-flex justify-content-between align-items-center",
+              div(
+                h3(icon("edit"), "Editor de Tarjeta", style = "margin: 0; font-weight: 600;"),
+                p("Personaliza tu texto y visualízalo en tiempo real", style = "margin: 5px 0 0 0; opacity: 0.9;")
+              ),
+              div(
+                icon("boxes-stacked", style = "font-size: 2.5rem; opacity: 0.8;")
+              )
+            )
+          )
+        )
+      )
+    })
+    output$card03_botonera_output <- renderUI({
       div(
         card(
           card_header("Resultado"),
+          uiOutput(ns("el_cartel")),
           uiOutput(ns("botones_dinamicos")),
           textOutput(ns("resultado"))
         )
@@ -322,7 +521,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     list_vec01[[3]] <- list("title" = "3) Anova 1 way - Table", "objects" = c("df_table_anova"))
     list_vec01[[4]] <- list("title" = "4) Multiple comparation test (Tukey)", "objects" = c("df_tukey_table"))
     list_vec01[[5]] <- list("title" = "5) Model Error", "objects" = c("df_model_error"))
-
+    
     ############################################################################
     
     # Tab02 - Requeriments
@@ -335,7 +534,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     list_vec02[[3]] <- list("title" = "3) Estimated variances - Residuals", 
                             "objects" = c("df_residuals_variance_levels"))
     
-
+    
     output$dynamic_tab02_ui <- renderUI({
       req(mis_valores())
       crear_outputs_y_ui(list_vec02, "render_tab02_", mis_valores, output, ns)
@@ -429,7 +628,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     ##############################################################################
     
     # Tab05 - RCode
-
+    
     output$shiny_ace_editor <- renderUI({
       req(mis_valores())
       
@@ -476,7 +675,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
         writeLines(function_code, file)
       }
     )
-  
+    
     
     output$dynamic_tab05_ui <- renderUI({
       req(mis_valores())
@@ -513,7 +712,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     the_quarto_file <- reactive({
       req(mis_valores())
       GeneralLM_fix_anova1_quarto_file_path()
-      })
+    })
     
     module_quartoRenderer_server(id="quarto_doc", documento = the_quarto_file())
     
@@ -539,7 +738,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     ############################################################################
     # Shiny Clasic
     
-
+    
     ############################################################################
     output$show_dev_full <- renderUI({
       ns <- NS(id)
@@ -583,137 +782,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     })
     
     # Reemplazar el renderPrint original con una versión más estética usando renderUI
-    output$info_text2 <- renderUI({
-      valores_internos_list <- reactiveValuesToList(valores_internos)
-      req(valores_internos_list)
-      
-      req(valores_internos_list$pack_import_dataset)
-      #req(valores_internos_list$pack_import_dataset)
-      data_source <- valores_internos_list$pack_import_dataset$data_source
-      original_file_name <- valores_internos_list$pack_import_dataset$"original_file_name"
-      value_ncol <- ncol(valores_internos_list$pack_import_dataset$"database")
-      value_nrow <- nrow(valores_internos_list$pack_import_dataset$"database")
-      
-      req(valores_internos_list$pack_tool_selection)
-      selected_tool <-  valores_internos_list$pack_tool_selection$"tipo_modelo"
-      acordeon <- valores_internos_list$pack_tool_selection$acordeon
-      modelo_seleccionado <- valores_internos_list$pack_tool_selection$modelo_seleccionado
-      
-      req(valores_internos_list$pack_var_selection)
-      value_factor <- valores_internos_list$pack_var_selection$"factor"
-      value_rv <-     valores_internos_list$pack_var_selection$"respuesta"
-      vector_selected_vars <- valores_internos_list$pack_var_selection$"vector_selected_vars"
-      
-      
-      # Suponemos que estos valores ya están definidos en valores_internos_list
-      # data_source <- "ejemplo"
-      # original_file_name <- "datos_ventas.csv"
-      # value_ncol <- 15
-      # value_nrow <- 250
-      # selected_tool <- "Regresión"
-      # acordeon <- "Panel 2"
-      # modelo_seleccionado <- "Regresión Lineal"
-      # value_factor <- "Género"
-      # value_rv <- "Ingreso"
-      # vector_selected_vars <- c("Edad", "Educación", "Experiencia")
-      
-      # Contenedor principal
-      div(
-        class = "p-3 rounded shadow-sm",
-        style = "background: linear-gradient(to right, #f8f9fa, #ffffff);",
-        
-        # Título principal
-        h4(
-          class = "mb-3 pb-2",
-          style = "border-bottom: 2px solid #0d6efd; color: #0d6efd;",
-          icon("info-circle"), 
-          "Resumen de configuración"
-        ),
-        
-        fluidRow(
-          column(4,       # Sección de datos
-                 div(
-                   class = "mb-3 p-2 rounded",
-                   style = "background-color: rgba(13, 110, 253, 0.05); border-left: 4px solid #0d6efd;",
-                   
-                   h5(class = "text-primary", icon("database", class = "me-2"), "Información de datos"),
-                   
-                   div(class = "d-flex flex-wrap",
-                       div(class = "me-4 mb-2",
-                           span(class = "fw-bold", "Fuente: "),
-                           span(data_source, style = "font-family: monospace;")),
-                       
-                       div(class = "me-4 mb-2",
-                           span(class = "fw-bold", "Archivo: "),
-                           span(original_file_name, style = "font-family: monospace;")),
-                       
-                       div(class = "me-4 mb-2",
-                           span(class = "fw-bold", "Dimensiones: "),
-                           span(paste0(value_nrow, " filas × ", value_ncol, " columnas"), 
-                                style = "font-family: monospace;"))
-                   )
-                 )
-          ),
-          column(4,
-                 # Sección de herramientas
-                 div(
-                   class = "mb-3 p-2 rounded",
-                   style = "background-color: rgba(25, 135, 84, 0.05); border-left: 4px solid #198754;",
-                   
-                   h5(class = "text-success", icon("tools", class = "me-2"), "Modelo seleccionado"),
-                   
-                   div(class = "d-flex flex-wrap",
-                       div(class = "me-4 mb-2",
-                           span(class = "fw-bold", "Tipo: "),
-                           span(selected_tool, style = "font-family: monospace;")),
-                       
-                       div(class = "me-4 mb-2",
-                           span(class = "fw-bold", "Modelo: "),
-                           span(modelo_seleccionado, style = "font-family: monospace;")),
-                       
-                       div(class = "me-4 mb-2",
-                           span(class = "fw-bold", "Panel: "),
-                           span(acordeon, style = "font-family: monospace;"))
-                   )
-                 )
-          ),
-          column(4,
-                 # Sección de variables
-                 div(
-                   class = "p-2 rounded",
-                   style = "background-color: rgba(255, 193, 7, 0.05); border-left: 4px solid #ffc107;",
-                   
-                   h5(class = "text-warning", icon("table-cells", class = "me-2"), "Variables seleccionadas"),
-                   
-                   div(class = "d-flex flex-wrap",
-                       div(class = "me-4 mb-2",
-                           span(class = "fw-bold", "Factor: "),
-                           span(value_factor, style = "font-family: monospace;")),
-                       
-                       div(class = "me-4 mb-2",
-                           span(class = "fw-bold", "Respuesta: "),
-                           span(value_rv, style = "font-family: monospace;"))
-                   ),
-                   
-                   div(
-                     class = "mt-2",
-                     span(class = "fw-bold", "Variables en el modelo: "),
-                     div(
-                       class = "mt-1",
-                       lapply(vector_selected_vars, function(var) {
-                         span(
-                           class = "badge bg-light text-dark me-1 mb-1",
-                           style = "border: 1px solid #dee2e6; padding: 5px;",
-                           var
-                         )
-                       })
-                     )
-                   )
-                 )
-          )
-        )
-      )
-    })
+
     
     
     output$info_text <- renderPrint({

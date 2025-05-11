@@ -7,9 +7,21 @@ GeneralLM_fix_anova1_take_code <- function(str_fn_name){
   
   str_fn_name <- "GeneralLM_fix_anova1_RCode"
   fn_file <- paste0(str_fn_name, ".R")
-  the_package_path <- find.package("Rscience.GeneralLM")
-  #the_folder_path <- file.path(the_package_path, "inst", "copies")
-  the_folder_path <- file.path(the_package_path, "copies") # NO DETALLAR "inst"!!!!
+  
+  # Local ---------------------------------------------------------------------- # Retirar al final
+  the_local_folder <- file.path(getwd(), "../../../", "inst")
+
+  if(dir.exists(the_local_folder)){
+    the_folder_path <- file.path(the_local_folder, "copies")  
+  } 
+  # ----------------------------------------------------------------------------
+  if(!dir.exists(the_local_folder)){
+    #From packages
+    the_package_path <- find.package("Rscience.GeneralLM")
+    the_folder_path <- file.path(the_package_path, "copies") # NO DETALLAR "inst"!!!!
+
+  }
+  # ----------------------------------------------------------------------------
   
   file_path <- file.path( the_folder_path, fn_file)
   
