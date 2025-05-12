@@ -37,7 +37,7 @@ MASTER_module_fixed_anova_1_way_ui <- function(id) {
         )
         ,
         
-        uiOutput(ns("mega_tabs")), br(),
+        #uiOutput(ns("mega_tabs")), br(),
         uiOutput(ns("show_dev_full")),
         
         
@@ -389,29 +389,30 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     
     # Define la información de los botones con grupo y orden
     botones_info <- list( 
-      list(id = "boton_1",  label = "Summary",                class = "btn-primary",         grupo = 1, orden = 1),
-      list(id = "boton_2",  label = "Full Analysis",          class = "btn-secondary",       grupo = 1, orden = 2),
-      list(id = "boton_3",  label = "Descriptive Statistics", class = "btn-success",         grupo = 1, orden = 3),
-      list(id = "boton_4",  label = "Script",                 class = "btn-danger",          grupo = 1, orden = 4),
-      list(id = "boton_5",  label = "Download",               class = "btn-warning",         grupo = 2, orden = 1),
-      list(id = "boton_6",  label = "Hypotheses",             class = "btn-info",            grupo = 3, orden = 1),
-      list(id = "boton_7",  label = "Theoretical Framework",  class = "btn-light",           grupo = 3, orden = 2),
-      list(id = "boton_8",  label = "Bibliography",           class = "btn-dark",            grupo = 3, orden = 3),
-      list(id = "boton_9",  label = "Stock",                  class = NULL,                  grupo = 3, orden = 4),
-      list(id = "boton_10", label = "Catastrophic Errors",    class = "btn-outline-primary", grupo = 3, orden = 5),
-      list(id = "boton_11", label = "Possible Cases",         class = "btn-outline-primary", grupo = 3, orden = 6),
-      list(id = "boton_12", label = "Analysis Structure",     class = "btn-outline-primary", grupo = 3, orden = 7)
+      list(id = "boton_1",  label = "Summary",                class = "btn-primary",         grupo = 1, orden = 1, content = "dynamic_tab01_ui"),
+      list(id = "boton_2",  label = "Full Analysis",          class = "btn-secondary",       grupo = 1, orden = 2, content = "mega_tabs"),
+      list(id = "boton_3",  label = "Descriptive Statistics", class = "btn-success",         grupo = 1, orden = 3, content = "3"),
+      list(id = "boton_4",  label = "Script",                 class = "btn-danger",          grupo = 1, orden = 4, content = "4"),
+      list(id = "boton_5",  label = "Download",               class = "btn-warning",         grupo = 2, orden = 1, content = "5"),
+      list(id = "boton_6",  label = "Hypotheses",             class = "btn-info",            grupo = 3, orden = 1, content = "6"),
+      list(id = "boton_7",  label = "Theoretical Framework",  class = "btn-light",           grupo = 3, orden = 2, content = "7"),
+      list(id = "boton_8",  label = "Bibliography",           class = "btn-dark",            grupo = 3, orden = 3, content = "8"),
+      list(id = "boton_9",  label = "Stock",                  class = NULL,                  grupo = 3, orden = 4, content = "9"),
+      list(id = "boton_10", label = "Catastrophic Errors",    class = "btn-outline-primary", grupo = 3, orden = 5, content = "10"),
+      list(id = "boton_11", label = "Possible Cases",         class = "btn-outline-primary", grupo = 3, orden = 6, content = "11"),
+      list(id = "boton_12", label = "Analysis Structure",     class = "btn-outline-primary", grupo = 3, orden = 7, content = "12")
     )
     
     # En cuanto a renderUI, primero filtramos por grupo
+    # Dentro de tu server, después de definir botones_info y el renderUI
+    
+    # Crear los botones con grupos y orden, y ponerlos en UI
     output$botones_dinamicos <- renderUI({
       grupos <- c(1, 2, 3)
       ui_list <- lapply(grupos, function(g) {
-        # Filtrar y ordenar botones del grupo
         botones_grupo <- Filter(function(b) b$grupo == g, botones_info)
         botones_grupo <- botones_grupo[order(sapply(botones_grupo, function(b) b$orden))]
         
-        # Crear los botones
         lista_botones <- lapply(botones_grupo, function(boton) {
           if (!is.null(boton$class)) {
             actionButton(
@@ -427,7 +428,6 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
           }
         })
         
-        # Crear un div estilo tarjeta
         div(
           style = "
         border: 1px solid #ccc; 
@@ -447,28 +447,126 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
       do.call(tagList, ui_list)
     })
     
-    # Detectar qué botón se ha pulsado y mostrar mensaje
-    observe({
-      for (boton in botones_info) {
-        nombre_interno <- boton$id
-        
-        if (!is.null(input[[nombre_interno]])) {
-          # Usar local para capturar el valor correcto en cada iteración
-          local({
-            local_boton <- boton
-            
-            observeEvent(input[[local_boton$id]], {
-              output$resultado <- renderText({
-                paste("Se ha pulsado el botón:", local_boton$label, 
-                      "(ID interno:", local_boton$id, ")",
-                      "- Clase:", ifelse(is.null(local_boton$class), "ninguna", local_boton$class),
-                      "- Número de clics:", input[[local_boton$id]])
-              })
-            })
-          })
-        }
-      }
+    boton_seleccionado <- reactiveVal(NULL)
+    
+    # Para cada botón, actualizamos la variable
+    lapply(botones_info, function(boton) {
+      observeEvent(input[[boton$id]], {
+        boton_seleccionado(boton)
+      })
     })
+    
+    observeEvent(boton_seleccionado(), {
+      output$resultado <- renderText({
+        boton <- boton_seleccionado()
+        paste(
+          "Se ha pulsado el botón:", boton$label,
+          "(ID interno:", boton$id, ")",
+          "- Clase:", ifelse(is.null(boton$class), "ninguna", boton$class),
+          "- Número de clics:", input[[boton$id]]
+        )
+      })
+    })
+    
+    observeEvent(boton_seleccionado(), {
+      output$resultado2 <- renderUI({
+        boton <- boton_seleccionado()
+        aver <- paste(
+          "Se ha pulsado el botón:", boton$label,
+          "(ID interno:", boton$id, ")",
+          "- Clase:", ifelse(is.null(boton$class), "ninguna", boton$class),
+          "- Número de clics:", input[[boton$id]]
+        )
+        
+        showModal(
+          modalDialog(
+            title = boton$label,
+            size = "xl",
+            # Aplicamos estilos personalizados para hacer el modal más grande y posicionarlo más arriba
+            tags$div(
+              tags$style(HTML("
+        /* Hacer que el modal sea más grande que xl - ancho y alto */
+        .modal-xl {
+          max-width: 95% !important; /* Aumentamos el ancho a 95% de la ventana */
+          width: 95%;
+        }
+        
+        /* Aumentar la altura del modal y posicionarlo más cerca del borde superior */
+        .modal-dialog {
+          height: 90vh !important; /* 90% de la altura de la ventana */
+          max-height: 90vh !important;
+          margin-top: 20px !important; /* Reducimos el margen superior (valor por defecto es 1.75rem ~28px) */
+        }
+        
+        /* Hacer que el contenido del modal ocupe más espacio vertical */
+        .modal-content {
+          height: 100% !important;
+          display: flex;
+          flex-direction: column;
+        }
+        
+        /* Ajustar el cuerpo del modal para que ocupe el espacio disponible */
+        .modal-body {
+          flex: 1;
+          overflow: hidden; /* Evita scroll doble */
+          padding: 0; /* Quitamos padding para maximizar espacio */
+        }
+        
+        /* Asegurar que en pantallas muy grandes se mantenga un tamaño razonable */
+        @media (min-width: 1400px) {
+          .modal-xl {
+            max-width: 1800px !important; /* O el tamaño máximo que prefieras */
+          }
+        }
+      ")),
+            ),
+            
+            # Contenedor para el módulo de importación - ahora ocupa todo el espacio disponible
+            div(
+              style = "height: 100%; overflow-y: auto; padding: 15px;", 
+              aver,
+              uiOutput(ns(boton$content)),
+              botones_info[[boton$id]]
+            ),
+            
+            easyClose = TRUE,
+            footer = modalButton("Cerrar33")#,
+            
+            #style = "color: #721c24; background-color: #f8d7da; border-color: #f5c6cb;"
+          )
+        )
+        
+      })
+    })
+    
+    # # Crear un obs para cada botón usando lapply
+    # lapply(botones_info, function(boton) {
+    #   observeEvent(input[[boton$id]], {
+    #     output$resultado <- renderText({
+    #       paste(
+    #         "Se ha pulsado el botón:", boton$label,
+    #         "(ID interno:", boton$id, ")",
+    #         "- Clase:", ifelse(is.null(boton$class), "ninguna", boton$class),
+    #         "- Número de clics:", input[[boton$id]]
+    #       )
+    #     })
+    #   })
+    # })
+    
+    
+    # # Crear un obs para cada botón usando lapply
+    # lapply(botones_info, function(boton) {
+    #   observeEvent(input[[boton$id]], {
+    #     output$resultado2 <- renderText({
+    #       paste(
+    #         "Se ha pulsado el botón:", boton$label,
+    #         "(ID interno:", boton$id, ")",
+    #         "- Clase:", ifelse(is.null(boton$class), "ninguna", boton$class),
+    #         "- Número de clics:", input[[boton$id]]
+    #       )
+    #     })
+    #   })
+    # })
     
     button_info <- reactive({
       # Aquí puedes devolver información sobre botones presionados si lo necesitas
@@ -503,24 +601,26 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
           card_header("Resultado"),
           uiOutput(ns("el_cartel")),
           uiOutput(ns("botones_dinamicos")),
-          textOutput(ns("resultado"))
+          textOutput(ns("resultado")),
+          uiOutput(ns("resultado2"))
         )
       )
     })
     ############################################################################
     
-    
-    # Tab01 - Analysis
-    output$dynamic_tab01_ui <- renderUI({
-      req(mis_valores())
-      crear_outputs_y_ui(list_vec01, "render_tab01_", mis_valores, output, ns)
-    })
     list_vec01 <- list()
     list_vec01[[1]] <- list("title" = "1) References", "objects" = c("df_selected_vars"))
     list_vec01[[2]] <- list("title" = "2) Factor resumen", "objects" = c("df_factor_info", "check_unbalanced_reps"))
     list_vec01[[3]] <- list("title" = "3) Anova 1 way - Table", "objects" = c("df_table_anova"))
     list_vec01[[4]] <- list("title" = "4) Multiple comparation test (Tukey)", "objects" = c("df_tukey_table"))
     list_vec01[[5]] <- list("title" = "5) Model Error", "objects" = c("df_model_error"))
+    
+    # Tab01 - Analysis
+    output$dynamic_tab01_ui <- renderUI({
+      req(mis_valores())
+      crear_outputs_y_ui(list_vec01, "render_tab01_", mis_valores, output, ns)
+    })
+    
     
     ############################################################################
     
