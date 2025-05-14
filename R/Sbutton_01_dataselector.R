@@ -1,7 +1,32 @@
 #' @export
 Sbutton_01_dataselector_ui <- function(id) {
   ns <- NS(id)
-  
+  div(
+  tags$head(
+    tags$style(HTML("
+      .btn-special-initial {
+        background-color: #FF8C00; /* Color naranja */
+        color: white;
+        border-color: #E27800;
+      }
+      .btn-special-initial:hover {
+        background-color: #E27800;
+        color: white;
+        border-color: #CC6A00;
+      }
+      
+      .btn-special-success {
+        background-color: #28a745; /* Color verde */
+        color: white;
+        border-color: #218838;
+      }
+      .btn-special-success:hover {
+        background-color: #218838;
+        color: white;
+        border-color: #1e7e34;
+      }
+    "))
+  ),
   # Solo necesitamos el botón para activar el modal
   actionButton(
     ns("btn_dataset"),
@@ -10,6 +35,7 @@ Sbutton_01_dataselector_ui <- function(id) {
     class = "btn-special-initial", #btn-primary", 
     style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
     title = "Import dataset"
+  )
   )
   
 
