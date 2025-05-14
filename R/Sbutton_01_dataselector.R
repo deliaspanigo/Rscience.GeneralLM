@@ -20,7 +20,13 @@ Sbutton_01_dataselector_server <- function(id, valores_internos, show_dev = FALS
     output_list_database_rv <- reactiveVal(NULL)  
     
     # My button
-    button_state <- reactiveVal("initial")
+    button_state <- reactiveVal(NULL)
+    
+    observe({
+      button_state(valores_internos$button_class_import_dataset)
+     # if(!valores_internos$check_import_dataset) button_state("initial")
+    })
+    
     output$my_action_button <- renderUI({
       
       btn_class <- switch(button_state(),
@@ -176,12 +182,13 @@ Sbutton_01_dataselector_server <- function(id, valores_internos, show_dev = FALS
         
         # Como todo esta OK...
         # asignamos los objetos al pack y al check y cambiamos de color el boton del pack
-        valores_internos$pack_import_dataset <- datos_importados
+        valores_internos$pack_import_dataset  <- datos_importados
         valores_internos$check_import_dataset <- TRUE
+        valores_internos$button_class_import_dataset <- "confirmed"
         
         if (valores_internos$check_import_dataset) {
           # Cambiar el color del botón
-          button_state("confirmed")
+          # button_state("confirmed")
           
           # shinyjs::runjs(sprintf("$('#%s').removeClass('btn-primary').addClass('btn-success');", 
           #                        ns("btn_dataset")))
@@ -214,12 +221,13 @@ Sbutton_01_dataselector_server <- function(id, valores_internos, show_dev = FALS
       })
     })
     
+    return(NULL)
     # Función para restablecer este botón (accesible desde el exterior)
-    return(list(
-      reset = function() {
-        shinyjs::runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", 
-                               ns("btn_dataset")))
-      }
-    ))
+    # return(list(
+    #   reset = function() {
+    #     shinyjs::runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", 
+    #                            ns("btn_dataset")))
+    #   }
+    # ))
   })
 }

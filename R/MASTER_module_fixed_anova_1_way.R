@@ -267,6 +267,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     valores_default <- list(
       pack_import_dataset = "",
       check_import_dataset = FALSE,
+      button_class_import_dataset = "initial",
       
       pack_tool_selection = "",
       check_tool_selection = FALSE,
@@ -287,8 +288,9 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     # Inicializar los módulos y guardar los callbacks de reseteo
     reset_callbacks <- list()
     
-    dataset_module  <- Sbutton_01_dataselector_server("dataset_selector", valores_internos, show_dev = show_dev)
-    reset_callbacks <- c(reset_callbacks, dataset_module$reset)
+    Sbutton_01_dataselector_server("dataset_selector", valores_internos, show_dev = show_dev)
+    #dataset_module  <- Sbutton_01_dataselector_server("dataset_selector", valores_internos, show_dev = show_dev)
+    #reset_callbacks <- c(reset_callbacks, dataset_module$reset)
     
     
     
