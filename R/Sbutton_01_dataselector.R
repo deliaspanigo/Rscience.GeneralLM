@@ -7,7 +7,7 @@ Sbutton_01_dataselector_ui <- function(id) {
     ns("btn_dataset"),
     HTML(paste0('<i class="fa fa-database" style="font-size: 75px; display: block; margin-bottom: 8px;"></i>', 
                 '<span></span>')),
-    class = "btn-special", #btn-primary", 
+    class = "btn-special-initial", #btn-primary", 
     style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
     title = "Import dataset"
   )
@@ -27,7 +27,7 @@ Sbutton_01_dataselector_server <- function(id, valores_internos, show_dev = FALS
     observeEvent(input$btn_dataset, {
       # 1. Primero inicializamos los elementos del módulo
       # Esto garantiza que estén creados antes de mostrar el modal
-      output_module <- Rscience.import::MASTER_module_import_ui(id = ns("MASTER_import"))
+      # output_module <- Rscience.import::MASTER_module_import_ui(id = ns("MASTER_import"))
       
       # 2. Mostramos el modal con el contenido del módulo ya inicializado
       # Usando tamaño "xl" (extra large)
@@ -35,7 +35,7 @@ Sbutton_01_dataselector_server <- function(id, valores_internos, show_dev = FALS
         modalDialog(
           # title = "Seleccionar Base de Datos",
           size = "xl", # Mantenemos "xl" como base
-          easyClose = FALSE,
+          easyClose = TRUE,
           
           # Aplicamos estilos personalizados para hacer el modal más grande y posicionarlo más arriba
           tags$div(
@@ -79,12 +79,25 @@ Sbutton_01_dataselector_server <- function(id, valores_internos, show_dev = FALS
           # Contenedor para el módulo de importación - ahora ocupa todo el espacio disponible
           div(
             style = "height: 100%; overflow-y: auto; padding: 15px;", 
-            output_module
+            Rscience.import::MASTER_module_import_ui(id = ns("MASTER_import"))
           ),
           
-          footer = tagList(
-            actionButton(ns("confirmar_dataset"), "Seleccionar", class = "btn-primary")
+          footer = tags$div(
+            style = "display: flex; justify-content: center; width: 100%; gap: 10px;",
+            # Botón Cancelar de ancho completo
+            tags$button(
+              id = ns("btn_cancelar"),
+              type = "button",
+              class = "btn btn-default",
+              style = "width: 50%; height: 45px;", # Aumentado la altura
+              "data-bs-dismiss" = "modal",
+              "Cancelar"
+            ),
+            actionButton(inputId = ns("confirmar_dataset"), label = "Seleccionar", 
+                         class = "btn-primary", style = "width: 100%; height: 45px;") # Aumentado la altura
+
           )
+          
         )
       )
       
@@ -150,7 +163,7 @@ Sbutton_01_dataselector_server <- function(id, valores_internos, show_dev = FALS
         
         if (valores_internos$check_import_dataset) {
           # Cambiar el color del botón
-          shinyjs::runjs(sprintf("$('#%s').removeClass('btn-primary').addClass('btn-success');", 
+          shinyjs::runjs(sprintf("$('#%s').removeClass('btn-special-initial').addClass('btn-special-success');", 
                                  ns("btn_dataset")))
           
           # Notificación de éxito
@@ -184,7 +197,7 @@ Sbutton_01_dataselector_server <- function(id, valores_internos, show_dev = FALS
     # Función para restablecer este botón (accesible desde el exterior)
     return(list(
       reset = function() {
-        shinyjs::runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", 
+        shinyjs::runjs(sprintf("$('#%s').removeClass('btn-special-success').addClass('btn-special-initial');", 
                                ns("btn_dataset")))
       }
     ))

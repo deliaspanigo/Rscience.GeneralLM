@@ -66,8 +66,45 @@ Sbutton_02_tools_server <- function(id, valores_default, valores_internos) {
       showModal(
         modalDialog(
           title = paste("Seleccionar una herramienta estadístisca para", general_topic_name),
-          
-          SSelector_tools_ui(ns("seleccion_modelo")),
+          size = "xl",
+          easyClose = TRUE,
+          tags$div(
+            tags$style(HTML("
+        /* Hacer que el modal sea más grande que xl - ancho y alto */
+        .modal-xl {
+          max-width: 95% !important; /* Aumentamos el ancho a 95% de la ventana */
+          width: 95%;
+        }
+        
+        /* Aumentar la altura del modal y posicionarlo más cerca del borde superior */
+        .modal-dialog {
+          height: 90vh !important; /* 90% de la altura de la ventana */
+          max-height: 90vh !important;
+          margin-top: 20px !important; /* Reducimos el margen superior (valor por defecto es 1.75rem ~28px) */
+        }
+        
+        /* Hacer que el contenido del modal ocupe más espacio vertical */
+        .modal-content {
+          height: 100% !important;
+          display: flex;
+          flex-direction: column;
+        }
+        
+        /* Ajustar el cuerpo del modal para que ocupe el espacio disponible */
+        .modal-body {
+          flex: 1;
+          overflow: hidden; /* Evita scroll doble */
+          padding: 0; /* Quitamos padding para maximizar espacio */
+        }
+        
+        /* Asegurar que en pantallas muy grandes se mantenga un tamaño razonable */
+        @media (min-width: 1400px) {
+          .modal-xl {
+            max-width: 1800px !important; /* O el tamaño máximo que prefieras */
+          }
+        }
+      ")),
+          ),
           
           
           # Instrucciones
@@ -75,12 +112,26 @@ Sbutton_02_tools_server <- function(id, valores_default, valores_internos) {
             class = "alert alert-info",
             "Por favor, seleccione exactamente 1 herramienta."
           ),
-          
-          footer = tagList(
-            modalButton("Cancelar"),
-            actionButton(ns("confirmar_tools"), "Seleccionar", class = "btn-primary")
+          div(
+            style = "height: 100%; overflow-y: auto; padding: 15px;", 
+            SSelector_tools_ui(ns("seleccion_modelo"))
           ),
-          size = "xl"
+          footer = tags$div(
+            style = "display: flex; justify-content: center; width: 100%; gap: 10px;",
+            # Botón Cancelar de ancho completo
+            tags$button(
+              id = ns("btn_cancelar"),
+              type = "button",
+              class = "btn btn-default",
+              style = "width: 50%; height: 45px;", # Aumentado la altura
+              "data-bs-dismiss" = "modal",
+              "Cancelar"
+            ),
+            actionButton(inputId = ns("confirmar_tools"), label = "Seleccionar", 
+                         class = "btn-primary", style = "width: 100%; height: 45px;") # Aumentado la altura
+            
+          )
+          
         ))
     })
     
@@ -148,7 +199,7 @@ Sbutton_02_tools_server <- function(id, valores_default, valores_internos) {
             ),
             "Herramienta estadística seleccionada exitosamente."
           ),
-          duration = 15,
+          duration = 3,
           closeButton = TRUE
         )
         removeModal()

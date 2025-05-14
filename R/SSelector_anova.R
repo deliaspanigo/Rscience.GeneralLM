@@ -7,9 +7,9 @@ SSelector_anova_ui <- function(id) {
     textOutput(ns("dataset_info")),
     
     hr(),
-    
-    uiOutput(ns("factor_selector")),
-    uiOutput(ns("respuesta_selector"))
+    uiOutput(ns("respuesta_selector")),
+    uiOutput(ns("factor_selector"))
+   
     
     
     
@@ -33,7 +33,7 @@ SSelector_anova_server <- function(id, my_dataset) {
       
       selectInput(
         ns("factor"),
-        "Seleccione un factor:",
+        "Select a factor:",
         choices = choices,
         selected = if (length(choices) > 0) choices[1] else NULL
       )
@@ -47,7 +47,7 @@ SSelector_anova_server <- function(id, my_dataset) {
       
       selectInput(
         ns("respuesta"),
-        "Seleccione variable respuesta:",
+        "Select a response variable:",
         choices = choices,
         selected = if (length(choices) > 0) choices[1] else NULL
       )

@@ -28,7 +28,31 @@ ui <- page_fluid( # Cambiado de page_sidebar a page_fluid para más flexibilidad
   
   # Necesario para manipular clases de CSS
   useShinyjs(),
-  
+  tags$head(
+    tags$style(HTML("
+      .btn-special-initial {
+        background-color: #FF8C00; /* Color naranja */
+        color: white;
+        border-color: #E27800;
+      }
+      .btn-special-initial:hover {
+        background-color: #E27800;
+        color: white;
+        border-color: #CC6A00;
+      }
+      
+      .btn-special-success {
+        background-color: #28a745; /* Color verde */
+        color: white;
+        border-color: #218838;
+      }
+      .btn-special-success:hover {
+        background-color: #218838;
+        color: white;
+        border-color: #1e7e34;
+      }
+    "))
+  ),
   # CSS para botón verde chillón y para corregir el problema de los cards
   # tags$head(
   #   tags$style("

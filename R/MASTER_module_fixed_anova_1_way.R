@@ -102,7 +102,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
         class = "mb-3 p-2 rounded",
         style = "background-color: rgba(13, 110, 253, 0.05); border-left: 4px solid #0d6efd;",
         
-        h5(class = "text-primary", icon("database", class = "me-2"), "Información de datos"),
+        h5(class = "text-primary", icon("database", class = "me-2"), "Data details"),
         
         div(
           div(
@@ -114,8 +114,8 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
             span(original_file_name, style = "font-family: monospace;")
           ),
           div(
-            span(class = "fw-bold", "Dimensiones: "),
-            span(paste0(value_nrow, " filas × ", value_ncol, " columnas"), 
+            span(class = "fw-bold", "Dimensions: "),
+            span(paste0(value_nrow, " rows × ", value_ncol, " columns"), 
                  style = "font-family: monospace;")
           )
         )
@@ -135,7 +135,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
         class = "mb-3 p-2 rounded",
         style = "background-color: rgba(25, 135, 84, 0.05); border-left: 4px solid #198754;",
         
-        h5(class = "text-success", icon("tools", class = "me-2"), "Modelo seleccionado"),
+        h5(class = "text-success", icon("tools", class = "me-2"), "Selected tool"),
         
         div(
           class = "d-flex flex-column",
@@ -166,19 +166,39 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
       value_rv <-     valores_internos_list$pack_var_selection$"respuesta"
       vector_selected_vars <- valores_internos_list$pack_var_selection$"vector_selected_vars"
       
+      minibase <- na.omit(valores_internos_list$pack_import_dataset$"database"[vector_selected_vars])
+      new_ncol <- ncol(minibase)
+      new_nrow <- nrow(minibase)
+      
       div(
         class = "p-2 rounded",
         style = "background-color: rgba(255, 193, 7, 0.05); border-left: 4px solid #ffc107;",
         
-        h5(class = "text-warning", icon("table-cells", class = "me-2"), "Variables seleccionadas"),
+        h5(class = "text-warning", icon("table-cells", class = "me-2"), "Selected variables"),
         
-        div(class = "d-flex flex-wrap",
+        # div(
+        #   class = "d-flex flex-column",
+        #   div(
+        #     span(class = "fw-bold", "Tipo: "),
+        #     span(selected_tool, style = "font-family: monospace;")
+        #   ),
+        #   div(
+        #     span(class = "fw-bold", "Modelo: "),
+        #     span(modelo_seleccionado, style = "font-family: monospace;")
+        #   ),
+        #   div(
+        #     span(class = "fw-bold", "Panel: "),
+        #     span(acordeon, style = "font-family: monospace;")
+        #   )
+        # )
+        
+        div(class = "d-flex flex-column",
             div(class = "me-4 mb-2",
                 span(class = "fw-bold", "Factor: "),
                 span(value_factor, style = "font-family: monospace;")),
             
             div(class = "me-4 mb-2",
-                span(class = "fw-bold", "Respuesta: "),
+                span(class = "fw-bold", "Response Variable: "),
                 span(value_rv, style = "font-family: monospace;"))
         ),
         
@@ -195,6 +215,11 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
               )
             })
           )
+        ),
+        div(
+          span(class = "fw-bold", "Dimensiones: "),
+          span(paste0(new_nrow, " filas × ", new_ncol, " columnas"), 
+               style = "font-family: monospace;")
         )
       )
       
@@ -392,8 +417,8 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
       list(id = "boton_1",  label = "Summary",                class = "btn-primary",         grupo = 1, orden = 1, content = "dynamic_tab01_ui"),
       list(id = "boton_2",  label = "Full Analysis",          class = "btn-secondary",       grupo = 1, orden = 2, content = "mega_tabs"),
       list(id = "boton_3",  label = "Descriptive Statistics", class = "btn-success",         grupo = 1, orden = 3, content = "3"),
-      list(id = "boton_4",  label = "Script",                 class = "btn-danger",          grupo = 1, orden = 4, content = "4"),
-      list(id = "boton_5",  label = "Download",               class = "btn-warning",         grupo = 2, orden = 1, content = "5"),
+      list(id = "boton_4",  label = "Script",                 class = "btn-danger",          grupo = 1, orden = 4, content = "dynamic_tab05_ui"),
+      list(id = "boton_5",  label = "Download",               class = "btn-warning",         grupo = 2, orden = 1, content = "dynamic_tab06_ui"),
       list(id = "boton_6",  label = "Hypotheses",             class = "btn-info",            grupo = 3, orden = 1, content = "6"),
       list(id = "boton_7",  label = "Theoretical Framework",  class = "btn-light",           grupo = 3, orden = 2, content = "7"),
       list(id = "boton_8",  label = "Bibliography",           class = "btn-dark",            grupo = 3, orden = 3, content = "8"),
@@ -742,26 +767,38 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
       card(
         card_header("Editor Options"),
         card_body(
-          selectInput(ns("theme"), "Editor Theme:", 
-                      choices = c("xcode", "monokai", "github", "eclipse", "tomorrow", 
-                                  "solarized_light", "solarized_dark", "textmate", "twilight"),
-                      selected = "xcode"),
-          sliderInput(ns("fontSize"), "Font Size:", min = 8, max = 24, value = 14, step = 1)
+          
+          fluidRow(
+            column(3, 
+                   selectInput(ns("theme"), "Editor Theme:", 
+                               choices = c("xcode", "monokai", "github", "eclipse", "tomorrow", 
+                                           "solarized_light", "solarized_dark", "textmate", "twilight"),
+                               selected = "solarized_dark")),
+            column(3,
+                   sliderInput(ns("fontSize"), "Font Size:", min = 8, max = 40, value = 14, step = 1)
+            ),
+            column(3, downloadButton(ns("download_btn"), "Descargar como .R", icon = icon("download")))
+            
+          ),
+          fluidRow(
+            shinyAce::aceEditor(
+              outputId = "script_part1",
+              value = function_code,
+              mode = "r",
+              theme = input$"theme", #"chrome",
+              height = editor_height,#"200px",
+              fontSize = input$"fontSize", #14,
+              showLineNumbers = TRUE,
+              readOnly = TRUE,
+              autoScrollEditorIntoView = TRUE,
+              maxLines = 1000,  # Un número grande para evitar scroll
+              minLines = line_count 
+            )
+          )
         )
-      )
-      
-      shinyAce::aceEditor(
-        outputId = "script_part1",
-        value = function_code,
-        mode = "r",
-        theme = input$"theme", #"chrome",
-        height = editor_height,#"200px",
-        fontSize = input$"fontSize", #14,
-        showLineNumbers = TRUE,
-        readOnly = TRUE,
-        autoScrollEditorIntoView = TRUE,
-        maxLines = 1000,  # Un número grande para evitar scroll
-        minLines = line_count 
+        
+        
+        
       )
       
     })
@@ -780,30 +817,10 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     output$dynamic_tab05_ui <- renderUI({
       req(mis_valores())
       
-      vector_editor_values <- c("xcode", "monokai", "github", "eclipse", "tomorrow", 
-                                "solarized_light", "solarized_dark", "textmate", "twilight")
-      
-      selected_pos <- 1
-      
-      card(
-        card_header("Editor Options"),
-        card_body(
-          fluidRow(
-            column(3,     
-                   selectInput(ns("theme"), "Editor Theme:", 
-                               choices = vector_editor_values,
-                               selected = vector_editor_values[selected_pos])
-            ),
-            column(3, 
-                   sliderInput(ns("fontSize"), "Font Size:", min = 8, max = 24, value = 14, step = 1)
-            ),
-            #column(3, actionButton(ns("copy_btn"), "Copiar código", icon = icon("copy"))),
-            column(3, downloadButton(ns("download_btn"), "Descargar como .R", icon = icon("download")))
-            
-          ),
+     
           uiOutput(ns("shiny_ace_editor"))
-        )
-      )
+        
+      
     })
     
     ############################################################################
@@ -829,9 +846,9 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
         tabPanel(title = "Analysis",          uiOutput(ns("dynamic_tab01_ui"))),
         tabPanel(title = "Requeriments",      uiOutput(ns("dynamic_tab02_ui"))),
         tabPanel(title = "Plots - Raw Data",  uiOutput(ns("dynamic_tab03_ui"))),
-        tabPanel(title = "Plots - Residuals", uiOutput(ns("dynamic_tab04_ui"))),
-        tabPanel(title = "RCode",             uiOutput(ns("dynamic_tab05_ui"))),
-        tabPanel(title = "Quarto",            uiOutput(ns("dynamic_tab06_ui")))
+        tabPanel(title = "Plots - Residuals", uiOutput(ns("dynamic_tab04_ui")))#,
+        #tabPanel(title = "RCode",             uiOutput(ns("dynamic_tab05_ui"))),
+        #tabPanel(title = "Quarto",            uiOutput(ns("dynamic_tab06_ui")))
       )
       
     })
