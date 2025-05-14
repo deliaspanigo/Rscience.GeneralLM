@@ -4,14 +4,9 @@ Sbutton_03_variable_selector_ui <- function(id) {
   
   # Botón para elegir variables
   
-  actionButton(
-    ns("btn_variables"),
-    HTML(paste0('<i class="fa fa-sliders" style="font-size: 75px; display: block; margin-bottom: 8px;"></i>', 
-                '<span></span>')),
-    class = "btn-primary", 
-    style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
-    title = "Variables Selection"
-  )
+  uiOutput(ns("my_action_button"))
+  
+  
   
   
 }
@@ -22,12 +17,38 @@ Sbutton_03_variable_selector_server <- function(id, valores_default, valores_int
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
+    # My button
+    button_state <- reactiveVal(NULL)
     
     observe({
-      special_check <- valores_internos$check_tool_selection && !valores_internos$check_var_selection
-      
-      if(special_check) runjs(sprintf("$('#%s').css('border', '2px dotted #3355FF');", ns("btn_variables")))
+      button_state(valores_internos$button_class_var_selection)
+      # if(!valores_internos$check_import_dataset) button_state("initial")
     })
+    
+    output$my_action_button <- renderUI({
+      
+      btn_class <- switch(button_state(),
+                          "initial"   = "btn-primary",    # Azul inicial
+                          "confirmed" = "btn-success",    # Verde después de confirmar
+                          "modified"  = "btn-primary")    # Vuelve a azul si se modifica
+      
+      # Botón para elegir variables
+      actionButton(
+        ns("btn_variables"),
+        HTML(paste0('<i class="fa fa-sliders" style="font-size: 75px; display: block; margin-bottom: 8px;"></i>', 
+                    '<span></span>')),
+        class = btn_class, 
+        style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
+        title = "Variables Selection"
+      )
+    })
+    
+    
+    # observe({
+    #   special_check <- valores_internos$check_tool_selection && !valores_internos$check_var_selection
+    #   
+    #   if(special_check) runjs(sprintf("$('#%s').css('border', '2px dotted #3355FF');", ns("btn_variables")))
+    # })
     # Observar cambios en el dataset seleccionado
     # Inicializar el módulo cuando cambia el dataset
     
@@ -39,13 +60,16 @@ Sbutton_03_variable_selector_server <- function(id, valores_default, valores_int
       # Si el dataset cambia, reset el estado de variables_seleccionadas
       valores_internos$pack_var_selection  <-  valores_default$pack_var_selection
       valores_internos$check_var_selection <-  valores_default$check_var_selection
+      valores_internos$button_class_var_selection <-  valores_default$button_class_var_selection
+      
       
       # Restablecer el color del botón a primario (azul)
-      runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", ns("btn_tools")))
+      # runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", ns("btn_tools")))
       
     }, ignoreInit = TRUE)
     
     selected_vars_anova <- SSelector_anova_server("anova_selector", valores_internos$pack_import_dataset$"database")
+    
     # factor
     # respuesta
     # vector_selected_vars
@@ -192,8 +216,10 @@ Sbutton_03_variable_selector_server <- function(id, valores_default, valores_int
       
       
       # Guardar las variables seleccionadas
-      valores_internos$pack_var_selection <- variables_seleccionadas
-      valores_internos$check_var_selection <- TRUE
+      valores_internos$pack_var_selection         <- variables_seleccionadas
+      valores_internos$check_var_selection        <- TRUE
+      valores_internos$button_class_var_selection <- "confirmed"
+      
       
       if(valores_internos$check_var_selection){
         # Cambiar el color del botón usando jQuery para asegurar que funcione
@@ -230,12 +256,13 @@ Sbutton_03_variable_selector_server <- function(id, valores_default, valores_int
       
     })
     
+    return(NULL)
     # Función para restablecer este botón (accesible desde el exterior)
-    return(list(
-      reset = function() {
-        runjs(sprintf("$('#%s').css('border', 'none');", ns("btn_variables")))
-        runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", ns("btn_variables")))
-      }
-    ))
+    # return(list(
+    #   reset = function() {
+    #     runjs(sprintf("$('#%s').css('border', 'none');", ns("btn_variables")))
+    #     runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", ns("btn_variables")))
+    #   }
+    # ))
   })
 }

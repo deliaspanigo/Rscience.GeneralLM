@@ -271,12 +271,15 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
       
       pack_tool_selection = "",
       check_tool_selection = FALSE,
+      button_class_tool_selection = "initial",
       
       pack_var_selection = "",
       check_var_selection = FALSE,
+      button_class_var_selection = "initial",
       
       check_play = FALSE,
-      the_results = ""
+      the_results = "",
+      button_class_play = "initial"
       
     )
     
@@ -295,16 +298,19 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     
     
     # # Inicializar el módulo de selector de datos
-    tools_module <- Sbutton_02_tools_server("selector_tools", valores_default, valores_internos)
-    reset_callbacks <- c(reset_callbacks, tools_module$reset)
+    Sbutton_02_tools_server("selector_tools", valores_default, valores_internos)
+    # tools_module <- Sbutton_02_tools_server("selector_tools", valores_default, valores_internos)
+    # reset_callbacks <- c(reset_callbacks, tools_module$reset)
     
     # Inicializar el módulo de selector de variables
-    variables_module <- Sbutton_03_variable_selector_server("selector_variables", valores_default, valores_internos)
-    reset_callbacks <- c(reset_callbacks, variables_module$reset)
+    Sbutton_03_variable_selector_server("selector_variables", valores_default, valores_internos)
+    # variables_module <- Sbutton_03_variable_selector_server("selector_variables", valores_default, valores_internos)
+    # reset_callbacks <- c(reset_callbacks, variables_module$reset)
     
     # Inicializar el módulo de botón PLAY
-    play_module <- Sbutton_play_server("play_button", valores_default, valores_internos, valores_activos)
-    reset_callbacks <- c(reset_callbacks, play_module$reset)
+    Sbutton_play_server("play_button", valores_default, valores_internos, valores_activos)
+    # play_module <- Sbutton_play_server("play_button", valores_default, valores_internos, valores_activos)
+    # reset_callbacks <- c(reset_callbacks, play_module$reset)
     
     # Inicializar el módulo de reseteo con los callbacks
     Sbutton_reset_server("reset_button", valores_default, valores_internos, valores_activos, reset_callbacks)
