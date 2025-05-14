@@ -114,7 +114,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
             span(original_file_name, style = "font-family: monospace;")
           ),
           div(
-            span(class = "fw-bold", "Dimensions: "),
+            span(class = "fw-bold", "Shape: "),
             span(paste0(value_nrow, " rows × ", value_ncol, " columns"), 
                  style = "font-family: monospace;")
           )
@@ -144,13 +144,14 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
             span(selected_tool, style = "font-family: monospace;")
           ),
           div(
-            span(class = "fw-bold", "Modelo: "),
-            span(modelo_seleccionado, style = "font-family: monospace;")
-          ),
-          div(
             span(class = "fw-bold", "Panel: "),
             span(acordeon, style = "font-family: monospace;")
+          ),
+          div(
+            span(class = "fw-bold", "Modelo: "),
+            span(modelo_seleccionado, style = "font-family: monospace;")
           )
+          
         )
         
       )
@@ -192,19 +193,9 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
         #   )
         # )
         
-        div(class = "d-flex flex-column",
-            div(class = "me-4 mb-2",
-                span(class = "fw-bold", "Factor: "),
-                span(value_factor, style = "font-family: monospace;")),
-            
-            div(class = "me-4 mb-2",
-                span(class = "fw-bold", "Response Variable: "),
-                span(value_rv, style = "font-family: monospace;"))
-        ),
-        
         div(
           class = "mt-2",
-          span(class = "fw-bold", "Variables en el modelo: "),
+          span(class = "fw-bold", "All variables: "),
           div(
             class = "mt-1",
             lapply(vector_selected_vars, function(var) {
@@ -217,8 +208,20 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
           )
         ),
         div(
-          span(class = "fw-bold", "Dimensiones: "),
-          span(paste0(new_nrow, " filas × ", new_ncol, " columnas"), 
+          class = "d-flex flex-column",
+            div(class = "me-4 mb-2",
+                span(class = "fw-bold", "Factor: "),
+                span(value_factor, style = "font-family: monospace;")),
+            
+            div(class = "me-4 mb-2",
+                span(class = "fw-bold", "Response Variable: "),
+                span(value_rv, style = "font-family: monospace;"))
+        ),
+        
+        
+        div(
+          span(class = "fw-bold", "Shape: "),
+          span(paste0(new_nrow, " rows × ", new_ncol, " columns"), 
                style = "font-family: monospace;")
         )
       )
@@ -422,18 +425,18 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     
     # Define la información de los botones con grupo y orden
     botones_info <- list( 
-      list(id = "boton_1",  label = "Summary",                class = "btn-primary",         grupo = 1, orden = 1, content = "dynamic_tab01_ui"),
-      list(id = "boton_2",  label = "Full Analysis",          class = "btn-secondary",       grupo = 1, orden = 2, content = "mega_tabs"),
-      list(id = "boton_3",  label = "Descriptive Statistics", class = "btn-success",         grupo = 1, orden = 3, content = "3"),
-      list(id = "boton_4",  label = "Script",                 class = "btn-danger",          grupo = 1, orden = 4, content = "dynamic_tab05_ui"),
-      list(id = "boton_5",  label = "Download",               class = "btn-warning",         grupo = 2, orden = 1, content = "dynamic_tab06_ui"),
-      list(id = "boton_6",  label = "Hypotheses",             class = "btn-info",            grupo = 3, orden = 1, content = "6"),
-      list(id = "boton_7",  label = "Theoretical Framework",  class = "btn-light",           grupo = 3, orden = 2, content = "7"),
-      list(id = "boton_8",  label = "Bibliography",           class = "btn-dark",            grupo = 3, orden = 3, content = "8"),
-      list(id = "boton_9",  label = "Stock",                  class = NULL,                  grupo = 3, orden = 4, content = "9"),
-      list(id = "boton_10", label = "Catastrophic Errors",    class = "btn-outline-primary", grupo = 3, orden = 5, content = "10"),
-      list(id = "boton_11", label = "Possible Cases",         class = "btn-outline-primary", grupo = 3, orden = 6, content = "11"),
-      list(id = "boton_12", label = "Analysis Structure",     class = "btn-outline-primary", grupo = 3, orden = 7, content = "12")
+      list(id = "boton_1",  label = "Summary",                class = "btn-primary",         grupo = 1, orden = 1, content = "dynamic_tab01_ui", show_always = TRUE),
+      list(id = "boton_2",  label = "Full Analysis",          class = "btn-secondary",       grupo = 1, orden = 2, content = "mega_tabs", show_always = TRUE),
+      list(id = "boton_3",  label = "Descriptive Statistics", class = "btn-success",         grupo = 1, orden = 3, content = "3", show_always = TRUE),
+      list(id = "boton_4",  label = "Script",                 class = "btn-danger",          grupo = 1, orden = 4, content = "dynamic_tab05_ui", show_always = TRUE),
+      list(id = "boton_5",  label = "Download",               class = "btn-warning",         grupo = 1, orden = 5, content = "dynamic_tab06_ui", show_always = TRUE),
+      list(id = "boton_6",  label = "Hypotheses",             class = "btn-info",            grupo = 2, orden = 1, content = "6", show_always = TRUE),
+      list(id = "boton_7",  label = "Theoretical Framework",  class = "btn-light",           grupo = 2, orden = 2, content = "7", show_always = TRUE),
+      list(id = "boton_8",  label = "Bibliography",           class = "btn-dark",            grupo = 2, orden = 3, content = "8", show_always = TRUE),
+      list(id = "boton_9",  label = "Stock",                  class = NULL,                  grupo = 2, orden = 4, content = "9", show_always = TRUE),
+      list(id = "boton_10", label = "Catastrophic Errors",    class = "btn-outline-primary", grupo = 2, orden = 5, content = "10", show_always = TRUE),
+      list(id = "boton_11", label = "Possible Cases",         class = "btn-outline-primary", grupo = 2, orden = 6, content = "11", show_always = TRUE),
+      list(id = "boton_12", label = "Analysis Structure",     class = "btn-outline-primary", grupo = 2, orden = 7, content = "12", show_always = TRUE)
     )
     
     # En cuanto a renderUI, primero filtramos por grupo
@@ -441,17 +444,28 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     
     # Crear los botones con grupos y orden, y ponerlos en UI
     output$botones_dinamicos <- renderUI({
-      grupos <- c(1, 2, 3)
+      
+      valores_internos_list <- reactiveValuesToList(valores_activos)
+      play_ok <- valores_internos_list$check_play
+      
+      
+      grupos <- c(1, 2)
       ui_list <- lapply(grupos, function(g) {
         botones_grupo <- Filter(function(b) b$grupo == g, botones_info)
         botones_grupo <- botones_grupo[order(sapply(botones_grupo, function(b) b$orden))]
         
+        
         lista_botones <- lapply(botones_grupo, function(boton) {
+          
+          is_disabled <- !boton$show_always
+          if(!is_disabled) if(g == 1) is_disabled <- !play_ok
+          
           if (!is.null(boton$class)) {
             actionButton(
               inputId = ns(boton$id),
               label = boton$label,
-              class = boton$class
+              class = boton$class,
+              disabled = is_disabled
             )
           } else {
             actionButton(

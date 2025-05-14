@@ -152,9 +152,9 @@ Sbutton_02_tools_server <- function(id, valores_default, valores_internos) {
               class = "btn btn-default",
               style = "width: 50%; height: 45px;", # Aumentado la altura
               "data-bs-dismiss" = "modal",
-              "Cancelar"
+              "CANCEL"
             ),
-            actionButton(inputId = ns("confirmar_tools"), label = "Seleccionar", 
+            actionButton(inputId = ns("confirmar_tools"), label = "ADD", 
                          class = "btn-primary", style = "width: 100%; height: 45px;") # Aumentado la altura
             
           )

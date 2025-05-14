@@ -20,7 +20,7 @@ Sbutton_01_dataselector_server <- function(id, valores_internos, show_dev = FALS
     output_list_database_rv <- reactiveVal(NULL)  
     
     # My button
-    button_state <- reactiveVal(NULL)
+    button_state <- reactiveVal("initial")
     
     observe({
       button_state(valores_internos$button_class_import_dataset)
@@ -44,14 +44,17 @@ Sbutton_01_dataselector_server <- function(id, valores_internos, show_dev = FALS
       )
     })
     
-    
-    
+    # Iniciamos el server
+    output_list_database_rv(
+      Rscience.import::MASTER_module_import_server(id = "MASTER_import", show_dev = show_dev)
+    )
     
     # Cuando el usuario hace clic en el botón para elegir datos
     observeEvent(input$btn_dataset, {
       # 1. Primero inicializamos los elementos del módulo
       # Esto garantiza que estén creados antes de mostrar el modal
       # output_module <- Rscience.import::MASTER_module_import_ui(id = ns("MASTER_import"))
+      
       
       # 2. Mostramos el modal con el contenido del módulo ya inicializado
       # Usando tamaño "xl" (extra large)
@@ -115,10 +118,10 @@ Sbutton_01_dataselector_server <- function(id, valores_internos, show_dev = FALS
               class = "btn btn-default",
               style = "width: 50%; height: 45px;", # Aumentado la altura
               "data-bs-dismiss" = "modal",
-              "Cancelar"
+              "CANCEL"
             ),
-            actionButton(inputId = ns("confirmar_dataset"), label = "Seleccionar", 
-                         class = "btn-primary", style = "width: 100%; height: 45px;") # Aumentado la altura
+            actionButton(inputId = ns("confirmar_dataset"), label = "ADD", 
+                         class = "btn-primary", style = "width: 50%; height: 45px;") # Aumentado la altura
 
           )
           
@@ -126,108 +129,38 @@ Sbutton_01_dataselector_server <- function(id, valores_internos, show_dev = FALS
       )
       
       
-      
-      
-      # 3. Inicializamos el servidor del módulo DESPUÉS de que el modal esté visible
-      # pero en el mismo contexto de ejecución para garantizar que todo esté listo
-      output_list_database_rv(
-        Rscience.import::MASTER_module_import_server(id = "MASTER_import", show_dev = show_dev)
-      )
+     
     })
     
     # Al confirmar selección, actualizar los valores_internos
     observeEvent(input$confirmar_dataset, {
-      # Obtenemos el valor actual del reactiveVal
-      output_list_database <- output_list_database_rv()
       
-      # Verificaciones
-      if (is.null(output_list_database) || !is.function(output_list_database)) {
-        showNotification("El módulo de importación no se ha inicializado correctamente.", type = "error")
+      # 1) Hacer validaciones sobre la importacion realizada.
+      #    Si todo esta bien...
+      # 2) Asignar nuevos valores a "valores_internos".
+      # 3) Cerrar el modal
+      
+      resultado <- fn_validate_01_dataselector(output_list_database_rv)
+      
+      if (!resultado$status) {
+        showNotification(resultado$message, type = "warning")
         return()
       }
       
-      # Intentamos obtener los datos
-      tryCatch({
-        datos_importados <- output_list_database()
-        
-        # Verificar que se haya seleccionado una opción válida
-        if (!is.list(datos_importados)) {
-          showNotification("Por favor, seleccione una base de datos.", type = "warning")
-          return()
-        }
-        
-        if (is.null(datos_importados$"database")) {
-          showNotification("Por favor, seleccione una base de datos.", type = "warning")
-          return()
-        }
-        
-        vector_nombres_esperados <- c("data_source", "selected_input_file", 
-                                      "temporal_file_path", "original_file_name",
-                                      "str_import_selected", "str_import_external",
-                                      "str_import_internal", "info_extra", "database",
-                                      "error_message")
-        
-        vector_nombres_observados <- names(datos_importados)
-        
-        if (!all(vector_nombres_esperados %in% vector_nombres_observados)) {
-          showNotification("Inconvenientes en la carga de la base de datos. \nLa lista esperada de objetos no corresponde con la observada.", 
-                           type = "warning")
-          return()
-        }
-        
-        if (!is.data.frame(datos_importados$"database")) {
-          showNotification("Inconvenientes en la carga de la base de datos.", type = "warning")
-          return()
-        }
-        
-        # Como todo esta OK...
-        # asignamos los objetos al pack y al check y cambiamos de color el boton del pack
-        valores_internos$pack_import_dataset  <- datos_importados
-        valores_internos$check_import_dataset <- TRUE
-        valores_internos$button_class_import_dataset <- "confirmed"
-        
-        if (valores_internos$check_import_dataset) {
-          # Cambiar el color del botón
-          # button_state("confirmed")
-          
-          # shinyjs::runjs(sprintf("$('#%s').removeClass('btn-primary').addClass('btn-success');", 
-          #                        ns("btn_dataset")))
-          
-          # Notificación de éxito
-          showNotification(
-            ui = tags$div(
-              style = "background-color: #d1e7dd; color: #0f5132; font-size: 15px; font-weight: bold; padding: 10px; border-radius: 4px; border-left: 5px solid #0f5132; display: flex; align-items: center;",
-              tags$i(
-                class = "fa fa-check-circle",
-                style = "font-size: 20px; margin-right: 5px;"
-              ),
-              "Base de datos importada exitosamente."
-            ),
-            duration = 5,
-            closeButton = TRUE
-          )
-          
-          # Cerrar el modal
-          removeModal()
-        } else {
-          showNotification("Error inespecífico en import_dataset.", type = "warning")
-        }
-      }, error = function(e) {
-        # En caso de error, mostrar un mensaje amigable
-        showNotification(
-          paste("Error al procesar los datos:", e$message), 
-          type = "error"
-        )
-      })
+      datos <- resultado$datos
+      
+      valores_internos$pack_import_dataset  <- datos
+      valores_internos$check_import_dataset <- TRUE
+      valores_internos$button_class_import_dataset <- "confirmed"
+      
+      fn_show_notification_ok("Base de datos importada exitosamente.")
+      
+      removeModal()
     })
     
+    
+    
     return(NULL)
-    # Función para restablecer este botón (accesible desde el exterior)
-    # return(list(
-    #   reset = function() {
-    #     shinyjs::runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", 
-    #                            ns("btn_dataset")))
-    #   }
-    # ))
+   
   })
 }

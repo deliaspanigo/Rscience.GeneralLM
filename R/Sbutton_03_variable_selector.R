@@ -164,9 +164,9 @@ Sbutton_03_variable_selector_server <- function(id, valores_default, valores_int
             class = "btn btn-default",
             style = "width: 50%; height: 45px;", # Aumentado la altura
             "data-bs-dismiss" = "modal",
-            "Cancelar"
+            "CANCEL"
           ),
-          actionButton(inputId = ns("confirmar_variables"), label = "Seleccionar", 
+          actionButton(inputId = ns("confirmar_variables"), label = "ADD", 
                        class = "btn-primary", style = "width: 100%; height: 45px;") # Aumentado la altura
           
         )
