@@ -7,7 +7,7 @@ Sbutton_02_tools_ui <- function(id) {
     ns("btn_tools"),
     HTML(paste0('<i class="fa fa-hammer" style="font-size: 75px; display: block; margin-bottom: 8px; transform: scaleX(-1);"></i>', 
                 '<span></span>')),
-    class = "btn-special", #btn-primary", 
+    class = "btn-primary", 
     style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
     title = "Statistic tools"
   )
@@ -43,7 +43,9 @@ Sbutton_02_tools_server <- function(id, valores_default, valores_internos) {
       valores_internos$check_tool_selection <-  valores_default$check_tool_selection
       
       # Restablecer el color del botón a primario (azul)
-      runjs(sprintf("$('#%s').removeClass('btn-neon-green').addClass('btn-primary');", ns("btn_tools")))
+      runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", ns("btn_tools")))
+      
+      #runjs(sprintf("$('#%s').removeClass('btn-neon-green').addClass('btn-primary');", ns("btn_tools")))
       
     }, ignoreInit = TRUE)
     
@@ -188,7 +190,7 @@ Sbutton_02_tools_server <- function(id, valores_default, valores_internos) {
       if(valores_internos$check_tool_selection){
         # Cambiar el color del botón usando jQuery para asegurar que funcione
         runjs(sprintf("$('#%s').css('border', 'none');", ns("btn_tools")))
-        runjs(sprintf("$('#%s').removeClass('btn-primary').addClass('btn-neon-green');", ns("btn_tools")))
+        runjs(sprintf("$('#%s').removeClass('btn-primary').addClass('btn-success');", ns("btn_tools")))
         
         showNotification(
           ui = tags$div(
@@ -221,7 +223,7 @@ Sbutton_02_tools_server <- function(id, valores_default, valores_internos) {
     return(list(
       reset = function() {
         runjs(sprintf("$('#%s').css('border', 'none');", ns("btn_tools")))
-        runjs(sprintf("$('#%s').removeClass('btn-neon-green').addClass('btn-primary');", ns("btn_tools")))
+        runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", ns("btn_tools")))
       }
     ))
   })

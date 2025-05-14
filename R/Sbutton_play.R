@@ -7,7 +7,7 @@ Sbutton_play_ui <- function(id) {
     ns("btn_play"),
     HTML(paste0('<i class="fa fa-play" style="font-size: 75px; display: block; margin-bottom: 8px; "></i>', 
                 '<span></span>')),
-    class = "btn-special", #btn-primary", 
+    class = "btn-primary", 
     style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
     title = "PLAY!"
   )
@@ -43,7 +43,7 @@ Sbutton_play_server <- function(id, valores_default, valores_internos, valores_a
       valores_internos$check_play <-  valores_default$check_play
       
       # Restablecer el color del botón a primario (azul)
-      runjs(sprintf("$('#%s').removeClass('btn-neon-green').addClass('btn-primary');", ns("btn_play")))
+      runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", ns("btn_play")))
       
     }, ignoreInit = TRUE)
     
@@ -117,7 +117,7 @@ Sbutton_play_server <- function(id, valores_default, valores_internos, valores_a
         
         # Cambiar el color del botón usando jQuery para asegurar que funcione
         ### runjs(sprintf("$('#%s').css('border', 'none');", ns("btn_play")))
-        runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-neon-green');", ns("btn_play")))
+        runjs(sprintf("$('#%s').removeClass('btn-primary').addClass('btn-success');", ns("btn_play")))
         
         showNotification(
           ui = tags$div(
@@ -140,7 +140,7 @@ Sbutton_play_server <- function(id, valores_default, valores_internos, valores_a
     return(list(
       reset = function() {
         #runjs(sprintf("$('#%s').css('border', 'none');", ns("btn_play")))
-        runjs(sprintf("$('#%s').removeClass('btn-neon-green').addClass('btn-primary');", ns("btn_play")))
+        runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", ns("btn_play")))
       }
     ))
   })

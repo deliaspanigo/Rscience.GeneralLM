@@ -8,7 +8,7 @@ Sbutton_03_variable_selector_ui <- function(id) {
     ns("btn_variables"),
     HTML(paste0('<i class="fa fa-sliders" style="font-size: 75px; display: block; margin-bottom: 8px;"></i>', 
                 '<span></span>')),
-    class = "btn-special", #btn-primary", 
+    class = "btn-primary", 
     style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
     title = "Variables Selection"
   )
@@ -41,7 +41,7 @@ Sbutton_03_variable_selector_server <- function(id, valores_default, valores_int
       valores_internos$check_var_selection <-  valores_default$check_var_selection
       
       # Restablecer el color del botón a primario (azul)
-      runjs(sprintf("$('#%s').removeClass('btn-neon-green').addClass('btn-primary');", ns("btn_tools")))
+      runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", ns("btn_tools")))
       
     }, ignoreInit = TRUE)
     
@@ -198,7 +198,7 @@ Sbutton_03_variable_selector_server <- function(id, valores_default, valores_int
       if(valores_internos$check_var_selection){
         # Cambiar el color del botón usando jQuery para asegurar que funcione
         runjs(sprintf("$('#%s').css('border', 'none');", ns("btn_variables")))
-        runjs(sprintf("$('#%s').removeClass('btn-primary').addClass('btn-neon-green');", ns("btn_variables")))
+        runjs(sprintf("$('#%s').removeClass('btn-primary').addClass('btn-success');", ns("btn_variables")))
         
         showNotification(
           ui = tags$div(
@@ -234,7 +234,7 @@ Sbutton_03_variable_selector_server <- function(id, valores_default, valores_int
     return(list(
       reset = function() {
         runjs(sprintf("$('#%s').css('border', 'none');", ns("btn_variables")))
-        runjs(sprintf("$('#%s').removeClass('btn-neon-green').addClass('btn-primary');", ns("btn_variables")))
+        runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", ns("btn_variables")))
       }
     ))
   })
