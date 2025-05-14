@@ -3,15 +3,8 @@ Sbutton_01_dataselector_ui <- function(id) {
   ns <- NS(id)
  
   # Solo necesitamos el botón para activar el modal
-  actionButton(
-    ns("btn_dataset"),
-    HTML(paste0('<i class="fa fa-database" style="font-size: 75px; display: block; margin-bottom: 8px;"></i>', 
-                '<span></span>')),
-    class = "btn-primary", 
-    style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
-    title = "Import dataset"
-  )
   
+  uiOutput(ns("my_action_button"))
   
 
 }
@@ -21,8 +14,32 @@ Sbutton_01_dataselector_server <- function(id, valores_internos, show_dev = FALS
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
+
+    
     # Variable reactiva para almacenar el módulo de importación
-    output_list_database_rv <- reactiveVal(NULL)
+    output_list_database_rv <- reactiveVal(NULL)  
+    
+    # My button
+    button_state <- reactiveVal("initial")
+    output$my_action_button <- renderUI({
+      
+      btn_class <- switch(button_state(),
+                          "initial"   = "btn-primary",    # Azul inicial
+                          "confirmed" = "btn-success",    # Verde después de confirmar
+                          "modified"  = "btn-primary")    # Vuelve a azul si se modifica
+      
+      actionButton(
+        ns("btn_dataset"),
+        HTML(paste0('<i class="fa fa-database" style="font-size: 75px; display: block; margin-bottom: 8px;"></i>', 
+                    '<span></span>')),
+        class = btn_class, 
+        style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
+        title = "Import dataset"
+      )
+    })
+    
+    
+    
     
     # Cuando el usuario hace clic en el botón para elegir datos
     observeEvent(input$btn_dataset, {
@@ -164,8 +181,10 @@ Sbutton_01_dataselector_server <- function(id, valores_internos, show_dev = FALS
         
         if (valores_internos$check_import_dataset) {
           # Cambiar el color del botón
-          shinyjs::runjs(sprintf("$('#%s').removeClass('btn-primary').addClass('btn-success');", 
-                                 ns("btn_dataset")))
+          button_state("confirmed")
+          
+          # shinyjs::runjs(sprintf("$('#%s').removeClass('btn-primary').addClass('btn-success');", 
+          #                        ns("btn_dataset")))
           
           # Notificación de éxito
           showNotification(
