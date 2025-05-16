@@ -172,31 +172,48 @@ Sbutton_03_variable_selector2_server <- function(id, internal_DATASET_SELECTOR,
       vector_names_observed <- names(variables_seleccionadas)
       vector_names_observed <- unname(vector_names_observed)
       
-      vector_cantidad_espected <- c(1, 1, 2, 1)
+      vector_cantidad_espected <- c(1, 1, 2, 1, 1, 1)
       vector_cantidad_observed <- sapply(variables_seleccionadas, length)
       
+      # print(vector_names_espected)
+      # print(vector_names_observed)
       # Verificar que se haya seleccionado una opción válida
       if (!all(vector_names_espected == vector_names_observed)) {
         #print(vector_names_espected == vector_names_observed)
+        internal_VARIABLE_SELECTOR$"pack_input"   = ""
+        internal_VARIABLE_SELECTOR$"check_input"  = FALSE
+        internal_VARIABLE_SELECTOR$"pack_output"  = ""
+        internal_VARIABLE_SELECTOR$"check_output" = FALSE
+        internal_VARIABLE_SELECTOR$"button_class" = "initial"
         showNotification("Inconvenientes en la eleccion de Variables para ANOVA.", type = "warning")
         return()  # No hacer nada si no se seleccionó nada
       }
       
       # Verificar que se haya seleccionado una opción válida
       if (!all(vector_cantidad_espected == vector_cantidad_observed)) {
+        internal_VARIABLE_SELECTOR$"pack_input"   = ""
+        internal_VARIABLE_SELECTOR$"check_input"  = FALSE
+        internal_VARIABLE_SELECTOR$"pack_output"  = ""
+        internal_VARIABLE_SELECTOR$"check_output" = FALSE
+        internal_VARIABLE_SELECTOR$"button_class" = "initial"
         showNotification("Inconvenientes en la eleccion de Variables para ANOVA.
                          No coincide la cantidad de elementos.", type = "warning")
         return()  # No hacer nada si no se seleccionó nada
       }
       
       
-   
+      fn_shiny_apply_changes_reactiveValues(rv = internal_VARIABLE_SELECTOR, list(
+        "pack_input"   = variables_seleccionadas,
+        "check_input"  = TRUE,
+        "pack_output"  = variables_seleccionadas,
+        "check_output" = TRUE,
+        "button_class" = "confirmed"))
       
-      internal_VARIABLE_SELECTOR$"pack_input"   = variables_seleccionadas
-      internal_VARIABLE_SELECTOR$"check_input"  = TRUE
-      internal_VARIABLE_SELECTOR$"pack_output"  = variables_seleccionadas
-      internal_VARIABLE_SELECTOR$"check_output" = TRUE
-      internal_VARIABLE_SELECTOR$"button_class" = "confirmed"
+      # internal_VARIABLE_SELECTOR$"pack_input"   = variables_seleccionadas
+      # internal_VARIABLE_SELECTOR$"check_input"  = TRUE
+      # internal_VARIABLE_SELECTOR$"pack_output"  = variables_seleccionadas
+      # internal_VARIABLE_SELECTOR$"check_output" = TRUE
+      # internal_VARIABLE_SELECTOR$"button_class" = "confirmed"
       
       # # Guardar las variables seleccionadas
       # valores_internos$pack_var_selection         <- variables_seleccionadas

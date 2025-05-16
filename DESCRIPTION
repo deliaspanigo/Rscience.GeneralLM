@@ -15,5 +15,6 @@ Imports:
     quarto,
     readxl,
     Rscience.import,
+    Rscience.menu,
     shinyAce,
     shinyjs

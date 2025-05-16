@@ -156,12 +156,19 @@ Sbutton_01_dataselector2_server <- function(id, internal_DATASET_SELECTOR) {
       }
       # 
        datos <- resultado$datos
-      # 
-       internal_DATASET_SELECTOR$"pack_input"   = datos
-       internal_DATASET_SELECTOR$"check_input"  = resultado$status
-       internal_DATASET_SELECTOR$"pack_output"  = datos
-       internal_DATASET_SELECTOR$"check_output" = resultado$status
-       internal_DATASET_SELECTOR$"button_class" = "confirmed"
+      
+       fn_shiny_apply_changes_reactiveValues(rv = internal_DATASET_SELECTOR, list(
+         "pack_input"   = datos,
+         "check_input"  = resultado$status,
+         "pack_output"  = datos,
+         "check_output" = resultado$status,
+         "button_class" = "confirmed"))
+       
+       # internal_DATASET_SELECTOR$"pack_input"   = datos
+       # internal_DATASET_SELECTOR$"check_input"  = resultado$status
+       # internal_DATASET_SELECTOR$"pack_output"  = datos
+       # internal_DATASET_SELECTOR$"check_output" = resultado$status
+       # internal_DATASET_SELECTOR$"button_class" = "confirmed"
        
       # 
       # button_state("confirmed")

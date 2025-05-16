@@ -114,15 +114,30 @@ Sbutton_play2_server <- function(id, internal_DATASET_SELECTOR,  active_DATASET_
       #   return()  # No hacer nada si no se han seleccionado variables
       # }
       
-      internal_PLAY_SELECTOR$"pack_input"   = ""
-      internal_PLAY_SELECTOR$"check_input"  = TRUE
-      internal_PLAY_SELECTOR$"pack_output"  = ""
-      internal_PLAY_SELECTOR$"check_output" = TRUE
-      internal_PLAY_SELECTOR$"button_class" = "confirmed"
+      fn_shiny_apply_changes_reactiveValues(rv = internal_PLAY_SELECTOR, list(
+        "pack_input"   = "",
+        "check_input"  = TRUE,
+        "pack_output"  = "",
+        "check_output" = TRUE,
+        "button_class" = "confirmed"))
+      
+      # internal_PLAY_SELECTOR$"pack_input"   = ""
+      # internal_PLAY_SELECTOR$"check_input"  = TRUE
+      # internal_PLAY_SELECTOR$"pack_output"  = ""
+      # internal_PLAY_SELECTOR$"check_output" = TRUE
+      # internal_PLAY_SELECTOR$"button_class" = "confirmed"
     
 
       if(internal_PLAY_SELECTOR$"check_output"){
         
+       
+        
+        fn_shiny_apply_changes_reactiveValues(rv = active_DATASET_SELECTOR, changes_list  = internal_DATASET_SELECTOR)
+        fn_shiny_apply_changes_reactiveValues(rv = active_TOOLS_SELECTOR,    changes_list = internal_TOOLS_SELECTOR)
+        fn_shiny_apply_changes_reactiveValues(rv = active_VARIABLE_SELECTOR, changes_list = internal_VARIABLE_SELECTOR)
+        fn_shiny_apply_changes_reactiveValues(rv = active_PLAY_SELECTOR,     changes_list = internal_PLAY_SELECTOR)
+        
+              
         # valores_activos$pack_import_dataset <- valores_internos$pack_import_dataset
         # valores_activos$check_import_dataset <- valores_internos$check_import_dataset
         # valores_activos$pack_tool_selection <-  valores_internos$pack_tool_selection

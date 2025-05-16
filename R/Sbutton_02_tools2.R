@@ -151,11 +151,18 @@ Sbutton_02_tools2_server <- function(id, internal_DATASET_SELECTOR, internal_TOO
       
       obj_intermedio <- list_user_tool_selection()
       
-      internal_TOOLS_SELECTOR$"pack_input"   = obj_intermedio
-      internal_TOOLS_SELECTOR$"check_input"  = TRUE
-      internal_TOOLS_SELECTOR$"pack_output"  = obj_intermedio
-      internal_TOOLS_SELECTOR$"check_output" = TRUE
-      internal_TOOLS_SELECTOR$"button_class" = "confirmed"
+      fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, list(
+        "pack_input"   = obj_intermedio,
+        "check_input"  = TRUE,
+        "pack_output"  = obj_intermedio,
+        "check_output" = TRUE,
+        "button_class" = "confirmed"))
+      
+      # internal_TOOLS_SELECTOR$"pack_input"   = obj_intermedio
+      # internal_TOOLS_SELECTOR$"check_input"  = TRUE
+      # internal_TOOLS_SELECTOR$"pack_output"  = obj_intermedio
+      # internal_TOOLS_SELECTOR$"check_output" = TRUE
+      # internal_TOOLS_SELECTOR$"button_class" = "confirmed"
       
 
       

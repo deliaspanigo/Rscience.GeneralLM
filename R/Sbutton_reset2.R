@@ -47,18 +47,31 @@ Sbutton_reset2_server <- function(id, default_structure,
     
     # Confirmación de reseteo
     observeEvent(input$confirmar_reset, {
-      # Restaurar todos los valores_internos a los predeterminados
-      for (nombre in names(default_structure)) {
-        internal_DATASET_SELECTOR[[nombre]] <- default_structure[[nombre]]
-        active_DATASET_SELECTOR[[nombre]]   <- default_structure[[nombre]]
-        
-        internal_TOOLS_SELECTOR[[nombre]] <- default_structure[[nombre]]
-        active_TOOLS_SELECTOR[[nombre]]   <- default_structure[[nombre]]
-        
-        internal_PLAY_SELECTOR[[nombre]] <- default_structure[[nombre]]
-        active_PLAY_SELECTOR[[nombre]]   <- default_structure[[nombre]]
-        #valores_activos[[nombre]]  <- default_structure[[nombre]]
-      }
+      
+      fn_shiny_apply_changes_reactiveValues(rv = internal_DATASET_SELECTOR, default_structure)
+      fn_shiny_apply_changes_reactiveValues(rv = active_DATASET_SELECTOR, default_structure)
+      
+      fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, default_structure)
+      fn_shiny_apply_changes_reactiveValues(rv = active_TOOLS_SELECTOR, default_structure)
+      
+      fn_shiny_apply_changes_reactiveValues(rv = internal_VARIABLE_SELECTOR, default_structure)
+      fn_shiny_apply_changes_reactiveValues(rv = active_VARIABLE_SELECTOR, default_structure)
+      
+      fn_shiny_apply_changes_reactiveValues(rv = internal_PLAY_SELECTOR, default_structure)
+      fn_shiny_apply_changes_reactiveValues(rv = active_PLAY_SELECTOR, default_structure)
+      
+      # # Restaurar todos los valores_internos a los predeterminados
+      # for (nombre in names(default_structure)) {
+      #   internal_DATASET_SELECTOR[[nombre]] <- default_structure[[nombre]]
+      #   active_DATASET_SELECTOR[[nombre]]   <- default_structure[[nombre]]
+      #   
+      #   internal_TOOLS_SELECTOR[[nombre]] <- default_structure[[nombre]]
+      #   active_TOOLS_SELECTOR[[nombre]]   <- default_structure[[nombre]]
+      #   
+      #   internal_PLAY_SELECTOR[[nombre]] <- default_structure[[nombre]]
+      #   active_PLAY_SELECTOR[[nombre]]   <- default_structure[[nombre]]
+      #   #valores_activos[[nombre]]  <- default_structure[[nombre]]
+      # }
       
       # # Llamar a todos los callbacks de reseteo
       # for (callback in reset_callbacks) {
@@ -77,19 +90,18 @@ Sbutton_reset2_server <- function(id, default_structure,
     
     observeEvent(internal_DATASET_SELECTOR$pack_output,{
       for (nombre in names(default_structure)) {
-        internal_TOOLS_SELECTOR[[nombre]] <- default_structure[[nombre]]
-        active_TOOLS_SELECTOR[[nombre]]   <- default_structure[[nombre]]
-
+        fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, default_structure)
+        fn_shiny_apply_changes_reactiveValues(rv = active_TOOLS_SELECTOR, default_structure)
       }
-
     })
+    
     # 
     # 
     observeEvent(internal_TOOLS_SELECTOR$pack_output,{
       for (nombre in names(default_structure)) {
         
-        internal_VARIABLE_SELECTOR[[nombre]] <- default_structure[[nombre]]
-        active_VARIABLE_SELECTOR[[nombre]]   <- default_structure[[nombre]]
+        fn_shiny_apply_changes_reactiveValues(rv = internal_VARIABLE_SELECTOR, default_structure)
+        fn_shiny_apply_changes_reactiveValues(rv = active_VARIABLE_SELECTOR, default_structure)
       
       }
       
@@ -98,8 +110,8 @@ Sbutton_reset2_server <- function(id, default_structure,
     observeEvent(internal_VARIABLE_SELECTOR$pack_output,{
       for (nombre in names(default_structure)) {
   
-        internal_PLAY_SELECTOR[[nombre]] <- default_structure[[nombre]]
-        active_PLAY_SELECTOR[[nombre]]   <- default_structure[[nombre]]
+        fn_shiny_apply_changes_reactiveValues(rv = internal_PLAY_SELECTOR, default_structure)
+        fn_shiny_apply_changes_reactiveValues(rv = active_PLAY_SELECTOR, default_structure)
       }
       
     })
