@@ -26,6 +26,7 @@ devtools::install()
 ########################################
 library(Rscience.GeneralLM)
 library(Rscience.menu)
+library(Rscience.import)
 Rscience.GeneralLM::run_app()
 
 

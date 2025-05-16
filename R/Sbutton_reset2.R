@@ -25,6 +25,7 @@ Sbutton_reset2_ui <- function(id) {
 #' @export
 Sbutton_reset2_server <- function(id, default_structure, 
                                   internal_DATASET_SELECTOR, active_DATASET_SELECTOR,
+                                  internal_TOOLS_SELECTOR,   active_TOOLS_SELECTOR,
                                   internal_PLAY_SELECTOR,    active_PLAY_SELECTOR) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
@@ -49,6 +50,9 @@ Sbutton_reset2_server <- function(id, default_structure,
       for (nombre in names(default_structure)) {
         internal_DATASET_SELECTOR[[nombre]] <- default_structure[[nombre]]
         active_DATASET_SELECTOR[[nombre]]   <- default_structure[[nombre]]
+        
+        internal_TOOLS_SELECTOR[[nombre]] <- default_structure[[nombre]]
+        active_TOOLS_SELECTOR[[nombre]]   <- default_structure[[nombre]]
         
         internal_PLAY_SELECTOR[[nombre]] <- default_structure[[nombre]]
         active_PLAY_SELECTOR[[nombre]]   <- default_structure[[nombre]]
