@@ -133,72 +133,72 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     })
     
     output$tarjeta03_vars <- renderUI({
-      valores_internos_list <- reactiveValuesToList(valores_internos)
-      req(valores_internos_list)
-      
-      req(valores_internos_list$pack_var_selection)
-      value_factor <- valores_internos_list$pack_var_selection$"factor"
-      value_rv <-     valores_internos_list$pack_var_selection$"respuesta"
-      vector_selected_vars <- valores_internos_list$pack_var_selection$"vector_selected_vars"
-      
-      minibase <- na.omit(valores_internos_list$pack_import_dataset$"database"[vector_selected_vars])
-      new_ncol <- ncol(minibase)
-      new_nrow <- nrow(minibase)
-      
-      div(
-        class = "p-2 rounded",
-        style = "background-color: rgba(255, 193, 7, 0.05); border-left: 4px solid #ffc107;",
-        
-        h5(class = "text-warning", icon("table-cells", class = "me-2"), "Selected variables"),
-        
-        # div(
-        #   class = "d-flex flex-column",
-        #   div(
-        #     span(class = "fw-bold", "Tipo: "),
-        #     span(selected_tool, style = "font-family: monospace;")
-        #   ),
-        #   div(
-        #     span(class = "fw-bold", "Modelo: "),
-        #     span(modelo_seleccionado, style = "font-family: monospace;")
-        #   ),
-        #   div(
-        #     span(class = "fw-bold", "Panel: "),
-        #     span(acordeon, style = "font-family: monospace;")
-        #   )
-        # )
-        
-        div(
-          class = "mt-2",
-          span(class = "fw-bold", "All variables: "),
-          div(
-            class = "mt-1",
-            lapply(vector_selected_vars, function(var) {
-              span(
-                class = "badge bg-light text-dark me-1 mb-1",
-                style = "border: 1px solid #dee2e6; padding: 5px;",
-                var
-              )
-            })
-          )
-        ),
-        div(
-          class = "d-flex flex-column",
-          div(class = "me-4 mb-2",
-              span(class = "fw-bold", "Factor: "),
-              span(value_factor, style = "font-family: monospace;")),
-          
-          div(class = "me-4 mb-2",
-              span(class = "fw-bold", "Response Variable: "),
-              span(value_rv, style = "font-family: monospace;"))
-        ),
-        
-        
-        div(
-          span(class = "fw-bold", "Shape: "),
-          span(paste0(new_nrow, " rows × ", new_ncol, " columns"), 
-               style = "font-family: monospace;")
-        )
-      )
+      # valores_internos_list <- reactiveValuesToList(valores_internos)
+      # req(valores_internos_list)
+      # 
+      # req(valores_internos_list$pack_var_selection)
+      # value_factor <- valores_internos_list$pack_var_selection$"factor"
+      # value_rv <-     valores_internos_list$pack_var_selection$"respuesta"
+      # vector_selected_vars <- valores_internos_list$pack_var_selection$"vector_selected_vars"
+      # 
+      # minibase <- na.omit(valores_internos_list$pack_import_dataset$"database"[vector_selected_vars])
+      # new_ncol <- ncol(minibase)
+      # new_nrow <- nrow(minibase)
+      # 
+      # div(
+      #   class = "p-2 rounded",
+      #   style = "background-color: rgba(255, 193, 7, 0.05); border-left: 4px solid #ffc107;",
+      #   
+      #   h5(class = "text-warning", icon("table-cells", class = "me-2"), "Selected variables"),
+      #   
+      #   # div(
+      #   #   class = "d-flex flex-column",
+      #   #   div(
+      #   #     span(class = "fw-bold", "Tipo: "),
+      #   #     span(selected_tool, style = "font-family: monospace;")
+      #   #   ),
+      #   #   div(
+      #   #     span(class = "fw-bold", "Modelo: "),
+      #   #     span(modelo_seleccionado, style = "font-family: monospace;")
+      #   #   ),
+      #   #   div(
+      #   #     span(class = "fw-bold", "Panel: "),
+      #   #     span(acordeon, style = "font-family: monospace;")
+      #   #   )
+      #   # )
+      #   
+      #   div(
+      #     class = "mt-2",
+      #     span(class = "fw-bold", "All variables: "),
+      #     div(
+      #       class = "mt-1",
+      #       lapply(vector_selected_vars, function(var) {
+      #         span(
+      #           class = "badge bg-light text-dark me-1 mb-1",
+      #           style = "border: 1px solid #dee2e6; padding: 5px;",
+      #           var
+      #         )
+      #       })
+      #     )
+      #   ),
+      #   div(
+      #     class = "d-flex flex-column",
+      #     div(class = "me-4 mb-2",
+      #         span(class = "fw-bold", "Factor: "),
+      #         span(value_factor, style = "font-family: monospace;")),
+      #     
+      #     div(class = "me-4 mb-2",
+      #         span(class = "fw-bold", "Response Variable: "),
+      #         span(value_rv, style = "font-family: monospace;"))
+      #   ),
+      #   
+      #   
+      #   div(
+      #     span(class = "fw-bold", "Shape: "),
+      #     span(paste0(new_nrow, " rows × ", new_ncol, " columns"), 
+      #          style = "font-family: monospace;")
+      #   )
+      # )
       
     })
     
