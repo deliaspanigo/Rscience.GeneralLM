@@ -1,6 +1,6 @@
 
 #' @export
-SSelector_anova_ui <- function(id) {
+SSelector_03_variable_selector_ui <- function(id) {
   ns <- NS(id)
   tagList(
     # Información sobre los datos
@@ -17,7 +17,7 @@ SSelector_anova_ui <- function(id) {
 }
 
 #' @export
-SSelector_anova_server <- function(id, my_dataset) {
+SSelector_03_variable_selector_server <- function(id, my_dataset) {
   moduleServer(id, function(input, output, session) {
     # Mostrar información sobre el dataset
     output$dataset_info <- renderText({

@@ -1,5 +1,5 @@
 #' @export
-SSelector_tools_ui <- function(id) {
+SSSelector_02_tools_GeneralLM_ui <- function(id) {
   ns <- NS(id)
   
   
@@ -153,8 +153,10 @@ SSelector_tools_ui <- function(id) {
 }
 
 #' @export
-SSelector_tools_server <- function(id) {
+SSSelector_02_tools_GeneralLM_server <- function(id) {
   moduleServer(id, function(input, output, session) {
+    ns <- session$ns
+    
     # Valores reactivos para almacenar la información de la selección
     valores <- reactiveValues(
       tipo_modelo = "fixed_models",

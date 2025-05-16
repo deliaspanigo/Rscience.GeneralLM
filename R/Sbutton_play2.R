@@ -1,0 +1,170 @@
+
+#' @export
+Sbutton_play2_ui <- function(id) {
+  ns <- NS(id)
+  
+  uiOutput(ns("my_action_button"))
+  
+  
+  
+}
+
+#' @export
+Sbutton_play2_server <- function(id, internal_DATASET_SELECTOR, internal_PLAY_SELECTOR,
+                                 active_DATASET_SELECTOR, active_PLAY_SELECTOR) {
+  moduleServer(id, function(input, output, session) {
+    ns <- session$ns
+    
+    
+    # My button
+    button_state <- reactiveVal(NULL)
+    
+    observe({
+      button_state(internal_PLAY_SELECTOR$button_class)
+      # if(!valores_internos$check_import_dataset) button_state("initial")
+    })
+    
+    output$my_action_button <- renderUI({
+      
+      btn_class <- switch(button_state(),
+                          "initial"   = "btn-primary",    # Azul inicial
+                          "confirmed" = "btn-success",    # Verde después de confirmar
+                          "modified"  = "btn-primary")    # Vuelve a azul si se modifica
+      
+      # Botón para elegir variables
+      actionButton(
+        ns("btn_play"),
+        HTML(paste0('<i class="fa fa-play" style="font-size: 75px; display: block; margin-bottom: 8px; "></i>', 
+                    '<span></span>')),
+        class = btn_class, 
+        style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
+        title = "PLAY!"
+      )
+    })
+    
+    
+    
+    
+    # observeEvent(valores_internos$pack_var_selection, {
+    #   
+    #   # Estamos en variables...
+    #   # Si el dataset cambia, damos reset al pack de variables, al check y al color del boton.
+    #   # Si el dataset cambia, reset el estado de variables_seleccionadas
+    #   valores_internos$pack_play         <-  default_structure$pack_play
+    #   valores_internos$check_play        <-  default_structure$check_play
+    #   valores_internos$button_class_play <-  default_structure$button_class_play
+    #   
+    #   # Restablecer el color del botón a primario (azul)
+    #   runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", ns("btn_play")))
+    #   
+    # }, ignoreInit = TRUE)
+    
+    
+    # observeEvent(!default_structure$check_play, {
+    #   
+    #   valores_activos$pack_import_dataset  <- default_structure$pack_import_dataset
+    #   valores_activos$check_import_dataset <- default_structure$check_import_dataset
+    #   
+    #   valores_activos$pack_tool_selection  <- default_structure$pack_tool_selection
+    #   valores_activos$check_tool_selection <- default_structure$check_tool_selection
+    #   
+    #   valores_activos$pack_var_selection   <- default_structure$pack_var_selection
+    #   valores_activos$check_var_selection  <- default_structure$check_var_selection
+    #   
+    #   valores_activos$valores_internos$check_play <- default_structure$check_play
+    #   valores_activos$the_results <- default_structure$the_results
+    #   
+    #   
+    # }, ignoreInit = TRUE)
+    
+    
+    # Activar la visualización cuando se presiona PLAY
+    observeEvent(input$btn_play, {
+    #   # Verificar si se ha seleccionado una base de datos
+    #   if (!valores_internos$check_import_dataset) {
+    #     showNotification(
+    #       "Por favor, seleccione una base de datos primero.",
+    #       type = "warning"
+    #     )
+    #     return()  # No hacer nada si no se ha seleccionado una base de datos
+    #   }
+      
+      # # Verificar si se han seleccionado una herramienta estadistica
+      # if (!valores_internos$check_tool_selection) {
+      #   showNotification(
+      #     "Por favor, seleccione una herramienta estadística.",
+      #     type = "warning"
+      #   )
+      #   return()  # No hacer nada si no se ha seleccionado una base de datos
+      # }
+      
+      # # Verificar si se han seleccionado variables
+      # if (!valores_internos$check_var_selection) {
+      #   showNotification(
+      #     "Por favor, seleccione variables primero.",
+      #     type = "warning"
+      #   )
+      #   return()  # No hacer nada si no se han seleccionado variables
+      # }
+      
+      internal_PLAY_SELECTOR$"pack_input"   = ""
+      internal_PLAY_SELECTOR$"check_input"  = TRUE
+      internal_PLAY_SELECTOR$"pack_output"  = ""
+      internal_PLAY_SELECTOR$"check_output" = TRUE
+      internal_PLAY_SELECTOR$"button_class" = "confirmed"
+    
+
+      if(internal_PLAY_SELECTOR$"check_output"){
+        
+        # valores_activos$pack_import_dataset <- valores_internos$pack_import_dataset
+        # valores_activos$check_import_dataset <- valores_internos$check_import_dataset
+        # valores_activos$pack_tool_selection <-  valores_internos$pack_tool_selection
+        # valores_activos$check_tool_selection <- valores_internos$check_tool_selection
+        # valores_activos$pack_var_selection <- valores_internos$pack_var_selection
+        # valores_activos$check_var_selection <- valores_internos$check_var_selection
+        # valores_activos$check_play <- valores_internos$check_play
+        # valores_activos$the_results <- valores_internos$the_results
+        
+        
+        
+        # Actualizar valores_internos activos
+        # valores_internos$seleccion_activa <- TRUE
+        # valores_internos$dataset_activo <- valores_internos$dataset_name
+        # valores_internos$variables_activas <- valores_internos$var_selection_col_names
+        # valores_internos$datos_activos <- valores_internos$dataset_df
+        # valores_activos <- do.call(reactiveValues, default_structure)
+        
+        # Cambiar el color del botón usando jQuery para asegurar que funcione
+        ### runjs(sprintf("$('#%s').css('border', 'none');", ns("btn_play")))
+        # runjs(sprintf("$('#%s').removeClass('btn-primary').addClass('btn-success');", ns("btn_play")))
+        
+        showNotification(
+          ui = tags$div(
+            style = "background-color: #d1e7dd; color: #0f5132; font-size: 15px; font-weight: bold; padding: 10px; border-radius: 4px; border-left: 5px solid #0f5132; display: flex; align-items: center;",
+            tags$i(
+              class = "fa fa-check-circle",
+              style = "font-size: 50px; margin-right: 5px;"  # Tamaño de ícono más grande
+            ),
+            "PLAY!!!"
+          ),
+          duration = 15,
+          closeButton = TRUE
+        )
+        
+      }
+    
+    })
+      
+      
+      # Función para restablecer este botón (accesible desde el exterior)
+      # return(list(
+      #   reset = function() {
+      #     #runjs(sprintf("$('#%s').css('border', 'none');", ns("btn_play")))
+      #     runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", ns("btn_play")))
+      #   }
+      # ))
+      
+    })
+  }
+
+

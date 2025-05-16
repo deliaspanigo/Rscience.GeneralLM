@@ -39,25 +39,16 @@ MASTER_module_fixed_anova_1_way_ui <- function(id) {
         
         #uiOutput(ns("mega_tabs")), br(),
         uiOutput(ns("show_dev_full")),
+        uiOutput(ns("mensaje_seleccion"))
         
         
-        # Panel de resultados
-        card(
-          card_header("Resultados"),
-          card_body(
-            # Mensaje de estado
-            uiOutput(ns("mensaje_seleccion"))
-            # Mostrar datos simple
-            #tableOutput("tabla_datos"),
-          )
-        ),
         
         # Card separado para Quarto
-        div(
-          style = "margin-top: 20px; width: 100%;",
-          ""
-          # quartoRendererUI(id = "quarto_doc")
-        )
+        # div(
+        #   style = "margin-top: 20px; width: 100%;",
+        #   ""
+        #   # quartoRendererUI(id = "quarto_doc")
+        # )
       )
     )
   )
@@ -67,6 +58,15 @@ MASTER_module_fixed_anova_1_way_ui <- function(id) {
 MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+    
+    default_structure <- list(
+      clicked = FALSE,
+      pack_selected = "",
+      check_done = FALSE,
+      button_class = "initial"
+    )    
+    
     
     
     output$card01_botonera_inicial <- renderUI({
@@ -267,6 +267,9 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     # Mostrar información sobre el dataset
     my_show_dev <- TRUE 
     
+   
+    
+    
     valores_default <- list(
       pack_import_dataset = "",
       check_import_dataset = FALSE,
@@ -446,7 +449,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     output$botones_dinamicos <- renderUI({
       
       valores_internos_list <- reactiveValuesToList(valores_activos)
-      play_ok <- valores_internos_list$check_play
+      if(is.null(valores_internos_list)) play_ok <- FALSE else  play_ok <- valores_internos_list$check_play
       
       
       grupos <- c(1, 2)
@@ -459,6 +462,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
           
           is_disabled <- !boton$show_always
           if(!is_disabled) if(g == 1) is_disabled <- !play_ok
+          # is_disabled <- FALSE
           
           if (!is.null(boton$class)) {
             actionButton(
@@ -882,7 +886,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     output$show_dev_full <- renderUI({
       ns <- NS(id)
       
-      req(my_show_dev)
+      req(show_dev)
       
       # Fila separada para el contenido en otra tarjeta
       card(
@@ -961,6 +965,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
     
     # Mensaje de selección
     output$mensaje_seleccion <- renderUI({
+      req(show_dev)
       if (!valores_activos$check_play) {
         div(
           class = "alert alert-info",

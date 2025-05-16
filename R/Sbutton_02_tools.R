@@ -49,7 +49,7 @@ Sbutton_02_tools_server <- function(id, valores_default, valores_internos) {
     #   if(special_check) runjs(sprintf("$('#%s').css('border', '2px dotted #3355FF');", ns("btn_tools")))
     # })
     
-    modelo_resultado <- SSelector_tools_server("seleccion_modelo")
+    modelo_resultado <- SSelector_02_tools_server("seleccion_modelo")
     # Es un objeto reactivo...
     # Contiene...
     # tipo_modelo
@@ -141,7 +141,7 @@ Sbutton_02_tools_server <- function(id, valores_default, valores_internos) {
           ),
           div(
             style = "height: 100%; overflow-y: auto; padding: 15px;", 
-            SSelector_tools_ui(ns("seleccion_modelo"))
+            SSelector_02_tools_ui(ns("seleccion_modelo"))
           ),
           footer = tags$div(
             style = "display: flex; justify-content: center; width: 100%; gap: 10px;",

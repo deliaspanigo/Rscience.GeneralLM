@@ -68,7 +68,7 @@ Sbutton_03_variable_selector_server <- function(id, valores_default, valores_int
       
     }, ignoreInit = TRUE)
     
-    selected_vars_anova <- SSelector_anova_server("anova_selector", valores_internos$pack_import_dataset$"database")
+    selected_vars_anova <- SSelector_03_variable_selector_server("variable_selector", valores_internos$pack_import_dataset$"database")
     
     # factor
     # respuesta
@@ -153,7 +153,7 @@ Sbutton_03_variable_selector_server <- function(id, valores_default, valores_int
         ),
         div(
           style = "height: 100%; overflow-y: auto; padding: 15px;", 
-          SSelector_anova_ui(ns("anova_selector"))
+          SSelector_03_variable_selector_ui(ns("variable_selector"))
         ),
         footer = tags$div(
           style = "display: flex; justify-content: center; width: 100%; gap: 10px;",
