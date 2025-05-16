@@ -24,7 +24,6 @@ Sbutton_01_dataselector2_server <- function(id, internal_DATASET_SELECTOR) {
     
     observe({
       button_state(internal_DATASET_SELECTOR$button_class)
-      # if(!valores_internos$check_import_dataset) button_state("initial")
     })
     
     output$my_action_button <- renderUI({
@@ -48,6 +47,8 @@ Sbutton_01_dataselector2_server <- function(id, internal_DATASET_SELECTOR) {
     output_list_database_rv(
       Rscience.import::MASTER_module_import_server(id = "MASTER_import", show_dev = show_dev)
     )
+    
+    
     
     # Cuando el usuario hace clic en el botón para elegir datos
     observeEvent(input$btn_dataset, {
@@ -164,7 +165,8 @@ Sbutton_01_dataselector2_server <- function(id, internal_DATASET_SELECTOR) {
        
       # 
       # button_state("confirmed")
-      fn_show_notification_ok("Base de datos importada exitosamente.")
+      fn_show_notification_ok(the_message = "Dataset imported successfully.")
+      
       
       removeModal()
       return(resultado)

@@ -7,7 +7,7 @@ fn_show_notification_ok <- function(the_message) {
       tags$i(class = "fa fa-check-circle", style = "font-size: 20px; margin-right: 5px;"),
       the_message
     ),
-    duration = 5,
+    duration = 2,
     closeButton = TRUE
   )
 }

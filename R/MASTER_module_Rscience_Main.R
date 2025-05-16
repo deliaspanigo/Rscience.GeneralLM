@@ -73,24 +73,32 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     internal_TOOLS_SELECTOR <- do.call(reactiveValues, default_structure)
     active_TOOLS_SELECTOR   <- do.call(reactiveValues, default_structure)
     
+    internal_VARIABLE_SELECTOR <- do.call(reactiveValues, default_structure)
+    active_VARIABLE_SELECTOR   <- do.call(reactiveValues, default_structure)
+    
     internal_PLAY_SELECTOR    <- do.call(reactiveValues, default_structure)
     active_PLAY_SELECTOR    <- do.call(reactiveValues, default_structure)
     
     
     Sbutton_01_dataselector2_server(id = "dataset_selector2", internal_DATASET_SELECTOR)
     
-    Sbutton_02_tools2_server(id = "tools_selector2", internal_TOOLS_SELECTOR)
+    Sbutton_02_tools2_server(id = "tools_selector2", internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR)
     
+    Sbutton_03_variable_selector2_server(id = "variable_selector2", internal_DATASET_SELECTOR, 
+                                         internal_TOOLS_SELECTOR, internal_VARIABLE_SELECTOR)
     
     Sbutton_reset2_server(id = "reset2", default_structure, 
-                          internal_DATASET_SELECTOR, active_DATASET_SELECTOR,
-                          internal_TOOLS_SELECTOR,   active_TOOLS_SELECTOR,
-                          internal_PLAY_SELECTOR,    active_PLAY_SELECTOR)
+                          internal_DATASET_SELECTOR,  active_DATASET_SELECTOR,
+                          internal_TOOLS_SELECTOR,    active_TOOLS_SELECTOR,
+                          internal_VARIABLE_SELECTOR, active_VARIABLE_SELECTOR,
+                          internal_PLAY_SELECTOR,     active_PLAY_SELECTOR)
     
     
     Sbutton_play2_server(id = "play2", 
-                         internal_DATASET_SELECTOR, active_DATASET_SELECTOR,
-                         internal_PLAY_SELECTOR,    active_PLAY_SELECTOR)
+                         internal_DATASET_SELECTOR,  active_DATASET_SELECTOR,
+                         internal_TOOLS_SELECTOR,    active_TOOLS_SELECTOR,
+                         internal_VARIABLE_SELECTOR, active_VARIABLE_SELECTOR,
+                         internal_PLAY_SELECTOR,     active_PLAY_SELECTOR)
     ############################################################################
     
     output$card01_botonera_inicial <- renderUI({
@@ -102,6 +110,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
             style = "gap: 20px;",
             Sbutton_01_dataselector2_ui(ns("dataset_selector2")), 
             Sbutton_02_tools2_ui(id = ns("tools_selector2")),
+            Sbutton_03_variable_selector2_ui(id = ns("variable_selector2")),
             Sbutton_reset2_ui(id = ns("reset2")),
             Sbutton_play2_ui(id = ns("play2"))
           )
@@ -133,72 +142,57 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     })
     
     output$tarjeta03_vars <- renderUI({
-      # valores_internos_list <- reactiveValuesToList(valores_internos)
-      # req(valores_internos_list)
-      # 
-      # req(valores_internos_list$pack_var_selection)
-      # value_factor <- valores_internos_list$pack_var_selection$"factor"
-      # value_rv <-     valores_internos_list$pack_var_selection$"respuesta"
-      # vector_selected_vars <- valores_internos_list$pack_var_selection$"vector_selected_vars"
-      # 
-      # minibase <- na.omit(valores_internos_list$pack_import_dataset$"database"[vector_selected_vars])
-      # new_ncol <- ncol(minibase)
-      # new_nrow <- nrow(minibase)
-      # 
-      # div(
-      #   class = "p-2 rounded",
-      #   style = "background-color: rgba(255, 193, 7, 0.05); border-left: 4px solid #ffc107;",
-      #   
-      #   h5(class = "text-warning", icon("table-cells", class = "me-2"), "Selected variables"),
-      #   
-      #   # div(
-      #   #   class = "d-flex flex-column",
-      #   #   div(
-      #   #     span(class = "fw-bold", "Tipo: "),
-      #   #     span(selected_tool, style = "font-family: monospace;")
-      #   #   ),
-      #   #   div(
-      #   #     span(class = "fw-bold", "Modelo: "),
-      #   #     span(modelo_seleccionado, style = "font-family: monospace;")
-      #   #   ),
-      #   #   div(
-      #   #     span(class = "fw-bold", "Panel: "),
-      #   #     span(acordeon, style = "font-family: monospace;")
-      #   #   )
-      #   # )
-      #   
-      #   div(
-      #     class = "mt-2",
-      #     span(class = "fw-bold", "All variables: "),
-      #     div(
-      #       class = "mt-1",
-      #       lapply(vector_selected_vars, function(var) {
-      #         span(
-      #           class = "badge bg-light text-dark me-1 mb-1",
-      #           style = "border: 1px solid #dee2e6; padding: 5px;",
-      #           var
-      #         )
-      #       })
-      #     )
-      #   ),
-      #   div(
-      #     class = "d-flex flex-column",
-      #     div(class = "me-4 mb-2",
-      #         span(class = "fw-bold", "Factor: "),
-      #         span(value_factor, style = "font-family: monospace;")),
-      #     
-      #     div(class = "me-4 mb-2",
-      #         span(class = "fw-bold", "Response Variable: "),
-      #         span(value_rv, style = "font-family: monospace;"))
-      #   ),
-      #   
-      #   
-      #   div(
-      #     span(class = "fw-bold", "Shape: "),
-      #     span(paste0(new_nrow, " rows × ", new_ncol, " columns"), 
-      #          style = "font-family: monospace;")
-      #   )
-      # )
+      
+      valores_list_variable_selector <- reactiveValuesToList(internal_VARIABLE_SELECTOR)
+      info_VS <- valores_list_variable_selector$"pack_output"
+      req(info_VS)
+      
+      # print(info_output)
+      
+      value_factor <- info_VS$"factor"
+      value_rv <-     info_VS$"respuesta"
+      vector_selected_vars <- info_VS$"vector_selected_vars"
+      new_ncol <-  info_VS$"ncol_minidataset"
+      new_nrow <-  info_VS$"nrow_minidataset"
+
+      div(
+        class = "p-2 rounded",
+        style = "background-color: rgba(255, 193, 7, 0.05); border-left: 4px solid #ffc107;",
+
+        h5(class = "text-warning", icon("table-cells", class = "me-2"), "Selected variables"),
+
+      div(
+          class = "mt-2",
+          span(class = "fw-bold", "All variables: "),
+          div(
+            class = "mt-1",
+            lapply(vector_selected_vars, function(var) {
+              span(
+                class = "badge bg-light text-dark me-1 mb-1",
+                style = "border: 1px solid #dee2e6; padding: 5px;",
+                var
+              )
+            })
+          )
+        ),
+        div(
+          class = "d-flex flex-column",
+          div(class = "me-4 mb-2",
+              span(class = "fw-bold", "Factor: "),
+              span(value_factor, style = "font-family: monospace;")),
+
+          div(class = "me-4 mb-2",
+              span(class = "fw-bold", "Response Variable: "),
+              span(value_rv, style = "font-family: monospace;"))
+        ),
+
+
+        div(
+          span(class = "fw-bold", "Shape: "),
+          span(paste0(new_nrow, " rows × ", new_ncol, " columns"),
+               style = "font-family: monospace;")
+        )
+      )
       
     })
     

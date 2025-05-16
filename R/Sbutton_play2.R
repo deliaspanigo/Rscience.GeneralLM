@@ -10,8 +10,10 @@ Sbutton_play2_ui <- function(id) {
 }
 
 #' @export
-Sbutton_play2_server <- function(id, internal_DATASET_SELECTOR, internal_PLAY_SELECTOR,
-                                 active_DATASET_SELECTOR, active_PLAY_SELECTOR) {
+Sbutton_play2_server <- function(id, internal_DATASET_SELECTOR,  active_DATASET_SELECTOR,
+                                 internal_TOOLS_SELECTOR,    active_TOOLS_SELECTOR,
+                                 internal_VARIABLE_SELECTOR, active_VARIABLE_SELECTOR,
+                                 internal_PLAY_SELECTOR,     active_PLAY_SELECTOR) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
@@ -80,24 +82,29 @@ Sbutton_play2_server <- function(id, internal_DATASET_SELECTOR, internal_PLAY_SE
     
     # Activar la visualización cuando se presiona PLAY
     observeEvent(input$btn_play, {
-    #   # Verificar si se ha seleccionado una base de datos
-    #   if (!valores_internos$check_import_dataset) {
-    #     showNotification(
-    #       "Por favor, seleccione una base de datos primero.",
-    #       type = "warning"
-    #     )
-    #     return()  # No hacer nada si no se ha seleccionado una base de datos
-    #   }
+      if (!internal_DATASET_SELECTOR$check_output) {
+        showNotification(
+          "Please, select a dataset first!",
+          type = "warning"
+        )
+        return(NULL)  # No hacer nada si no se ha seleccionado una base de datos
+      }
       
-      # # Verificar si se han seleccionado una herramienta estadistica
-      # if (!valores_internos$check_tool_selection) {
-      #   showNotification(
-      #     "Por favor, seleccione una herramienta estadística.",
-      #     type = "warning"
-      #   )
-      #   return()  # No hacer nada si no se ha seleccionado una base de datos
-      # }
+      if (!internal_TOOLS_SELECTOR$check_output) {
+        showNotification(
+          "Please, select a statistic tool!",
+          type = "warning"
+        )
+        return(NULL)  # No hacer nada si no se ha seleccionado una base de datos
+      }
       
+      if (!internal_VARIABLE_SELECTOR$check_output) {
+        showNotification(
+          "Please, select your variables!",
+          type = "warning"
+        )
+        return(NULL)  # No hacer nada si no se ha seleccionado una base de datos
+      }
       # # Verificar si se han seleccionado variables
       # if (!valores_internos$check_var_selection) {
       #   showNotification(
