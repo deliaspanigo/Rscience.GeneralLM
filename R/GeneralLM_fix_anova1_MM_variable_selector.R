@@ -1,6 +1,5 @@
-
 #' @export
-GeneralLM_fix_anova1_variable_selector_ui <- function(id) {
+GeneralLM_fix_anova1_MM_variable_selector_ui <- function(id) {
   ns <- NS(id)
   tagList(
     # Información sobre los datos
@@ -17,7 +16,7 @@ GeneralLM_fix_anova1_variable_selector_ui <- function(id) {
 }
 
 #' @export
-GeneralLM_fix_anova1_variable_selector_server <- function(id, my_dataset) {
+GeneralLM_fix_anova1_MM_variable_selector_server <- function(id, my_dataset) {
   moduleServer(id, function(input, output, session) {
     # Mostrar información sobre el dataset
     output$dataset_info <- renderText({

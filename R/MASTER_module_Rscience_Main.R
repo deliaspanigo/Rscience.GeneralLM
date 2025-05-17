@@ -67,11 +67,28 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       button_class = "initial"
     )    
     
+    my_selected_tool <- reactiveVal(NULL)
+    
+   
+    
     internal_DATASET_SELECTOR <- do.call(reactiveValues, default_structure)
     active_DATASET_SELECTOR   <- do.call(reactiveValues, default_structure)
     
     internal_TOOLS_SELECTOR <- do.call(reactiveValues, default_structure)
     active_TOOLS_SELECTOR   <- do.call(reactiveValues, default_structure)
+    
+    observe({
+      valores_internos_list <- reactiveValuesToList(internal_TOOLS_SELECTOR)
+      
+      info_output <- valores_internos_list$"pack_output"
+      req(info_output)
+      
+      # print(info_output)
+      #print(info_output)
+      
+      my_selected_tool(info_output$"selected_tool")
+      
+    })
     
     internal_VARIABLE_SELECTOR <- do.call(reactiveValues, default_structure)
     active_VARIABLE_SELECTOR   <- do.call(reactiveValues, default_structure)
@@ -84,7 +101,33 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     Sbutton_02_tools2_server(id = "tools_selector2", internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR)
     
-    Sbutton_03_variable_selector2_server(id = "variable_selector2", internal_DATASET_SELECTOR, 
+    
+    my_list_str_rv <- reactive({
+      
+      valores_internos_list <- reactiveValuesToList(internal_TOOLS_SELECTOR)
+      info_output <- valores_internos_list$"pack_output"
+      req(info_output)
+      
+      str_selected_tool <- info_output$"selected_tool"
+      
+      the_str_list <- list(
+        str_01_MM_variable_selector = "_MM_variable_selector",
+        str_02_FN_validate_vars =     "_FN_validate_vars",
+        str_03_FN_zocalo =            "_FN_shiny_zocalo"
+        
+        
+      )
+      vector_names <- names(the_str_list)
+      
+      the_str_list <- lapply(the_str_list, function(x){paste0(str_selected_tool, x)})
+      names(the_str_list) <- vector_names
+      the_str_list
+      
+    })
+    
+    Sbutton_03_variable_selector2_server(id = "variable_selector2", 
+                                         my_list_str_rv, 
+                                         internal_DATASET_SELECTOR, 
                                          internal_TOOLS_SELECTOR, internal_VARIABLE_SELECTOR)
     
     Sbutton_reset2_server(id = "reset2", default_structure, 
@@ -99,6 +142,10 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
                          internal_TOOLS_SELECTOR,    active_TOOLS_SELECTOR,
                          internal_VARIABLE_SELECTOR, active_VARIABLE_SELECTOR,
                          internal_PLAY_SELECTOR,     active_PLAY_SELECTOR)
+    
+    
+    #my_selected_tool <- reactiveVal(NULL)
+
     ############################################################################
     
     output$card01_botonera_inicial <- renderUI({
@@ -141,58 +188,37 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
     })
     
+    output$agregado_tools <- renderUI({
+      req(my_selected_tool())
+      # mi_selected_tool()
+      paste0("Elegido: ", my_selected_tool())
+      
+    })
+    
     output$tarjeta03_vars <- renderUI({
       
-      valores_list_variable_selector <- reactiveValuesToList(internal_VARIABLE_SELECTOR)
-      info_VS <- valores_list_variable_selector$"pack_output"
-      req(info_VS)
+      req(my_list_str_rv())
+      # print(my_list_str_rv())
       
-      # print(info_output)
+      str_selected_tool <- my_list_str_rv()$"str_03_FN_zocalo"
+      # Nombre de la función como string
+      # str_selected_tool <- "GeneralLM_fix_anova1_FN_shiny_zocalo"
       
-      value_factor <- info_VS$"factor"
-      value_rv <-     info_VS$"respuesta"
-      vector_selected_vars <- info_VS$"vector_selected_vars"
-      new_ncol <-  info_VS$"ncol_minidataset"
-      new_nrow <-  info_VS$"nrow_minidataset"
-
-      div(
-        class = "p-2 rounded",
-        style = "background-color: rgba(255, 193, 7, 0.05); border-left: 4px solid #ffc107;",
-
-        h5(class = "text-warning", icon("table-cells", class = "me-2"), "Selected variables"),
-
-      div(
-          class = "mt-2",
-          span(class = "fw-bold", "All variables: "),
-          div(
-            class = "mt-1",
-            lapply(vector_selected_vars, function(var) {
-              span(
-                class = "badge bg-light text-dark me-1 mb-1",
-                style = "border: 1px solid #dee2e6; padding: 5px;",
-                var
-              )
-            })
-          )
-        ),
-        div(
-          class = "d-flex flex-column",
-          div(class = "me-4 mb-2",
-              span(class = "fw-bold", "Factor: "),
-              span(value_factor, style = "font-family: monospace;")),
-
-          div(class = "me-4 mb-2",
-              span(class = "fw-bold", "Response Variable: "),
-              span(value_rv, style = "font-family: monospace;"))
-        ),
-
-
-        div(
-          span(class = "fw-bold", "Shape: "),
-          span(paste0(new_nrow, " rows × ", new_ncol, " columns"),
-               style = "font-family: monospace;")
-        )
-      )
+      # Argumentos
+      args <- list(internal_VARIABLE_SELECTOR = internal_VARIABLE_SELECTOR)
+      
+      vector_funciones <- ls("package:Rscience.GeneralLM")
+      
+      # Verificar si la función existe y ejecutarla
+      if (str_selected_tool %in% vector_funciones ) {
+        resultado <- do.call(str_selected_tool, args)
+        resultado
+        # print(resultado)  # Output: 5
+      } else {
+        print("La función no existe.")
+      }
+      
+      
       
     })
     
@@ -205,6 +231,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         card_header("User selection"),
         card_body(
           uiOutput(ns("tarjeta01_dataset")),
+          uiOutput(ns("agregado_tools")),
           uiOutput(ns("tarjeta02_tools")),
           uiOutput(ns("tarjeta03_vars"))
         )
@@ -231,6 +258,11 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     })
     
     
+    GeneralLM_fix_anova1_MM_output_server(id = "aver")
+    
+    output$card03_botonera_output   <- renderUI({
+      GeneralLM_fix_anova1_MM_output_ui(id = ns("aver"))
+    })
     ############################################################################
   })
 }

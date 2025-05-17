@@ -13,20 +13,31 @@ Sbutton_03_variable_selector2_ui <- function(id) {
 
 
 #' @export
-Sbutton_03_variable_selector2_server <- function(id, internal_DATASET_SELECTOR, 
+Sbutton_03_variable_selector2_server <- function(id, my_list_str_rv, internal_DATASET_SELECTOR, 
                                                  internal_TOOLS_SELECTOR, internal_VARIABLE_SELECTOR) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+    
+    output_list_variable_selector_rv <- reactiveVal(NULL)
+    str_01_MM_variable_selector <- reactiveVal(NULL)
+    str_02_FN_validate_vars <- reactiveVal(NULL)
+    
+    str_server <- reactiveVal(NULL)
+    str_ui <- reactiveVal(NULL)
     
     # My button
     button_state <- reactiveVal(NULL)
     
     observe({
+      # req(my_list_str_rv())
       button_state(internal_VARIABLE_SELECTOR$button_class)
+      
+      str_01_MM_variable_selector(my_list_str_rv()$"str_01_MM_variable_selector")
+      str_02_FN_validate_vars(my_list_str_rv()$"str_02_FN_validate_vars")
     })
     
     output$my_action_button <- renderUI({
-      
       btn_class <- switch(button_state(),
                           "initial"   = "btn-primary",    # Azul inicial
                           "confirmed" = "btn-success",    # Verde después de confirmar
@@ -43,10 +54,58 @@ Sbutton_03_variable_selector2_server <- function(id, internal_DATASET_SELECTOR,
       )
     })
     
+    # Usar str_01_MM_variable_selector dinámicamente
+    observe({
+      req(str_01_MM_variable_selector())  # Asegurarse de que str_01_MM_variable_selector tenga un valor
+      
+      new_server <- paste0(str_01_MM_variable_selector(), "_server")
+      new_ui <- paste0(str_01_MM_variable_selector(), "_ui")
+      
+      str_server(new_server)
+      str_ui(new_ui)
+      
+      args <- list(id = "the_selection", my_dataset = internal_DATASET_SELECTOR$"pack_output"$"database")
+
+      vector_funciones <- ls("package:Rscience.GeneralLM")
+      
+      # Verificar si la función existe y ejecutarla
+      if (str_server() %in% vector_funciones ) {
+        resultado <- do.call(str_server(), args)
+        output_list_variable_selector_rv(resultado)
+        # print(resultado)  # Output: 5
+      } else {
+        print("La función no existe.")
+      }
+      
+      # # Construir la cadena de la función
+      # str_server <- paste0(
+      #   str_01_MM_variable_selector(), "_server",
+      #   '(id = "the_selection", my_dataset = internal_DATASET_SELECTOR$"pack_output"$"database")'
+      # )
+      # 
+      # # Ejecutar la función dinámicamente
+      # output_list_variable_selector_rv(eval(parse(text = str_server)))
+    })
     
-
-    selected_vars_anova <- GeneralLM_fix_anova1_variable_selector_server(id = "the_selection", my_dataset = internal_DATASET_SELECTOR$"pack_output"$"database")
-
+    # Renderizar la UI del selector de variables
+    output$salida_general <- renderUI({
+      req(str_01_MM_variable_selector())  # Asegurarse de que str_01_MM_variable_selector tenga un valor
+      
+      # str_ui(new_ui)
+      args <- list(id = ns("the_selection"))
+      resultado <- do.call(str_ui(), args)
+      resultado
+      
+      # # Construir la cadena de la función UI
+      # str_ui <- paste0(
+      #   str_01_MM_variable_selector(),  # Nombre de la función
+      #   '_ui(id = ns("the_selection"))'
+      # )
+      # 
+      # # Ejecutar la función dinámicamente
+      # eval(parse(text = str_ui))
+    })
+    
     # factor
     # respuesta
     # vector_selected_vars
@@ -129,7 +188,7 @@ Sbutton_03_variable_selector2_server <- function(id, internal_DATASET_SELECTOR,
         ),
         div(
           style = "height: 100%; overflow-y: auto; padding: 15px;", 
-          GeneralLM_fix_anova1_variable_selector_ui(id = ns("the_selection"))
+          uiOutput(ns("salida_general"))
         ),
         footer = tags$div(
           style = "display: flex; justify-content: center; width: 100%; gap: 10px;",
@@ -151,62 +210,74 @@ Sbutton_03_variable_selector2_server <- function(id, internal_DATASET_SELECTOR,
     
     # Al confirmar selección de variables
     observeEvent(input$confirmar_variables, {
-      req(selected_vars_anova())
       
-      variables_seleccionadas <- selected_vars_anova()
+      if (is.null(output_list_variable_selector_rv)) {
+        # print(output_list_variable_selector_rv)
+        showNotification(
+          "Please, select variables.",
+          type = "warning"
+        )
+        return()  # No hacer nada si no se ha seleccionado una base de datos
+      }
       
-      # print(variables_seleccionadas)
       
-      # Verificar que se hayan seleccionado exactamente 2 variables
-      # if (length(variables_seleccionadas) != 2) {
-      #   showNotification(
-      #     "Por favor, seleccione exactamente 2 variables.",
-      #     type = "warning"
-      #   )
-      #   return()
+      # variables_seleccionadas <- output_list_variable_selector_rv()
+      
+      args <- list(output_list_variable_selector_rv = output_list_variable_selector_rv)
+      print(str_02_FN_validate_vars())
+      resultado <- do.call(str_02_FN_validate_vars(), args)
+      resultado
+        
+      # resultado <- GeneralLM_fix_anova1_FN_validate_vars(output_list_variable_selector_rv = output_list_variable_selector_rv)
+      
+      if (!resultado$status) {
+        showNotification(resultado$message, type = "warning")
+        return()
+      }
+      
+      # vector_names_espected <- c("factor", "respuesta", "vector_selected_vars",
+      #                            "check_not_equal", "nrow_minidataset", "ncol_minidataset")
+      # 
+      # vector_names_espected <- unname(vector_names_espected)
+      # vector_names_observed <- names(variables_seleccionadas)
+      # vector_names_observed <- unname(vector_names_observed)
+      # 
+      # vector_cantidad_espected <- c(1, 1, 2, 1, 1, 1)
+      # vector_cantidad_observed <- sapply(variables_seleccionadas, length)
+      
+      # # print(vector_names_espected)
+      # # print(vector_names_observed)
+      # # Verificar que se haya seleccionado una opción válida
+      # if (!all(vector_names_espected == vector_names_observed)) {
+      #   #print(vector_names_espected == vector_names_observed)
+      #   internal_VARIABLE_SELECTOR$"pack_input"   = ""
+      #   internal_VARIABLE_SELECTOR$"check_input"  = FALSE
+      #   internal_VARIABLE_SELECTOR$"pack_output"  = ""
+      #   internal_VARIABLE_SELECTOR$"check_output" = FALSE
+      #   internal_VARIABLE_SELECTOR$"button_class" = "initial"
+      #   showNotification("Inconvenientes en la eleccion de Variables para ANOVA.", type = "warning")
+      #   return()  # No hacer nada si no se seleccionó nada
       # }
-      vector_names_espected <- c("factor", "respuesta", "vector_selected_vars",
-                                 "check_not_equal", "nrow_minidataset", "ncol_minidataset")
-      
-      vector_names_espected <- unname(vector_names_espected)
-      vector_names_observed <- names(variables_seleccionadas)
-      vector_names_observed <- unname(vector_names_observed)
-      
-      vector_cantidad_espected <- c(1, 1, 2, 1, 1, 1)
-      vector_cantidad_observed <- sapply(variables_seleccionadas, length)
-      
-      # print(vector_names_espected)
-      # print(vector_names_observed)
-      # Verificar que se haya seleccionado una opción válida
-      if (!all(vector_names_espected == vector_names_observed)) {
-        #print(vector_names_espected == vector_names_observed)
-        internal_VARIABLE_SELECTOR$"pack_input"   = ""
-        internal_VARIABLE_SELECTOR$"check_input"  = FALSE
-        internal_VARIABLE_SELECTOR$"pack_output"  = ""
-        internal_VARIABLE_SELECTOR$"check_output" = FALSE
-        internal_VARIABLE_SELECTOR$"button_class" = "initial"
-        showNotification("Inconvenientes en la eleccion de Variables para ANOVA.", type = "warning")
-        return()  # No hacer nada si no se seleccionó nada
-      }
-      
-      # Verificar que se haya seleccionado una opción válida
-      if (!all(vector_cantidad_espected == vector_cantidad_observed)) {
-        internal_VARIABLE_SELECTOR$"pack_input"   = ""
-        internal_VARIABLE_SELECTOR$"check_input"  = FALSE
-        internal_VARIABLE_SELECTOR$"pack_output"  = ""
-        internal_VARIABLE_SELECTOR$"check_output" = FALSE
-        internal_VARIABLE_SELECTOR$"button_class" = "initial"
-        showNotification("Inconvenientes en la eleccion de Variables para ANOVA.
-                         No coincide la cantidad de elementos.", type = "warning")
-        return()  # No hacer nada si no se seleccionó nada
-      }
-      
+      # 
+      # # Verificar que se haya seleccionado una opción válida
+      # if (!all(vector_cantidad_espected == vector_cantidad_observed)) {
+      #   internal_VARIABLE_SELECTOR$"pack_input"   = ""
+      #   internal_VARIABLE_SELECTOR$"check_input"  = FALSE
+      #   internal_VARIABLE_SELECTOR$"pack_output"  = ""
+      #   internal_VARIABLE_SELECTOR$"check_output" = FALSE
+      #   internal_VARIABLE_SELECTOR$"button_class" = "initial"
+      #   showNotification("Inconvenientes en la eleccion de Variables para ANOVA.
+      #                    No coincide la cantidad de elementos.", type = "warning")
+      #   return()  # No hacer nada si no se seleccionó nada
+      # }
+      # 
+      # 
       
       fn_shiny_apply_changes_reactiveValues(rv = internal_VARIABLE_SELECTOR, list(
-        "pack_input"   = variables_seleccionadas,
-        "check_input"  = TRUE,
-        "pack_output"  = variables_seleccionadas,
-        "check_output" = TRUE,
+        "pack_input"   = resultado$output_list,
+        "check_input"  = resultado$status,
+        "pack_output"  = resultado$output_list,
+        "check_output" = resultado$status,
         "button_class" = "confirmed"))
       
       # internal_VARIABLE_SELECTOR$"pack_input"   = variables_seleccionadas
@@ -235,7 +306,7 @@ Sbutton_03_variable_selector2_server <- function(id, internal_DATASET_SELECTOR,
             ),
             "Variables seleccionadas exitosamente."
           ),
-          duration = 15,
+          duration = 3,
           closeButton = TRUE
         )
         
