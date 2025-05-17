@@ -344,7 +344,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev) {
             div(
               class = "d-flex justify-content-between align-items-center",
               div(
-                h3(icon("edit"), "Editor de Tarjeta", style = "margin: 0; font-weight: 600;"),
+                h3(icon("edit"), "Anova 1 way - Fixed Effects - General Linear Model", style = "margin: 0; font-weight: 600;"),
                 p("Personaliza tu texto y visualízalo en tiempo real", style = "margin: 5px 0 0 0; opacity: 0.9;")
               ),
               div(

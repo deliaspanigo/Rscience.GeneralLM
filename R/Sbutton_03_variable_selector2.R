@@ -57,6 +57,9 @@ Sbutton_03_variable_selector2_server <- function(id, my_list_str_rv, internal_DA
     # Usar str_01_MM_variable_selector dinámicamente
     observe({
       req(str_01_MM_variable_selector())  # Asegurarse de que str_01_MM_variable_selector tenga un valor
+      req(internal_DATASET_SELECTOR)
+      req(internal_DATASET_SELECTOR$"pack_output")
+      req(internal_DATASET_SELECTOR$"pack_output"$"database")
       
       new_server <- paste0(str_01_MM_variable_selector(), "_server")
       new_ui <- paste0(str_01_MM_variable_selector(), "_ui")
@@ -224,7 +227,7 @@ Sbutton_03_variable_selector2_server <- function(id, my_list_str_rv, internal_DA
       # variables_seleccionadas <- output_list_variable_selector_rv()
       
       args <- list(output_list_variable_selector_rv = output_list_variable_selector_rv)
-      print(str_02_FN_validate_vars())
+      # print(str_02_FN_validate_vars())
       resultado <- do.call(str_02_FN_validate_vars(), args)
       resultado
         

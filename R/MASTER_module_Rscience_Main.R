@@ -18,27 +18,29 @@ MASTER_module_Rscience_Main_ui <- function(id) {
         # Encabezado con botones en una fila
         div(
           class = "d-flex flex-wrap",
+          style = "height: 100vh;",  # Altura del contenedor principal (100% de la ventana)
           # Primer bloque - 3/12
           div(
-            style = "flex: 0 0 12.5%; max-width: 12.5%;",
+            style = "flex: 0 0 12.5%; max-width: 12.5%; max-height: 70%; overflow-y: auto;",  # Altura máxima del 70%
             uiOutput(ns("card01_botonera_inicial"))
           ),
-          # Segundo bloque - 3/12
           div(
-            style = "flex: 0 0 25%; max-width: 25%;",
-            uiOutput(ns("card02_user_selection"))
-          ),
-          # Tercer bloque - 6/12
-          div(
-            style = "flex: 0 0 62.5%; max-width: 62.5%;",
-            uiOutput(ns("card03_botonera_output"))
+            style = "flex: 0 0 87.5%; max-width: 87.5%; max-height: 70%; overflow-y: auto;",  # Altura máxima del 70%
+            navs_tab_card(
+              title = "R for Science",
+              nav("User selection", 
+                  uiOutput(ns("card02_user_selection"))
+              ),
+              nav("Outputs", 
+                  uiOutput(ns("card03_botonera_output"))
+              )
+            )
           )
         )
-        ,
         
         #uiOutput(ns("mega_tabs")), br(),
-        uiOutput(ns("show_dev_full")),
-        uiOutput(ns("mensaje_seleccion"))
+        # uiOutput(ns("show_dev_full")),
+        # uiOutput(ns("mensaje_seleccion"))
         
         
         
@@ -48,8 +50,9 @@ MASTER_module_Rscience_Main_ui <- function(id) {
         #   ""
         #   # quartoRendererUI(id = "quarto_doc")
         # )
-      )
+      # )
     )
+  )
   )
 }
 
@@ -78,13 +81,12 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     active_TOOLS_SELECTOR   <- do.call(reactiveValues, default_structure)
     
     observe({
+      my_selected_tool(NULL)
       valores_internos_list <- reactiveValuesToList(internal_TOOLS_SELECTOR)
       
       info_output <- valores_internos_list$"pack_output"
-      req(info_output)
       
-      # print(info_output)
-      #print(info_output)
+      req(info_output)
       
       my_selected_tool(info_output$"selected_tool")
       
@@ -113,7 +115,8 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       the_str_list <- list(
         str_01_MM_variable_selector = "_MM_variable_selector",
         str_02_FN_validate_vars =     "_FN_validate_vars",
-        str_03_FN_zocalo =            "_FN_shiny_zocalo"
+        str_03_FN_zocalo =            "_FN_shiny_zocalo",
+        str_04_MM_output =            "_MM_output"
         
         
       )
@@ -227,15 +230,21 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       # valores_internos_list <- reactiveValuesToList(valores_internos)
       # req(valores_internos_list)
       
-      card(
-        card_header("User selection"),
-        card_body(
+      div(
+        style = "display: flex;",  # Contenedor flexible
+        div(
+          style = "flex: 1 1 50%; max-width: 50%; padding: 10px; box-sizing: border-box;",
           uiOutput(ns("tarjeta01_dataset")),
           uiOutput(ns("agregado_tools")),
-          uiOutput(ns("tarjeta02_tools")),
+          uiOutput(ns("tarjeta02_tools"))
+        ),
+        div(
+          style = "flex: 1 1 50%; max-width: 50%; max-height: 70%; overflow-y: auto; padding: 10px; box-sizing: border-box;",
           uiOutput(ns("tarjeta03_vars"))
         )
       )
+      
+      
       
       
       # # Contenedor principal
@@ -257,12 +266,99 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
     })
     
+    ############################################################################
     
-    GeneralLM_fix_anova1_MM_output_server(id = "aver")
     
-    output$card03_botonera_output   <- renderUI({
-      GeneralLM_fix_anova1_MM_output_ui(id = ns("aver"))
+    # GeneralLM_fix_anova1_MM_output_server(id = "the_output")
+
+    # output$card03_botonera_output   <- renderUI({
+    #   GeneralLM_fix_anova1_MM_output_ui(id = ns("aver"))
+    # })
+    
+    # str_server <- reactiveVal(NULL)
+    # str_ui <- reactiveVal(NULL)
+    # my_id <- reactiveVal(NULL)
+# 
+    observe({
+
+      req(my_list_str_rv())
+      str_selected_modulo <- my_list_str_rv()$"str_04_MM_output"
+      new_server <- paste0(str_selected_modulo, "_server")
+      new_ui <- paste0(str_selected_modulo, "_ui")
+      new_id <- "the_output"
+
+      print(new_server)
+      # str_server(new_server)
+      # str_ui(new_ui)
+      # my_id(new_id)
+      args <- list(id = new_id, show_dev = FALSE)
+
+      vector_funciones <- ls("package:Rscience.GeneralLM")
+      check_in <- new_server %in% vector_funciones
+      print(check_in)
+
+      # print(str_server())
+      # Verificar si la función existe y ejecutarla
+      if (check_in) {
+        do.call(new_server, args)
+        # print(resultado)  # Output: 5
+      } else {
+        print("El modulo no existe.")
+      }
+
+
     })
+#     
+    
+    ok_show_all <- reactive({
+      req(active_DATASET_SELECTOR, active_TOOLS_SELECTOR, 
+          active_VARIABLE_SELECTOR, active_PLAY_SELECTOR)
+      
+      req(active_DATASET_SELECTOR$"check_output", 
+          active_TOOLS_SELECTOR$"check_output",
+          active_VARIABLE_SELECTOR$"check_output",
+          active_PLAY_SELECTOR$"check_output")
+      
+      return(TRUE)
+      
+    })
+    
+    # # Renderizar la UI del selector de variables
+    output$card03_botonera_output <- renderUI({
+      req(my_list_str_rv(), ok_show_all())
+
+      str_selected_modulo <- my_list_str_rv()$"str_04_MM_output"
+      new_modulo_server <- paste0(str_selected_modulo, "_server")
+      new_modulo_ui <- paste0(str_selected_modulo, "_ui")
+      new_id <- "the_output"
+      
+      print(new_modulo_ui)
+      args <- list(id = ns(new_id))
+      do.call(new_modulo_ui, args)
+
+      # my_str_special <- 'GeneralLM_fix_anova1_MM_output_ui(id = ns("the_output"))'
+      # eval(parse(text= my_str_special))
+      
+      # 
+
+      # 
+      # # print(new_ui)
+      # # str_ui(new_ui)
+      # args <- list(id = ns(new_id))
+      # do.call(new_ui, args)
+      # # resultado
+
+      # # Construir la cadena de la función UI
+      # str_ui <- paste0(
+      #   str_01_MM_variable_selector(),  # Nombre de la función
+      #   '_ui(id = ns("the_selection"))'
+      # )
+      #
+      # # Ejecutar la función dinámicamente
+      # eval(parse(text = str_ui))
+    })
+    # 
+    # 
     ############################################################################
   })
 }
