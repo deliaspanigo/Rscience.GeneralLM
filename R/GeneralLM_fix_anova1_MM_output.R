@@ -160,11 +160,83 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev) {
     
     ############################################################################
     
+    output$df_summary_anova <- DT::renderDataTable({
+      req(mis_valores())
+      tabla_p <- mis_valores()$"df_summary_anova"
+      validate(need(!is.null(tabla_p), "No hay datos disponibles."))
+      datatable(
+        tabla_p,
+        rownames = FALSE,
+        editable = FALSE,
+        options = list(
+          dom = 't',
+          ordering = FALSE,
+          paging = FALSE,
+          info = FALSE,
+          autoWidth = TRUE
+        ),
+        class = 'stripe hover compact'
+      ) %>% formatStyle(
+        columns = names(tabla_p),
+        target = 'cell',
+        backgroundColor = 'white'
+      )
+    })
     
+    output$the_plot <- renderPlotly({
+      req(mis_valores())
+      my_plot <- mis_valores()$"plot007_factor"
+      my_plot
+    })
+    
+    output$mini_resumen <- renderUI({
+      req(mis_valores())
+      
+      div(
+        # Contenedor de las 3 cards en línea
+        div(
+          style = "display: flex; justify-content: space-between; width: 100%;",
+          
+          # Card 1: Tabla
+          div(
+            id = "card1",
+            style = "flex: 1 1 33%; border: 1px solid #ccc; border-radius: 4px; padding: 10px; margin-right: 10px; cursor:default;",
+            DTOutput(ns("df_summary_anova"))
+          ),
+          # Card 2: Frases
+          div(
+            id = "card2",
+            style = "flex: 1 1 33%; border: 1px solid #ccc; border-radius: 4px; padding: 10px; cursor:pointer;",
+            div(
+              id = "contenido_card2",
+              style = "display:block;",
+              tags$div(mis_valores()$"phrase_shapiro_selected"),
+              tags$div(mis_valores()$"phrase_bartlett_selected"),
+              tags$div(mis_valores()$"phrase_requeriments_selected"),
+              tags$div(mis_valores()$"phrase_anova_selected")
+            )
+          ),
+          # Card 3 vacío
+          div(
+            id = "card3",
+            style = "flex: 1 1 33%; border: 1px solid #ccc; border-radius: 4px; padding: 10px;",
+            div(
+              plotlyOutput(ns("the_plot"))
+            )
+          )
+        )
+      )
+      
+      
+      
+      
+    })
+    
+    ############################################################################
     
     # Define la información de los botones con grupo y orden
     botones_info <- list( 
-      list(id = "boton_1",  label = "Summary",                class = "btn-primary",         grupo = 1, orden = 1, content = "dynamic_tab01_ui", show_always = TRUE),
+      list(id = "boton_1",  label = "Summary",                class = "btn-primary",         grupo = 1, orden = 1, content = "mini_resumen", show_always = TRUE),
       list(id = "boton_2",  label = "Full Analysis",          class = "btn-secondary",       grupo = 1, orden = 2, content = "mega_tabs", show_always = TRUE),
       list(id = "boton_3",  label = "Descriptive Statistics", class = "btn-success",         grupo = 1, orden = 3, content = "3", show_always = TRUE),
       list(id = "boton_4",  label = "Script",                 class = "btn-danger",          grupo = 1, orden = 4, content = "dynamic_tab05_ui", show_always = TRUE),
@@ -355,23 +427,31 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev) {
         )
       )
     })
+    # style = "height: 100%; width: 100%; max-width: 100%; box-sizing: border-box; overflow-x: hidden;",  # Ajustes para evitar el scroll horizontal
     
     output$card03_botonera_output <- renderUI({
       div(
-        card(
-          card_header("Resultado"),
-          uiOutput(ns("el_cartel")),
-          uiOutput(ns("botones_dinamicos")),
-          textOutput(ns("resultado")),
-          uiOutput(ns("resultado2"))
+      # style = "",  # Altura del contenedor (100% del contenedor padre)
+        # card(
+          # style = "height: 100%; display: flex; flex-direction: column;",  # Altura de la card (100% del contenedor padre)
+          # card_header("Resultado"),
+          # div(
+            style = "flex-grow: 1; overflow-y: auto; height: 100%; width: 100%; max-width: 100%; box-sizing: border-box; overflow-x: hidden;",  # Ocupa el espacio restante y añade scroll si es necesario
+            uiOutput(ns("el_cartel")),
+            # uiOutput(ns("mini_resumen")),
+            uiOutput(ns("botones_dinamicos")),
+            textOutput(ns("resultado")),
+            uiOutput(ns("resultado2"))
+          # )
         )
-      )
+      # )
+      
     })
     ############################################################################
     
     list_vec01 <- list()
     list_vec01[[1]] <- list("title" = "1) References", "objects" = c("df_selected_vars"))
-    list_vec01[[2]] <- list("title" = "2) Factor resumen", "objects" = c("df_factor_info", "check_unbalanced_reps"))
+    list_vec01[[2]] <- list("title" = "2) Factor resumen", "objects" = c("df_factor_info", "check_unbalanced_reps", "phrase_selected_tukey"))
     list_vec01[[3]] <- list("title" = "3) Anova 1 way - Table", "objects" = c("df_table_anova"))
     list_vec01[[4]] <- list("title" = "4) Multiple comparation test (Tukey)", "objects" = c("df_tukey_table"))
     list_vec01[[5]] <- list("title" = "5) Model Error", "objects" = c("df_model_error"))
@@ -426,11 +506,11 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev) {
     
     list_vec03[[6]] <- list("title" = "", 
                             "table" = "df_table_factor_plot006",
-                            "plot"  = "plot005_factor")
+                            "plot"  = "plot006_factor")
     
     list_vec03[[7]] <- list("title" = "", 
                             "table" = "df_table_factor_plot007",
-                            "plot"  = "plot005_factor")
+                            "plot"  = "plot007_factor")
     
     output$dynamic_tab03_ui <- renderUI({
       req(mis_valores())

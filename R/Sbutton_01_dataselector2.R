@@ -27,6 +27,7 @@ Sbutton_01_dataselector2_server <- function(id, internal_DATASET_SELECTOR) {
     })
     
     output$my_action_button <- renderUI({
+     
       
       btn_class <- switch(button_state(),
                           "initial"   = "btn-primary",    # Azul inicial
@@ -35,8 +36,10 @@ Sbutton_01_dataselector2_server <- function(id, internal_DATASET_SELECTOR) {
       
       actionButton(
         ns("btn_dataset"),
-        HTML(paste0('<i class="fa fa-database" style="font-size: 75px; display: block; margin-bottom: 8px;"></i>', 
-                    '<span></span>')),
+        tagList(
+          icon("database", style = "font-size: 75px; display: block; margin-bottom: 8px;"),
+          span()
+        ),
         class = btn_class, 
         style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
         title = "Import dataset"

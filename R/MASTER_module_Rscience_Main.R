@@ -4,6 +4,16 @@ MASTER_module_Rscience_Main_ui <- function(id) {
   ns <- NS(id)
   # Contenido principal organizado en columnas para mantener los cards separados
   div(
+    tags$head(
+    tags$style(HTML("
+       /* Establecer altura y centrado para todos los card headers */
+      .card-header {
+        height: 60px !important;
+        display: flex !important;
+        align-items: center !important;
+      }
+    "))
+  ),
     # Usamos card() para envolver todo el contenido
     card(
       # Añadimos un card_header explícito
@@ -17,44 +27,32 @@ MASTER_module_Rscience_Main_ui <- function(id) {
         ),
         # Encabezado con botones en una fila
         div(
-          class = "d-flex flex-wrap",
-          style = "height: 100vh;",  # Altura del contenedor principal (100% de la ventana)
+          class = "d-flex",  # Contenedor flexible
+          style = "height: 80vh;",  # Altura del contenedor principal (80% de la ventana)
           # Primer bloque - 3/12
           div(
-            style = "flex: 0 0 12.5%; max-width: 12.5%; max-height: 70%; overflow-y: auto;",  # Altura máxima del 70%
+            style = "flex: 0 0 12.5%; max-width: 12.5%; padding: 10px; height: 100%;",  # Ancho del 25%, alto del 100%
             uiOutput(ns("card01_botonera_inicial"))
           ),
           div(
-            style = "flex: 0 0 87.5%; max-width: 87.5%; max-height: 70%; overflow-y: auto;",  # Altura máxima del 70%
-            navs_tab_card(
+            style = "flex: 0 0 87.5%; max-width: 87.5%; padding: 10px; height: 100%;",# overflow-y: auto;",  # Altura del 100%
+            bslib::navset_card_tab(
               title = "R for Science",
-              nav("User selection", 
-                  uiOutput(ns("card02_user_selection"))
+              height = "100%",  # Especificar altura explícitamente
+              bslib::nav_panel("User selection", 
+                               uiOutput(ns("card02_user_selection"))
               ),
-              nav("Outputs", 
-                  uiOutput(ns("card03_botonera_output"))
+              bslib::nav_panel("Outputs", 
+                               uiOutput(ns("card03_botonera_output"))
               )
             )
           )
         )
-        
-        #uiOutput(ns("mega_tabs")), br(),
-        # uiOutput(ns("show_dev_full")),
-        # uiOutput(ns("mensaje_seleccion"))
-        
-        
-        
-        # Card separado para Quarto
-        # div(
-        #   style = "margin-top: 20px; width: 100%;",
-        #   ""
-        #   # quartoRendererUI(id = "quarto_doc")
-        # )
-      # )
+      )
     )
   )
-  )
 }
+
 
 #' @export
 MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
@@ -152,21 +150,26 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     ############################################################################
     
     output$card01_botonera_inicial <- renderUI({
-      card(
-        card_header("Main menu"),
-        card_body(
-          div(
-            class = "d-flex flex-column align-items-center", # Para centrar horizontalmente
-            style = "gap: 20px;",
-            Sbutton_01_dataselector2_ui(ns("dataset_selector2")), 
-            Sbutton_02_tools2_ui(id = ns("tools_selector2")),
-            Sbutton_03_variable_selector2_ui(id = ns("variable_selector2")),
-            Sbutton_reset2_ui(id = ns("reset2")),
-            Sbutton_play2_ui(id = ns("play2"))
+      div(
+        style = "height: 100%;",  # Altura del contenedor (100% del contenedor padre)
+        card(
+          style = "height: 100%;",  # Altura de la card (100% del contenedor padre)
+          card_header("Main menu"),
+          card_body(
+            div(
+              class = "d-flex flex-column align-items-center",  # Para centrar horizontalmente
+              style = "gap: 20px; height: 100%;",  # Altura del cuerpo de la card (100%)
+              Sbutton_01_dataselector2_ui(ns("dataset_selector2")), 
+              Sbutton_02_tools2_ui(id = ns("tools_selector2")),
+              Sbutton_03_variable_selector2_ui(id = ns("variable_selector2")),
+              Sbutton_reset2_ui(id = ns("reset2")),
+              Sbutton_play2_ui(id = ns("play2"))
+            )
           )
         )
       )
     })
+    
     
     ############################################################################
     
@@ -227,44 +230,21 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     
     output$card02_user_selection <- renderUI({
-      # valores_internos_list <- reactiveValuesToList(valores_internos)
-      # req(valores_internos_list)
-      
       div(
-        style = "display: flex;",  # Contenedor flexible
+        style = "height: 100%; display: flex;",  # Altura del contenedor (100% del contenedor padre)
         div(
-          style = "flex: 1 1 50%; max-width: 50%; padding: 10px; box-sizing: border-box;",
+          style = "flex: 1 1 50%; max-width: 50%; padding: 10px; box-sizing: border-box; height: 100%;",  # Altura del 100%
           uiOutput(ns("tarjeta01_dataset")),
           uiOutput(ns("agregado_tools")),
           uiOutput(ns("tarjeta02_tools"))
         ),
         div(
-          style = "flex: 1 1 50%; max-width: 50%; max-height: 70%; overflow-y: auto; padding: 10px; box-sizing: border-box;",
+          style = "flex: 1 1 50%; max-width: 50%; height: 100%; overflow-y: auto; padding: 10px; box-sizing: border-box;",  # Altura del 100%
           uiOutput(ns("tarjeta03_vars"))
         )
       )
-      
-      
-      
-      
-      # # Contenedor principal
-      # div(
-      #   # class = "p-3 rounded shadow-sm",
-      #   # style = "background: linear-gradient(to right, #f8f9fa, #ffffff);",
-      #   
-      #   # Título principal
-      #   h4(
-      #     # class = "mb-3 pb-2",
-      #     # style = "border-bottom: 2px solid #0d6efd; color: #0d6efd;",
-      #     # icon("info-circle"), 
-      #     "Resumen de configuración"
-      #   ),
-      #  
-      #   
-      #   
-      # )
-      
     })
+    
     
     ############################################################################
     
@@ -326,37 +306,20 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     # # Renderizar la UI del selector de variables
     output$card03_botonera_output <- renderUI({
       req(my_list_str_rv(), ok_show_all())
-
+      
       str_selected_modulo <- my_list_str_rv()$"str_04_MM_output"
-      new_modulo_server <- paste0(str_selected_modulo, "_server")
       new_modulo_ui <- paste0(str_selected_modulo, "_ui")
       new_id <- "the_output"
       
       print(new_modulo_ui)
       args <- list(id = ns(new_id))
-      do.call(new_modulo_ui, args)
-
-      # my_str_special <- 'GeneralLM_fix_anova1_MM_output_ui(id = ns("the_output"))'
-      # eval(parse(text= my_str_special))
       
-      # 
-
-      # 
-      # # print(new_ui)
-      # # str_ui(new_ui)
-      # args <- list(id = ns(new_id))
-      # do.call(new_ui, args)
-      # # resultado
-
-      # # Construir la cadena de la función UI
-      # str_ui <- paste0(
-      #   str_01_MM_variable_selector(),  # Nombre de la función
-      #   '_ui(id = ns("the_selection"))'
-      # )
-      #
-      # # Ejecutar la función dinámicamente
-      # eval(parse(text = str_ui))
+      div(
+        style = "height: 100%;",  # Altura del contenedor (100% del contenedor padre)
+        do.call(new_modulo_ui, args)  # Altura del contenido (100% del contenedor padre)
+      )
     })
+    
     # 
     # 
     ############################################################################
