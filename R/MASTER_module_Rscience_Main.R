@@ -337,7 +337,11 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       # str_server(new_server)
       # str_ui(new_ui)
       # my_id(new_id)
-      args <- list(id = new_id, show_dev = FALSE)
+      args <- list(id = new_id, show_dev = FALSE,
+                   active_DATASET_SELECTOR, 
+                   active_TOOLS_SELECTOR,
+                   active_VARIABLE_SELECTOR,
+                   active_PLAY_SELECTOR)
 
       vector_funciones <- ls("package:Rscience.GeneralLM")
       check_in <- new_server %in% vector_funciones

@@ -9,33 +9,88 @@ GeneralLM_fix_anova1_MM_output_ui <- function(id) {
 }
 
 #' @export
-GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev) {
+GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev, 
+                                                  active_DATASET_SELECTOR, 
+                                                  active_TOOLS_SELECTOR,
+                                                  active_VARIABLE_SELECTOR,
+                                                  active_PLAY_SELECTOR) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
     
-    
+    OK_ALL_ACTIVE <- reactive({
+      req(active_DATASET_SELECTOR, active_TOOLS_SELECTOR, 
+          active_VARIABLE_SELECTOR, active_PLAY_SELECTOR)
+      
+      req(active_DATASET_SELECTOR$"check_output", 
+          active_TOOLS_SELECTOR$"check_output",
+          active_VARIABLE_SELECTOR$"check_output",
+          active_PLAY_SELECTOR$"check_output")
+      
+      return(TRUE)
+      
+    })
     
     ############################################################################
+    # R Code
+    Rcode_original <- reactive({
+      req(OK_ALL_ACTIVE())
+      
+      the_code   <- GeneralLM_fix_anova1_take_code(str_fn_name="GeneralLM_fix_anova1_RCode")
+      the_code
+    })
+    
+    Rcode_script   <- reactive({
+      req(OK_ALL_ACTIVE())
+      
+      the_code   <- Rcode_original()
+      str_import <- active_DATASET_SELECTOR$"pack_output"$"str_import_external"
+      the_code   <- sub(pattern = "_my_import_sentence_", replacement = str_import, x = the_code)
+      the_code   <- gsub(pattern = "#---", replacement = "", x = the_code)
+      the_code   <- gsub(pattern = "#---", replacement = "", x = the_code)
+      
+      the_code   <- gsub(pattern = "#---", replacement = "", x = the_code)
+      
+      the_code
+    })
+    
+    Rcode_quarto <- Rcode_script   <- reactive({
+      req(OK_ALL_ACTIVE(), Rcode_original())
+      
+      str_import      <- active_DATASET_SELECTOR$"pack_output"$"str_import_external"
+      var_name_factor <- active_VARIABLE_SELECTOR$"pack_output"$"factor" #valores_internos_list$pack_var_selection$"factor"
+      var_name_vr     <- active_VARIABLE_SELECTOR$"pack_output"$"respuesta"  #     #valores_internos_list$pack_var_selection$"respuesta"
+      alpha_value     <- 0.05
+      
+      the_code   <- Rcode_original()
+      the_code   <- sub(pattern = "_my_import_sentence_", replacement = str_import, x = the_code)
+      the_code   <- gsub(pattern = "#---", replacement = "", x = the_code)
+      the_code   <- sub(pattern = "_var_name_factor_", replacement = var_name_factor, x = the_code)
+      the_code   <- sub(pattern = "_var_name_vr_", replacement = var_name_vr, x = the_code)
+      the_code   <- sub(pattern = "_alpha_value_", replacement = alpha_value, x = the_code)
+      the_code
+      
+    })
+    
+    
     # R
     mis_valores <- reactive({
       
-      # valores_internos_list <- reactiveValuesToList(valores_activos)
-      # req(valores_internos_list)
-      # req(valores_internos_list$pack_import_dataset)
-      # req(valores_internos_list$pack_import_dataset$"database")
-      database <- mtcars #valores_internos_list$pack_import_dataset$"database"
-      var_name_factor <- "cyl" #valores_internos_list$pack_var_selection$"factor"
-      var_name_vr <- "mpg"     #valores_internos_list$pack_var_selection$"respuesta"
-      alpha_value <- 0.05
+      req(OK_ALL_ACTIVE())
       
-      the_results <- GeneralLM_fix_anova1_RCode(database, var_name_factor, var_name_vr, alpha_value)
+      database        <- active_DATASET_SELECTOR$"pack_output"$"database" # mtcars #valores_internos_list$pack_import_dataset$"database"
+      var_name_factor <- active_VARIABLE_SELECTOR$"pack_output"$"factor" #valores_internos_list$pack_var_selection$"factor"
+      var_name_vr     <- active_VARIABLE_SELECTOR$"pack_output"$"respuesta"  #     #valores_internos_list$pack_var_selection$"respuesta"
+      alpha_value     <- 0.05
+      
+      the_results        <- GeneralLM_fix_anova1_RCode(database, var_name_factor, var_name_vr, alpha_value)
       vector_order_names <- GeneralLM_fix_anova1_objects_in_order(fn = GeneralLM_fix_anova1_RCode)
-      the_results <- the_results[vector_order_names]
+      the_results        <- the_results[vector_order_names]
       the_results
       
     })
-    function_code <- GeneralLM_fix_anova1_take_code(str_fn_name="GeneralLM_fix_anova1_RCode")
+    
+    ############################################################################
     
     crear_outputs_y_ui  <- function(list_objetos, prefix, mis_valores_reactive, output, ns) {
       # Crea los outputs en bucle, en ámbitos independientes para evitar sobrescrituras
@@ -91,21 +146,25 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev) {
           
           output[[id_table]] <- renderPrint({
             req(mis_valores_reactive())
-            mis_valores_reactive()[[obj_table]]
+            mis_valores_reactive()[obj_table]
           })
         })
       }
       
       # Crear UI dinámicamente
       ui_list <- lapply(seq_along(list_objetos), function(i) {
+        
+        obj_name_plot <- list_objetos[[i]]$"plot"
         id_output_table <- paste0(prefix, i, "_table")
         id_output_plot <- paste0(prefix, i, "_plot")
         list(
+          h4(list_objetos[[i]]$"title"),
+          HTML(paste0("<b><u>R plot object:</u></b> ", obj_name_plot)),
           fluidRow(
-            h4(list_objetos[[i]]$"title"),
             column(6, plotlyOutput(ns(id_output_plot))),
             column(6, verbatimTextOutput(ns(id_output_table)))
           ),
+          hr(),
           br(), br(), br()
         )
       })
@@ -453,7 +512,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev) {
     
     list_vec03[[5]] <- list("title" = "", 
                             "table" = "df_table_factor_plot005",
-                            "plot"  = "")
+                            "plot"  = "plot005_factor")
     
     list_vec03[[6]] <- list("title" = "", 
                             "table" = "df_table_factor_plot006",
@@ -538,7 +597,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev) {
     output$shiny_ace_editor_MENU <- renderUI({
       req(mis_valores())
       
-      #function_code <- GeneralLM_fix_anova1_take_code(my_fn=GeneralLM_fix_anova1_RCode)
+      #Rcode_script <- GeneralLM_fix_anova1_take_code(my_fn=GeneralLM_fix_anova1_RCode)
       # Calcular la altura adecuada para el editor basado en el número de líneas
 
       
@@ -564,16 +623,17 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev) {
     })
     
     output$shiny_ace_CODE <- renderUI({
-      req(mis_valores())
+      req(mis_valores(), Rcode_script(), input$"theme", input$"fontSize")
       
-      line_count <- length(strsplit(function_code, "\n")[[1]])
+      
+      line_count <- length(strsplit(Rcode_script(), "\n")[[1]])
       line_count <- line_count + 5
       # Asignar aproximadamente 20px por línea para el alto del editor
       editor_height <- paste0(max(300, line_count * 20), "px")
       
             shinyAce::aceEditor(
               outputId = "script_part1",
-              value = function_code,
+              value = Rcode_script(),
               mode = "r",
               theme = input$"theme", #"chrome",
               height = editor_height,#"200px",
@@ -601,7 +661,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev) {
         "code_generalLM_fixed_anova_1way.R"
       },
       content = function(file) {
-        writeLines(function_code, file)
+        writeLines(Rcode_script(), file)
       }
     )
     
