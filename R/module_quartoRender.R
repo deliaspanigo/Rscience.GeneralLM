@@ -9,7 +9,36 @@ module_quartoRenderer_ui <- function(id) {
       ),
       card_body(
         p("Haz clic en el botón para renderizar el documento Quarto."),
-        actionButton(ns("renderizar"), "Renderizar documento", class = "btn-primary mb-3"),
+        fluidRow("Anova 1 way - Fixed Models - General Linear Model - Rscience"),
+        
+        fluidRow(
+          column(6,
+            fluidRow(
+              column(3, "R code"),
+              column(2, actionButton(ns("render_RCode"), "Render", class = "btn-primary")),
+              column(2, "Status"),
+              column(2, downloadButton(ns("download_RCode"), "Download", class = "btn-primary", icon = icon("download"))),
+            ),
+            fluidRow(
+              column(3, "R code and Outputs"),
+              column(2, actionButton(ns("render_RCode_Outputs"), "Render", class = "btn-primary")),
+              column(2, "Status"),
+              column(2, downloadButton(ns("download_RCode_Outputs"), "Download", class = "btn-primary", icon = icon("download"))),
+            ),
+            fluidRow(
+              column(3, "Report"),
+              column(2, actionButton(ns("render_RReport"), "Render", class = "btn-primary")),
+              column(2, "Status"),
+              column(2, actionButton(ns("download_RReport"), "Download", class = "btn-primary", icon = icon("download"))),
+            )
+        ),
+        column(6, actionButton(ns("download_ALL"), "Download ALL", class = "btn-primary", icon = icon("download"))),
+        ),
+        br(),
+        uiOutput(ns("visual_para_archivos")),
+        br(),
+        actionButton(ns("renderizar"), "Render VIEJO", class = "btn-primary"),
+        
         uiOutput(ns("render_status")),
         
         # Aquí se mostrará el HTML renderizado
@@ -27,8 +56,169 @@ module_quartoRenderer_ui <- function(id) {
 }
 
 #' @export
-module_quartoRenderer_server <- function(id, documento) {
+module_quartoRenderer_server <- function(id, documento, Rcode_script) {
   moduleServer(id, function(input, output, session) {
+    ns <- session$ns
+    
+    temp_folder_path_internal <- file.path(tempdir(), "internal_folder")
+    temp_folder_path_external <- file.path(tempdir(), "internal_folder")
+    
+    if (!dir.exists(temp_folder_path_internal)) {
+      dir.create(temp_folder_path_internal, recursive = TRUE)
+    } else {
+      # La carpeta existe, borramos todo su contenido
+      archivos <- list.files(temp_folder_path_internal, full.names = TRUE, recursive = TRUE)
+      if (length(archivos) > 0) {
+        file.remove(archivos)
+      }
+    }
+    
+
+    if (!dir.exists(temp_folder_path_external)) {
+      dir.create(temp_folder_path_external, recursive = TRUE)
+    } else {
+      # La carpeta existe, borramos todo su contenido
+      archivos <- list.files(temp_folder_path_external, full.names = TRUE, recursive = TRUE)
+      if (length(archivos) > 0) {
+        file.remove(archivos)
+      }
+    }
+    
+    ############################################################################
+    file_name_RCode <- "my_script_anova.R"
+    file_name_RCode_and_Outputs <- "my_html_RCode_and_Outputs.html"
+    file_name_RReport <- "my_html_RReport.html"
+
+    file_path_internal_RCode <- file.path(temp_folder_path_internal, file_name_RCode)
+    file_path_external_RCode <- file.path(temp_folder_path_external, file_name_RCode)
+    
+    file_path_internal_RCode_and_Outputs <- file.path(temp_folder_path_internal, file_name_RCode_and_Outputs)
+    file_path_external_RCode_and_Outputs <- file.path(temp_folder_path_external, file_name_RCode_and_Outputs)
+    
+    file_path_internal_RReport <- file.path(temp_folder_path_internal, file_name_RReport)
+    file_path_external_RReport <- file.path(temp_folder_path_external, file_name_RReport)
+    ############################################################################
+    
+    check_file_RCode <- reactiveVal(FALSE)
+    observeEvent(input$"render_RCode", {
+      print(list.files(temp_folder_path_internal, all.files = TRUE, recursive = TRUE))
+      
+      writeLines(Rcode_script(), file_path_internal_RCode)
+      Sys.sleep(0.5)
+      
+      # Verificar si el archivo existe después de escribir
+      if (file.exists(file_path_internal_RCode)) {
+        check_file_RCode(TRUE)
+      } else {
+        check_file_RCode(FALSE)
+      }
+      
+      print(list.files(temp_folder_path_internal, all.files = TRUE, recursive = TRUE))
+    })
+    
+    
+    output$visual_RCode <- renderText({
+      if (check_file_RCode()) {
+        paste(readLines(file_path_internal_RCode), collapse = "\n")
+      } else {
+        "El archivo no existe."
+      }
+    })
+    
+    
+    output$download_RCode <- downloadHandler(
+      filename = function() {
+        file_name_RCode
+      },
+      content = function(file) {
+        if (file.exists(file_path_internal_RCode)) {
+          file.copy(file_path_internal_RCode, file)
+        } else {
+          stop("El archivo no existe en la ruta esperada.")
+        }
+      }
+    )
+    
+    
+    ############################################################################
+    
+    check_file_RReport <- reactiveVal(FALSE)
+    observeEvent(input$"render_RReport", {
+      print(list.files(temp_folder_path_internal, all.files = T, recursive = T))
+      
+      ruta_quarto <- documento
+      
+      # Extraer el nombre del archivo sin la ruta
+      nombre_archivo <- basename(ruta_quarto)
+      
+      # Copiar el archivo .qmd a la carpeta temporal
+      #archivo_temp <- file.path(dir_temp, nombre_archivo)
+      # archivo_temp <- file_path_internal_RReport
+      archivo_temp <- file.path(temp_folder_path_internal, nombre_archivo)
+      file.copy(from = ruta_quarto, to = archivo_temp, overwrite = TRUE)
+      ###
+      # Guardar el directorio actual
+      dir_actual <- getwd()
+      
+      # Cambiar al directorio temporal
+      setwd(temp_folder_path_internal)
+      
+      # Ejecutar el comando quarto render
+      comando_render <- paste0("quarto render ", nombre_archivo)
+      sistema_output <- system(comando_render, intern = TRUE)
+      
+      # Volver al directorio original
+      setwd(dir_actual)
+      ###
+      
+      # Verificar si el archivo existe después de escribir
+      if (file.exists(archivo_temp)) {
+        check_file_RReport(TRUE)
+      } else {
+        check_file_RReport(FALSE)
+      }
+      print(list.files(temp_folder_path_internal, all.files = T, recursive = T))
+    })
+    
+    output$visual_RReport <- renderText({
+      
+      req(check_file_RReport())
+      
+      file_name_html <- "anova.html"
+      dir_temp <- temp_folder_path_internal
+      
+      # check_file_RReport()
+      addResourcePath(prefix = "output_temp_folder", directoryPath = dir_temp)
+      my_local_file <- file.path("output_temp_folder", file_name_html)
+      
+      armado_v <- paste('<div style="height: 100%; width: 100%; overflow: hidden;"><iframe style="height: 2500vh; width:100%; border: none;" src="', my_local_file, '"></iframe></div>', sep = "")
+      
+      return(armado_v)
+    })
+    ############################################################################
+    
+    
+      
+    
+    output$"visual_para_archivos" <- renderUI({
+      
+    
+          bslib::navset_card_tab(
+            # title = "R for Science",
+            id = ns("mynav"),
+            height = "100%",  # Especificar altura explícitamente
+            bslib::nav_panel(title = "R Code",
+                             verbatimTextOutput(ns("visual_RCode"))
+            ),
+            bslib::nav_panel(title = "R Code and Outputs",
+                             "El RCODE AND OUTPUS"),
+            bslib::nav_panel(title = "Report",
+                             htmlOutput(ns("visual_RReport")))
+          )
+          
+    
+    })
+    
     # Estado del renderizado
     estado_renderizado <- reactiveVal("no_iniciado") # Puede ser: no_iniciado, en_proceso, finalizado, error
     
@@ -353,6 +543,7 @@ module_quartoRenderer_server <- function(id, documento) {
     
     # Observar clic en botón "Cerrar"
     # Observar clic en botón "Cerrar"
+    if(FALSE){
     observeEvent(input$cerrar_modal, {
       # Intentar el método estándar
       removeModal()
@@ -401,7 +592,7 @@ module_quartoRenderer_server <- function(id, documento) {
     }, 100);
   ')
     })
-    
+    }
     
     
     

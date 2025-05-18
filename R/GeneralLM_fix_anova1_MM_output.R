@@ -32,7 +32,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
     })
     
     ############################################################################
-    # R Code
+    # 1) R Code
     Rcode_original <- reactive({
       req(OK_ALL_ACTIVE())
       
@@ -72,8 +72,9 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
       
     })
     
+    ############################################################################
     
-    # R
+    # 2) R - Results
     mis_valores <- reactive({
       
       req(OK_ALL_ACTIVE())
@@ -258,8 +259,8 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
       list(id = "boton_1",  label = "Summary",                class = "btn-outline-primary",         grupo = 1, orden = 1, content = "mini_resumen", show_always = TRUE),
       list(id = "boton_2",  label = "Full Analysis",          class = "btn-outline-primary",       grupo = 1, orden = 2, content = "mega_tabs", show_always = TRUE),
       list(id = "boton_3",  label = "Descriptive Statistics", class = "btn-outline-primary",         grupo = 1, orden = 3, content = "3", show_always = TRUE),
-      list(id = "boton_4",  label = "Script",                 class = "btn-outline-primary",          grupo = 1, orden = 4, content = "dynamic_tab05_ui", show_always = TRUE),
-      list(id = "boton_5",  label = "Download",               class = "btn-warning",         grupo = 1, orden = 5, content = "dynamic_tab06_ui", show_always = TRUE),
+      list(id = "boton_4",  label = "Script",                 class = "btn-outline-primary",          grupo = 1, orden = 4, content = "shiny_ace_editor_OUTPUT", show_always = TRUE),
+      list(id = "boton_5",  label = "Download",               class = "btn-warning",         grupo = 1, orden = 5, content = "dynamic_download_quarto", show_always = TRUE),
       list(id = "boton_6",  label = "Hypotheses",             class = "btn-info",            grupo = 2, orden = 1, content = "6", show_always = TRUE),
       list(id = "boton_7",  label = "Theoretical Framework",  class = "btn-light",           grupo = 2, orden = 2, content = "7", show_always = TRUE),
       list(id = "boton_8",  label = "Bibliography",           class = "btn-dark",            grupo = 2, orden = 3, content = "8", show_always = TRUE),
@@ -666,26 +667,20 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
     )
     
     
-    output$dynamic_tab05_ui <- renderUI({
-      req(mis_valores())
-      
-      
-      uiOutput(ns("shiny_ace_editor_OUTPUT"))
-      
-      
-    })
+   
     
     ############################################################################
     
     # Tab06 - Quarto
-    the_quarto_file <- reactive({
+    the_quarto_file_path <- reactive({
       req(mis_valores())
       GeneralLM_fix_anova1_quarto_file_path()
     })
     
-    module_quartoRenderer_server(id="quarto_doc", documento = the_quarto_file())
+    module_quartoRenderer_server(id="quarto_doc", documento = the_quarto_file_path(), 
+                                 Rcode_script = Rcode_script)
     
-    output$dynamic_tab06_ui <- renderUI({
+    output$dynamic_download_quarto <- renderUI({
       req(mis_valores())
       module_quartoRenderer_ui(id=ns("quarto_doc"))
     })
@@ -699,144 +694,14 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
         tabPanel(title = "Requeriments",      uiOutput(ns("dynamic_tab02_ui"))),
         tabPanel(title = "Plots - Raw Data",  uiOutput(ns("dynamic_tab03_ui"))),
         tabPanel(title = "Plots - Residuals", uiOutput(ns("dynamic_tab04_ui"))),
-        tabPanel(title = "Summary",           uiOutput(ns("dynamic_ESPECIAL_ui")))#,
-        
-        #tabPanel(title = "RCode",             uiOutput(ns("dynamic_tab05_ui"))),
-        #tabPanel(title = "Quarto",            uiOutput(ns("dynamic_tab06_ui")))
+        tabPanel(title = "Summary",           uiOutput(ns("dynamic_ESPECIAL_ui")))
       )
       
     })
     ############################################################################
-    # Shiny Clasic
+
     
     
-    ############################################################################
-    if(FALSE){
-    output$show_dev_full <- renderUI({
-      ns <- NS(id)
-      
-      req(show_dev)
-      
-      # Fila separada para el contenido en otra tarjeta
-      card(
-        card_body(
-          #fluidRow(uiOutput(ns("info_text2"))),
-          fluidRow(verbatimTextOutput(ns("info_text"))),
-          fluidRow(
-            column(4, verbatimTextOutput(ns("debug_rv_default"))),
-            column(4, verbatimTextOutput(ns("debug_rv_internos"))),
-            column(4, verbatimTextOutput(ns("debug_rv_activos")))
-            
-            
-          )
-        )
-      )
-    })
-    
-    output$debug_rv_default <- renderPrint({
-      # Crear una lista con toda la información relevante
-      
-      
-      # Mostrar la lista completa
-      str(valores_default, max.level = 2)
-    })
-    output$debug_rv_internos <- renderPrint({
-      valores_internos_list <- reactiveValuesToList(valores_internos)
-      
-      # Imprimir la estructura con detalles
-      str(valores_internos_list, max.level = 3)
-    })
-    output$debug_rv_activos <- renderPrint({
-      valores_activos_list <- reactiveValuesToList(valores_activos)
-      
-      # Imprimir la estructura con detalles
-      str(valores_activos_list, max.level = 3)
-    })
-    
-    # Reemplazar el renderPrint original con una versión más estética usando renderUI
-    
-    
-    
-    output$info_text <- renderPrint({
-      valores_internos_list <- reactiveValuesToList(valores_internos)
-      req(valores_internos_list)
-      
-      req(valores_internos_list$pack_import_dataset)
-      #req(valores_internos_list$pack_import_dataset)
-      data_source <- valores_internos_list$pack_import_dataset$data_source
-      original_file_name <- valores_internos_list$pack_import_dataset$"original_file_name"
-      value_ncol <- ncol(valores_internos_list$pack_import_dataset$"database")
-      value_nrow <- nrow(valores_internos_list$pack_import_dataset$"database")
-      
-      
-      print(paste0("data_source: ", data_source))
-      print(paste0("original_file_name: ", original_file_name))
-      print(paste0("value_ncol: ", value_ncol))
-      print(paste0("value_nrow: ", value_nrow))
-      
-      req(valores_internos_list$pack_tool_selection)
-      selected_tool <-  valores_internos_list$pack_tool_selection$"tipo_modelo"
-      acordeon <- valores_internos_list$pack_tool_selection$acordeon
-      modelo_seleccionado <- valores_internos_list$pack_tool_selection$modelo_seleccionado
-      print(paste0("selected_tool: ", selected_tool))
-      print(paste0("acordeon: ", acordeon))
-      print(paste0("modelo_seleccionado: ", modelo_seleccionado))
-      
-      req(valores_internos_list$pack_var_selection)
-      value_factor <- valores_internos_list$pack_var_selection$"factor"
-      value_rv <-     valores_internos_list$pack_var_selection$"respuesta"
-      vector_selected_vars <- valores_internos_list$pack_var_selection$"vector_selected_vars"
-      print(paste0("value_factor: ", value_factor))
-      print(paste0("value_rv: ", value_rv))
-      print(paste0("vector_selected_vars: ", paste0(vector_selected_vars, collapse =",")))
-      
-    })
-    
-    # Mensaje de selección
-    output$mensaje_seleccion <- renderUI({
-      req(show_dev)
-      if (!valores_activos$check_play) {
-        div(
-          class = "alert alert-info",
-          icon("info-circle"),
-          " Seleccione datos, luego las variables y presione ",
-          tags$strong("PLAY"),
-          " para visualizar los resultados."
-        )
-      } else {
-        div(
-          class = "alert alert-success",
-          icon("check-circle"),
-          paste(" Mostrando:", valores_internos$dataset_activo, "- Variables:",
-                paste(valores_internos$variables_activas, collapse = ", "))
-        )
-      }
-    })
- 
-      quartoRendererServer("quarto_doc", documento = "anova2.qmd")
-      # Mostrar el dataframe simple
-      output$tabla_datos <- renderTable({
-        # Solo mostrar los datos si la selección está activa y hay datos
-        req(valores_activos$check_play, !is.null(valores_activos$pack_import_dataset$"database"))
-        
-        df <- mtcars
-        # Devolver los datos con solo las variables seleccionadas
-        df <- valores_activos$pack_import_dataset$"database"
-        # if (!is.null(valores_internos$variables_activas)) {
-        #   if (all(valores_internos$variables_activas %in% names(df))) {
-        #     # Para mtcars, incluir los nombres de filas
-        #     if (identical(valores_internos$dataset_activo, "mtcars")) {
-        #       df <- df[, valores_internos$variables_activas, drop = FALSE]
-        #       df <- cbind(car = rownames(df), df)
-        #     } else {
-        #       df <- df[, c(valores_internos$variables_activas), drop = FALSE]
-        #     }
-        #   }
-        # }
-        
-        head(df, 10)
-      })
-    }
-    
+
   })
 }
