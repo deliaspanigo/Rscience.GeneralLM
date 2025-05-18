@@ -17,6 +17,8 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, a
   var_name_factor <- var_name_factor
   var_name_vr <- var_name_vr
   
+  #-- database <- _my_import_sentence_
+  
   vector_selected_vars <- c(var_name_vr, var_name_factor)
   alpha_value <- 0.05
   confidence_value <- 1 - alpha_value
@@ -101,9 +103,13 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, a
   check_unbalanced_reps <- length(unique(df_factor_info$n)) > 1
   check_unbalanced_reps
   
+  phrase_yes_unbalanced <- "The design is unbalanced in repetitions. A correction is applied to the Tukey test."
+  phrase_no_unbalanced  <- "The design is unbalanced in replicates. A correction should be applied to the Tukey test."
+  phrase_selected_unbalanced <- ifelse(test = check_unbalanced_reps, 
+                                  yes = phrase_yes_unbalanced,
+                                  no  = phrase_no_unbalanced)
   
-  
-  
+  phrase_selected_unbalanced
   
   # # # # # Section 06 - Anova Test ----------------------------------------------
   # # # Anova test
@@ -188,8 +194,73 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, a
   mean_residuals
   
   
+  ##################################
+  p_value_shapiro  <- test_residuals_normality$p.value
+  p_value_bartlett <- test_residuals_homogeneity$p.value
+  p_value_anova    <- df_table_anova$"Pr(>F)"[1]
+  
+  vector_p_value <- c(p_value_shapiro, p_value_bartlett, p_value_anova)
+  vector_logic_rejected <- vector_p_value < alpha_value
+  vector_ho_decision <- ifelse(test = vector_logic_rejected, yes = "Ho Rejected", "Ho no rejected")
+  vector_ho_rejected <- ifelse(test = vector_logic_rejected, yes = "Yes", "No")
+  
+  df_summary_anova <- data.frame(
+    "test" = c("Shapiro-Wilk test", "Bartlett test", "Anova 1 way"),
+    "aim"  = c("Normality", "Homogeneity", "Mean"),
+    "variable"    = c("residuals", "residuals", var_name_vr),
+    "p_value"     = vector_p_value,
+    "alpha_value" = c(alpha_value, alpha_value, alpha_value),
+    "Decision"    = vector_ho_decision
+  )
+  
+  df_summary_anova
+  
+  check_shapiro_rejected      <- p_value_shapiro < alpha_value
+  phrase_shapiro_yes_rejected <- "The null hypothesis of normal distribution of residuals is rejected."
+  phrase_shapiro_no_rejected  <- "The null hypothesis of normal distribution of residuals is not rejected."
+  phrase_shapiro_selected     <- ifelse(test = check_shapiro_rejected, 
+                                        yes = phrase_shapiro_yes_rejected, 
+                                        no = phrase_shapiro_no_rejected)
+  phrase_shapiro_selected 
+  
+  
+  check_bartlett_rejected      <- p_value_bartlett < alpha_value
+  phrase_bartlett_yes_rejected <- "The hypothesis of homogeneity of variances (heteroscedasticity) is rejected."
+  phrase_bartlett_no_rejected  <- "The hypothesis of homogeneity of variances (homoscedasticity) is not rejected."
+  phrase_bartlett_selected     <- ifelse(test = check_bartlett_rejected, 
+                                         yes = phrase_bartlett_yes_rejected, 
+                                         no = phrase_bartlett_no_rejected)
+  phrase_bartlett_selected
+  
+  
+  check_ok_all_requeriments     <- sum(vector_logic_rejected[c(1,2)]) == 2
+  phrase_requeriments_yes_valid <- "All residual assumptions are met, so it is valid to draw conclusions from the ANOVA test."
+  phrase_requeriments_no_valid  <- "Not all model assumptions are met, so it is NOT valid to draw conclusions from the ANOVA test."
+  phrase_requeriments_selected  <- ifelse(test = check_ok_all_requeriments, 
+                                          yes = phrase_requeriments_yes_valid, 
+                                          no = phrase_requeriments_no_valid)
+  
+  phrase_requeriments_selected  
+  
+  
+  
+  check_anova_rejected      <- p_value_anova < alpha_value
+  phrase_anova_yes_rejected <- "The null hypothesis of the ANOVA test is rejected. There are statistically significant differences in at least one level of the factor."
+  phrase_anova_no_rejected  <- "The null hypothesis of the ANOVA test is not rejected. All levels of the factor are statistically equal."
+  phrase_anova_selected     <- ifelse(test = check_anova_rejected, 
+                                      yes = phrase_anova_yes_rejected, 
+                                      no = phrase_anova_no_rejected)
+  
+  phrase_anova_selected <- ifelse(
+    test = check_ok_all_requeriments,
+    yes = phrase_anova_selected,
+    no = "Regardless of the p-value obtained in ANOVA, it is not valid to draw conclusions."
+  )
+  
+  phrase_anova_selected
+  ##############################################################################
   tukey01_full_groups <- agricolae::HSD.test(y = lm_anova,
-                                             trt = colnames(minibase)[2],
+                                             trt = colnames(minibase_mod)[2],
                                              alpha = alpha_value,
                                              group = TRUE,
                                              console = FALSE,
@@ -199,7 +270,7 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, a
   
   # # # Tukey test - Tukey pairs comparation - Full version
   tukey02_full_pairs <- agricolae::HSD.test(y = lm_anova,
-                                            trt = colnames(minibase)[2],
+                                            trt = colnames(minibase_mod)[2],
                                             alpha = alpha_value,
                                             group = FALSE,
                                             console = FALSE,
@@ -813,7 +884,7 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, a
   #._ Filtrar para excluir los parámetros de la función
   ._obj_to_keep <- setdiff(._obj_names, names(formals(sys.function())))
   
-  # Crear una lista con los objetos (excluyendo parámetros)
+  #._ Crear una lista con los objetos (excluyendo parámetros)
   ._result_list <- mget(._obj_to_keep)
   
   #._ Devolver la lista ordenada según su definición

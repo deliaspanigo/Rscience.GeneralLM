@@ -28,11 +28,15 @@ Sbutton_play2_server <- function(id, internal_DATASET_SELECTOR,  active_DATASET_
     
     output$my_action_button <- renderUI({
       
-      btn_class <- switch(button_state(),
-                          "initial"   = "btn-primary",    # Azul inicial
-                          "confirmed" = "btn-success",    # Verde después de confirmar
-                          "modified"  = "btn-primary")    # Vuelve a azul si se modifica
+      # btn_class <- switch(button_state(),
+      #                     "initial"   = "btn-primary",    # Azul inicial
+      #                     "confirmed" = "btn-success",    # Verde después de confirmar
+      #                     "modified"  = "btn-primary")    # Vuelve a azul si se modifica
       
+      btn_class <- switch(button_state(),
+                          "initial"   = "btn-outline-primary",    # Azul inicial
+                          "confirmed" = "btn-outline-success",    # Verde después de confirmar
+                          "modified"  = "btn-outline-primary")    # Vuelve a azul si se modifica
       # Botón para elegir variables
       actionButton(
         ns("btn_play"),
@@ -169,7 +173,7 @@ Sbutton_play2_server <- function(id, internal_DATASET_SELECTOR,  active_DATASET_
             ),
             "PLAY!!!"
           ),
-          duration = 15,
+          duration = 2,
           closeButton = TRUE
         )
         

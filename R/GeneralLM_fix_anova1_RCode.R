@@ -17,6 +17,8 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, a
   var_name_factor <- var_name_factor
   var_name_vr <- var_name_vr
   
+  #-- database <- _my_import_sentence_
+  
   vector_selected_vars <- c(var_name_vr, var_name_factor)
   alpha_value <- 0.05
   confidence_value <- 1 - alpha_value
@@ -101,13 +103,13 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, a
   check_unbalanced_reps <- length(unique(df_factor_info$n)) > 1
   check_unbalanced_reps
   
-  phrase_correction_yes_tukey <- "The design is unbalanced in repetitions. A correction is applied to the Tukey test."
-  phrase_correction_no_tukey  <- "The design is unbalanced in replicates. A correction should be applied to the Tukey test."
-  phrase_selected_tukey <- ifelse(test = check_unbalanced_reps, 
-                                  yes = phrase_correction_yes_tukey,
-                                  no  = phrase_correction_no_tukey)
+  phrase_yes_unbalanced <- "The design is unbalanced in repetitions. A correction is applied to the Tukey test."
+  phrase_no_unbalanced  <- "The design is unbalanced in replicates. A correction should be applied to the Tukey test."
+  phrase_selected_unbalanced <- ifelse(test = check_unbalanced_reps, 
+                                  yes = phrase_yes_unbalanced,
+                                  no  = phrase_no_unbalanced)
   
-  phrase_selected_tukey
+  phrase_selected_unbalanced
   
   # # # # # Section 06 - Anova Test ----------------------------------------------
   # # # Anova test
@@ -202,7 +204,7 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, a
   vector_ho_decision <- ifelse(test = vector_logic_rejected, yes = "Ho Rejected", "Ho no rejected")
   vector_ho_rejected <- ifelse(test = vector_logic_rejected, yes = "Yes", "No")
   
-  df_summary_anova <- data_frame(
+  df_summary_anova <- data.frame(
     "test" = c("Shapiro-Wilk test", "Bartlett test", "Anova 1 way"),
     "aim"  = c("Normality", "Homogeneity", "Mean"),
     "variable"    = c("residuals", "residuals", var_name_vr),
@@ -214,8 +216,8 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, a
   df_summary_anova
   
   check_shapiro_rejected      <- p_value_shapiro < alpha_value
-  phrase_shapiro_yes_rejected <- "Se rechaza la hipótesis de distribución normal de los residuos."
-  phrase_shapiro_no_rejected  <- "No se rechaza la hipótesis de distribución normal de los residuos."
+  phrase_shapiro_yes_rejected <- "The null hypothesis of normal distribution of residuals is rejected."
+  phrase_shapiro_no_rejected  <- "The null hypothesis of normal distribution of residuals is not rejected."
   phrase_shapiro_selected     <- ifelse(test = check_shapiro_rejected, 
                                         yes = phrase_shapiro_yes_rejected, 
                                         no = phrase_shapiro_no_rejected)
@@ -223,8 +225,8 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, a
   
   
   check_bartlett_rejected      <- p_value_bartlett < alpha_value
-  phrase_bartlett_yes_rejected <- "Se rechaza la hipótesis de homogeneidad de varianzas (heterosedasticidad)."
-  phrase_bartlett_no_rejected  <- "No se rechaza la hipótesis de homogeneidad de varianzas (homosedasticidad)."
+  phrase_bartlett_yes_rejected <- "The hypothesis of homogeneity of variances (heteroscedasticity) is rejected."
+  phrase_bartlett_no_rejected  <- "The hypothesis of homogeneity of variances (homoscedasticity) is not rejected."
   phrase_bartlett_selected     <- ifelse(test = check_bartlett_rejected, 
                                          yes = phrase_bartlett_yes_rejected, 
                                          no = phrase_bartlett_no_rejected)
@@ -232,8 +234,8 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, a
   
   
   check_ok_all_requeriments     <- sum(vector_logic_rejected[c(1,2)]) == 2
-  phrase_requeriments_yes_valid <- "Se cumplen todos los requisitos de los residuos por lo tanto es válido sacar conclusiones del test de Anova."
-  phrase_requeriments_no_valid  <- "No se cumplen todos los requisitos del modelo por lo tanto NO es válido para sacar conclusiones del test de Anova."
+  phrase_requeriments_yes_valid <- "All residual assumptions are met, so it is valid to draw conclusions from the ANOVA test."
+  phrase_requeriments_no_valid  <- "Not all model assumptions are met, so it is NOT valid to draw conclusions from the ANOVA test."
   phrase_requeriments_selected  <- ifelse(test = check_ok_all_requeriments, 
                                           yes = phrase_requeriments_yes_valid, 
                                           no = phrase_requeriments_no_valid)
@@ -243,15 +245,17 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, a
   
   
   check_anova_rejected      <- p_value_anova < alpha_value
-  phrase_anova_yes_rejected <- "Se rechaza la hipótesis nula del test de Anova. Existe diferencias estadísticamente significativas en al menos 1 nivel del factor."
-  phrase_anova_no_rejected  <- "No se rechaza la hipótesis nula del test de Anova. Todos los niveles del factor son estadísticamente iguales"
+  phrase_anova_yes_rejected <- "The null hypothesis of the ANOVA test is rejected. There are statistically significant differences in at least one level of the factor."
+  phrase_anova_no_rejected  <- "The null hypothesis of the ANOVA test is not rejected. All levels of the factor are statistically equal."
   phrase_anova_selected     <- ifelse(test = check_anova_rejected, 
                                       yes = phrase_anova_yes_rejected, 
                                       no = phrase_anova_no_rejected)
   
-  phrase_anova_selected <- ifelse(test = check_ok_all_requeriments,
-                                  yes = phrase_anova_selected,
-                                  no = "Indistintamente del valor p obtenido en anova, no es válido sacar conclusiones.")
+  phrase_anova_selected <- ifelse(
+    test = check_ok_all_requeriments,
+    yes = phrase_anova_selected,
+    no = "Regardless of the p-value obtained in ANOVA, it is not valid to draw conclusions."
+  )
   
   phrase_anova_selected
   ##############################################################################

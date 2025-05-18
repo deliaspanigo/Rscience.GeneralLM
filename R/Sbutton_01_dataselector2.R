@@ -30,10 +30,14 @@ Sbutton_01_dataselector2_server <- function(id, internal_DATASET_SELECTOR) {
      
       
       btn_class <- switch(button_state(),
-                          "initial"   = "btn-primary",    # Azul inicial
-                          "confirmed" = "btn-success",    # Verde después de confirmar
-                          "modified"  = "btn-primary")    # Vuelve a azul si se modifica
-      
+                          "initial"   = "btn-outline-primary",    # Azul inicial
+                          "confirmed" = "btn-outline-success",    # Verde después de confirmar
+                          "modified"  = "btn-outline-primary")    # Vuelve a azul si se modifica
+      # 
+      # btn_class <- switch(button_state(),
+      #                     "initial"   = "btn-primary",    # Azul inicial
+      #                     "confirmed" = "btn-success",    # Verde después de confirmar
+      #                     "modified"  = "btn-primary")    # Vuelve a azul si se modifica
       actionButton(
         ns("btn_dataset"),
         tagList(

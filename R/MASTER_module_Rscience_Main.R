@@ -38,11 +38,12 @@ MASTER_module_Rscience_Main_ui <- function(id) {
             style = "flex: 0 0 87.5%; max-width: 87.5%; padding: 10px; height: 100%;",# overflow-y: auto;",  # Altura del 100%
             bslib::navset_card_tab(
               title = "R for Science",
+              id = ns("mynav"),
               height = "100%",  # Especificar altura explícitamente
-              bslib::nav_panel("User selection", 
+              bslib::nav_panel(title = "user_selection",
                                uiOutput(ns("card02_user_selection"))
               ),
-              bslib::nav_panel("Outputs", 
+              bslib::nav_panel(title = "outputs",
                                uiOutput(ns("card03_botonera_output"))
               )
             )
@@ -149,6 +150,57 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
 
     ############################################################################
     
+    # Cuando quieras activar otra pestaña
+    # updateNavset <- function(session, navset_id, new_panel_title) {
+    #   update_navset_card(
+    #     session,
+    #     inputId = navset_id,
+    #     selected = new_panel_title
+    #   )
+    # }
+    # 
+    observeEvent(active_PLAY_SELECTOR$"check_output", {
+      # Verificar el valor de check_output que disparó este evento
+      # print(paste("Valor de check_output:", active_PLAY_SELECTOR$"check_output"))
+      
+      # Mostrar el ID completo del navset (con namespace)
+      # print(paste("ID completo del navset:", session$ns("mynav")))
+      
+      # Usar isolate() para ver la pestaña actual sin crear dependencia reactiva
+      # print(paste("Pestaña actualmente activa:", isolate(input$mynav)))
+      
+      # Mostrar a cuál pestaña intentamos cambiar
+      el_check <- active_PLAY_SELECTOR$"check_output"
+      mi_ventana <- ifelse(test = el_check, yes = "outputs", no = "user_selection")
+      # print(paste("Intentando cambiar a la pestaña:", mi_ventana))
+      
+      # Cambiar la pestaña usando updateTabsetPanel en lugar de nav_select
+      updateTabsetPanel(session, inputId = "mynav", selected = mi_ventana)
+      
+      # Para verificar después del cambio, necesitas otro contexto reactivo
+      # Esto creará un observador aparte que se ejecutará una vez después de 0.5 segundos
+      # observe({
+      #   print(paste("En un nuevo observe(), pestaña activa:", input$mynav))
+      # })
+    })
+    
+    # # Añade esto fuera del observeEvent
+    # observe({
+    #   # Este observe se ejecutará cada vez que cambie la pestaña
+    #   print(paste("Cambio detectado - Pestaña activa ahora:", input$mynav))
+    # })
+    
+    
+    # observeEvent(active_PLAY_SELECTOR$"check_output", {
+    #   print(paste("Valor de check_output:", active_PLAY_SELECTOR$"check_output"))
+    #   print(paste("ID completo del navset:", session$ns("mynav")))
+    #   req(active_PLAY_SELECTOR$"check_output")
+    #   print("HOLA ADENTRO")
+    #   el_check <- active_PLAY_SELECTOR$"check_output"
+    #   mi_ventana <- ifelse(test = el_check, yes = "la02", no = "la01")
+    #   bslib::nav_select(id = ns("mynav"), selected =mi_ventana)  # Change to "Outputs" tab
+    # })
+    ############################################################################
     output$card01_botonera_inicial <- renderUI({
       div(
         style = "height: 100%;",  # Altura del contenedor (100% del contenedor padre)
@@ -259,15 +311,29 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     # str_ui <- reactiveVal(NULL)
     # my_id <- reactiveVal(NULL)
 # 
+    
+    
+    OK_ALL_ACTIVE <- reactive({
+      req(active_DATASET_SELECTOR, active_TOOLS_SELECTOR, 
+          active_VARIABLE_SELECTOR, active_PLAY_SELECTOR)
+      
+      req(active_DATASET_SELECTOR$"check_output", 
+          active_TOOLS_SELECTOR$"check_output",
+          active_VARIABLE_SELECTOR$"check_output",
+          active_PLAY_SELECTOR$"check_output")
+      
+      return(TRUE)
+      
+    })
     observe({
-
+      req(OK_ALL_ACTIVE())
       req(my_list_str_rv())
       str_selected_modulo <- my_list_str_rv()$"str_04_MM_output"
       new_server <- paste0(str_selected_modulo, "_server")
       new_ui <- paste0(str_selected_modulo, "_ui")
       new_id <- "the_output"
 
-      print(new_server)
+      # print(new_server)
       # str_server(new_server)
       # str_ui(new_ui)
       # my_id(new_id)
@@ -275,7 +341,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
 
       vector_funciones <- ls("package:Rscience.GeneralLM")
       check_in <- new_server %in% vector_funciones
-      print(check_in)
+      # print(check_in)
 
       # print(str_server())
       # Verificar si la función existe y ejecutarla
@@ -290,28 +356,17 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     })
 #     
     
-    ok_show_all <- reactive({
-      req(active_DATASET_SELECTOR, active_TOOLS_SELECTOR, 
-          active_VARIABLE_SELECTOR, active_PLAY_SELECTOR)
-      
-      req(active_DATASET_SELECTOR$"check_output", 
-          active_TOOLS_SELECTOR$"check_output",
-          active_VARIABLE_SELECTOR$"check_output",
-          active_PLAY_SELECTOR$"check_output")
-      
-      return(TRUE)
-      
-    })
     
     # # Renderizar la UI del selector de variables
     output$card03_botonera_output <- renderUI({
-      req(my_list_str_rv(), ok_show_all())
+      req(OK_ALL_ACTIVE())
+      req(my_list_str_rv())
       
       str_selected_modulo <- my_list_str_rv()$"str_04_MM_output"
       new_modulo_ui <- paste0(str_selected_modulo, "_ui")
       new_id <- "the_output"
       
-      print(new_modulo_ui)
+      # print(new_modulo_ui)
       args <- list(id = ns(new_id))
       
       div(
