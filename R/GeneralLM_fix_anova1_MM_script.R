@@ -3,7 +3,7 @@
 GeneralLM_fix_anova1_MM_script_ui <- function(id) {
   ns <- NS(id)
   
-  uiOutput(ns("SUPER_OUTPUT"))
+  uiOutput(ns("shiny_ace_editor_OUTPUT"))
   
   
 }
@@ -41,20 +41,24 @@ GeneralLM_fix_anova1_MM_script_server <- function(id, show_dev,
     })
     
     Rcode_script   <- reactive({
-      req(OK_ALL_ACTIVE())
+      req(OK_ALL_ACTIVE(), Rcode_original())
+      
+      str_import      <- active_DATASET_SELECTOR$"pack_output"$"str_import_external"
+      var_name_factor <- active_VARIABLE_SELECTOR$"pack_output"$"factor" #valores_internos_list$pack_var_selection$"factor"
+      var_name_vr     <- active_VARIABLE_SELECTOR$"pack_output"$"respuesta"  #     #valores_internos_list$pack_var_selection$"respuesta"
+      alpha_value     <- 0.05
       
       the_code   <- Rcode_original()
-      str_import <- active_DATASET_SELECTOR$"pack_output"$"str_import_external"
       the_code   <- sub(pattern = "_my_import_sentence_", replacement = str_import, x = the_code)
       the_code   <- gsub(pattern = "#---", replacement = "", x = the_code)
-      the_code   <- gsub(pattern = "#---", replacement = "", x = the_code)
-      
-      the_code   <- gsub(pattern = "#---", replacement = "", x = the_code)
-      
+      the_code   <- sub(pattern = "_var_name_factor_", replacement = var_name_factor, x = the_code)
+      the_code   <- sub(pattern = "_var_name_vr_", replacement = var_name_vr, x = the_code)
+      the_code   <- sub(pattern = "_alpha_value_", replacement = alpha_value, x = the_code)
       the_code
+      
     })
     
-    Rcode_quarto <- Rcode_script   <- reactive({
+    Rcode_quarto <-  reactive({
       req(OK_ALL_ACTIVE(), Rcode_original())
       
       str_import      <- active_DATASET_SELECTOR$"pack_output"$"str_import_external"
@@ -74,26 +78,6 @@ GeneralLM_fix_anova1_MM_script_server <- function(id, show_dev,
     
     ############################################################################
     
-    # 2) R - Results
-    mis_valores <- reactive({
-      
-      req(OK_ALL_ACTIVE())
-      
-      database        <- active_DATASET_SELECTOR$"pack_output"$"database" # mtcars #valores_internos_list$pack_import_dataset$"database"
-      var_name_factor <- active_VARIABLE_SELECTOR$"pack_output"$"factor" #valores_internos_list$pack_var_selection$"factor"
-      var_name_vr     <- active_VARIABLE_SELECTOR$"pack_output"$"respuesta"  #     #valores_internos_list$pack_var_selection$"respuesta"
-      alpha_value     <- 0.05
-      
-      the_results        <- GeneralLM_fix_anova1_RCode(database, var_name_factor, var_name_vr, alpha_value)
-      vector_order_names <- GeneralLM_fix_anova1_objects_in_order(fn = GeneralLM_fix_anova1_RCode)
-      the_results        <- the_results[vector_order_names]
-      the_results
-      
-    })
-    
-    ############################################################################
-    
-  
     
     
     
@@ -108,8 +92,7 @@ GeneralLM_fix_anova1_MM_script_server <- function(id, show_dev,
     # Tab05 - RCode
     
     output$shiny_ace_editor_MENU <- renderUI({
-      req(mis_valores())
-      
+
       #Rcode_script <- GeneralLM_fix_anova1_take_code(my_fn=GeneralLM_fix_anova1_RCode)
       # Calcular la altura adecuada para el editor basado en el número de líneas
       
@@ -136,7 +119,7 @@ GeneralLM_fix_anova1_MM_script_server <- function(id, show_dev,
     })
     
     output$shiny_ace_CODE <- renderUI({
-      req(mis_valores(), Rcode_script(), input$"theme", input$"fontSize")
+      req(Rcode_script(), input$"theme", input$"fontSize")
       
       
       line_count <- length(strsplit(Rcode_script(), "\n")[[1]])
@@ -161,7 +144,7 @@ GeneralLM_fix_anova1_MM_script_server <- function(id, show_dev,
     })
     
     output$shiny_ace_editor_OUTPUT <- renderUI({
-      req(mis_valores())
+      # req(mis_valores())
       
       div(uiOutput(ns("shiny_ace_editor_MENU")),
           uiOutput(ns("shiny_ace_CODE")))

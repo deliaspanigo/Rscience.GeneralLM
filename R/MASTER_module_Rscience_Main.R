@@ -51,7 +51,7 @@ MASTER_module_Rscience_Main_ui <- function(id) {
                                uiOutput(ns("card05_output"))
               ),
               bslib::nav_panel(title = "script",
-                               uiOutput(ns("card04_script"))
+                               uiOutput(ns("card06_script"))
               )
             )
           )
@@ -421,11 +421,6 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     ############################################################################
 
-
-    if(TRUE){
-      
-    # Card 04) "script"
-    
     
     observe({
       req(OK_ALL_ACTIVE())
@@ -476,7 +471,68 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         do.call(new_modulo_ui, args)  # Altura del contenido (100% del contenedor padre)
       )
     })
-    }
+    
+    
+    
+    
+    ############################################################################
+    
+    
+    
+    
+    observe({
+      req(OK_ALL_ACTIVE())
+      req(my_list_str_rv())
+      str_selected_modulo <- my_list_str_rv()$"str_06_MM_script"
+      new_server <- paste0(str_selected_modulo, "_server")
+      new_ui <- paste0(str_selected_modulo, "_ui")
+      new_id <- "the_script"
+      
+      # print(new_server)
+      # str_server(new_server)
+      # str_ui(new_ui)
+      # my_id(new_id)
+      args <- list(id = new_id, show_dev = FALSE,
+                   active_DATASET_SELECTOR, 
+                   active_TOOLS_SELECTOR,
+                   active_VARIABLE_SELECTOR,
+                   active_PLAY_SELECTOR)
+      
+      vector_funciones <- ls("package:Rscience.GeneralLM")
+      check_in <- new_server %in% vector_funciones
+      # print(check_in)
+      
+      # print(str_server())
+      # Verificar si la función existe y ejecutarla
+      if (check_in) {
+        do.call(new_server, args)
+        # print(resultado)  # Output: 5
+      } else {
+        print("El modulo no existe.")
+      }
+      
+      
+    })
+    
+    
+    # # Renderizar la UI del selector de variables
+    output$card06_script <- renderUI({
+      req(OK_ALL_ACTIVE())
+      req(my_list_str_rv())
+      
+      str_selected_modulo <- my_list_str_rv()$"str_06_MM_script"
+      new_modulo_ui <- paste0(str_selected_modulo, "_ui")
+      new_id <- "the_script"
+      
+      # print(new_modulo_ui)
+      args <- list(id = ns(new_id))
+      
+      div(
+        style = "height: 100%;",  # Altura del contenedor (100% del contenedor padre)
+        do.call(new_modulo_ui, args)  # Altura del contenido (100% del contenedor padre)
+      )
+    })
+    
     
     
     
