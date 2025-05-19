@@ -3,7 +3,7 @@
 GeneralLM_fix_anova1_objects_in_order <- function(fn) {
   # Obtener el código de la función como texto
   
-  
+  # fn = GeneralLM_fix_anova1_RCode
   fn_text <- deparse(fn)
   # Eliminar la primera y última línea (definición de función y llave final)
   fn_body <- fn_text[2:(length(fn_text)-1)]
@@ -23,7 +23,13 @@ GeneralLM_fix_anova1_objects_in_order <- function(fn) {
   # Eliminar comentarios que pueden estar al final de las líneas
   lines <- gsub("#.*$", "", lines)
   
+  lines <- sub("^[[:space:]]+", "", lines)
+  
   lines <- lines[grepl(".+<-.+", lines)]
+  lines <- lines[!grepl("^[^a-zA-Z0-9]+<-.+", lines)]  
+  
+  lines <- lines[!grepl("^\\._", lines)]
+  
   
   # Unir nuevamente las líneas en un solo texto
   body_text <- paste(lines, collapse = "\n")

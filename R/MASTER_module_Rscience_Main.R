@@ -39,12 +39,19 @@ MASTER_module_Rscience_Main_ui <- function(id) {
             bslib::navset_card_tab(
               title = "R for Science",
               id = ns("mynav"),
-              height = "100%",  # Especificar altura explícitamente
+              #height = "100%",  # Especificar altura explícitamente
               bslib::nav_panel(title = "user_selection",
                                uiOutput(ns("card02_user_selection"))
               ),
-              bslib::nav_panel(title = "outputs",
-                               uiOutput(ns("card03_botonera_output"))
+              bslib::nav_panel(title = "crystal01_run_code",
+                               uiOutput(ns("crystal01_run_code"))
+                               # verbatimTextOutput(ns("crystal01_run_code"))
+              ),
+              bslib::nav_panel(title = "output",
+                               uiOutput(ns("card05_output"))
+              ),
+              bslib::nav_panel(title = "script",
+                               uiOutput(ns("card04_script"))
               )
             )
           )
@@ -59,6 +66,32 @@ MASTER_module_Rscience_Main_ui <- function(id) {
 MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+    
+    
+    ############################################################################
+    
+    # Card 01) Botonera "main menu"
+    output$card01_botonera_inicial <- renderUI({
+      div(
+        style = "height: 100%;",  # Altura del contenedor (100% del contenedor padre)
+        card(
+          style = "height: 100%;",  # Altura de la card (100% del contenedor padre)
+          card_header("Main menu"),
+          card_body(
+            div(
+              class = "d-flex flex-column align-items-center",  # Para centrar horizontalmente
+              style = "gap: 20px; height: 100%;",  # Altura del cuerpo de la card (100%)
+              Sbutton_01_dataselector2_ui(ns("dataset_selector2")), 
+              Sbutton_02_tools2_ui(id = ns("tools_selector2")),
+              Sbutton_03_variable_selector2_ui(id = ns("variable_selector2")),
+              Sbutton_reset2_ui(id = ns("reset2")),
+              Sbutton_play2_ui(id = ns("play2"))
+            )
+          )
+        )
+      )
+    })
     
     
     default_structure <- list(
@@ -102,7 +135,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     Sbutton_02_tools2_server(id = "tools_selector2", internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR)
     
-    
+    # # # # # # - - - Calling names - - - - - - - -
     my_list_str_rv <- reactive({
       
       valores_internos_list <- reactiveValuesToList(internal_TOOLS_SELECTOR)
@@ -115,8 +148,9 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         str_01_MM_variable_selector = "_MM_variable_selector",
         str_02_FN_validate_vars =     "_FN_validate_vars",
         str_03_FN_zocalo =            "_FN_shiny_zocalo",
-        str_04_MM_output =            "_MM_output"
-        
+        str_04_MM_run_code =          "_MM_run_code",
+        str_05_MM_output =            "_MM_output",
+        str_06_MM_script =            "_MM_script"
         
       )
       vector_names <- names(the_str_list)
@@ -126,6 +160,10 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       the_str_list
       
     })
+    # # # # # # - - - - - - - - - - - - - - - - - -
+    # # # # # # - - - - - - - - - - - - - - - - - -
+    # # # # # # - - - - - - - - - - - - - - - - - -
+    
     
     Sbutton_03_variable_selector2_server(id = "variable_selector2", 
                                          my_list_str_rv, 
@@ -146,84 +184,26 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
                          internal_PLAY_SELECTOR,     active_PLAY_SELECTOR)
     
     
-    #my_selected_tool <- reactiveVal(NULL)
-
     ############################################################################
     
-    # Cuando quieras activar otra pestaña
-    # updateNavset <- function(session, navset_id, new_panel_title) {
-    #   update_navset_card(
-    #     session,
-    #     inputId = navset_id,
-    #     selected = new_panel_title
-    #   )
-    # }
-    # 
-    observeEvent(active_PLAY_SELECTOR$"check_output", {
-      # Verificar el valor de check_output que disparó este evento
-      # print(paste("Valor de check_output:", active_PLAY_SELECTOR$"check_output"))
-      
-      # Mostrar el ID completo del navset (con namespace)
-      # print(paste("ID completo del navset:", session$ns("mynav")))
-      
-      # Usar isolate() para ver la pestaña actual sin crear dependencia reactiva
-      # print(paste("Pestaña actualmente activa:", isolate(input$mynav)))
-      
-      # Mostrar a cuál pestaña intentamos cambiar
-      el_check <- active_PLAY_SELECTOR$"check_output"
-      mi_ventana <- ifelse(test = el_check, yes = "outputs", no = "user_selection")
-      # print(paste("Intentando cambiar a la pestaña:", mi_ventana))
-      
-      # Cambiar la pestaña usando updateTabsetPanel en lugar de nav_select
-      updateTabsetPanel(session, inputId = "mynav", selected = mi_ventana)
-      
-      # Para verificar después del cambio, necesitas otro contexto reactivo
-      # Esto creará un observador aparte que se ejecutará una vez después de 0.5 segundos
-      # observe({
-      #   print(paste("En un nuevo observe(), pestaña activa:", input$mynav))
-      # })
-    })
-    
-    # # Añade esto fuera del observeEvent
-    # observe({
-    #   # Este observe se ejecutará cada vez que cambie la pestaña
-    #   print(paste("Cambio detectado - Pestaña activa ahora:", input$mynav))
-    # })
     
     
-    # observeEvent(active_PLAY_SELECTOR$"check_output", {
-    #   print(paste("Valor de check_output:", active_PLAY_SELECTOR$"check_output"))
-    #   print(paste("ID completo del navset:", session$ns("mynav")))
-    #   req(active_PLAY_SELECTOR$"check_output")
-    #   print("HOLA ADENTRO")
-    #   el_check <- active_PLAY_SELECTOR$"check_output"
-    #   mi_ventana <- ifelse(test = el_check, yes = "la02", no = "la01")
-    #   bslib::nav_select(id = ns("mynav"), selected =mi_ventana)  # Change to "Outputs" tab
-    # })
-    ############################################################################
-    output$card01_botonera_inicial <- renderUI({
+    # Card 02) "user_selection"
+    output$card02_user_selection <- renderUI({
       div(
-        style = "height: 100%;",  # Altura del contenedor (100% del contenedor padre)
-        card(
-          style = "height: 100%;",  # Altura de la card (100% del contenedor padre)
-          card_header("Main menu"),
-          card_body(
-            div(
-              class = "d-flex flex-column align-items-center",  # Para centrar horizontalmente
-              style = "gap: 20px; height: 100%;",  # Altura del cuerpo de la card (100%)
-              Sbutton_01_dataselector2_ui(ns("dataset_selector2")), 
-              Sbutton_02_tools2_ui(id = ns("tools_selector2")),
-              Sbutton_03_variable_selector2_ui(id = ns("variable_selector2")),
-              Sbutton_reset2_ui(id = ns("reset2")),
-              Sbutton_play2_ui(id = ns("play2"))
-            )
-          )
+        style = "height: 100%; display: flex;",  # Altura del contenedor (100% del contenedor padre)
+        div(
+          style = "flex: 1 1 50%; max-width: 50%; padding: 10px; box-sizing: border-box; height: 100%;",  # Altura del 100%
+          uiOutput(ns("tarjeta01_dataset")),
+          uiOutput(ns("agregado_tools")),
+          uiOutput(ns("tarjeta02_tools"))
+        ),
+        div(
+          style = "flex: 1 1 50%; max-width: 50%; height: 100%; overflow-y: auto; padding: 10px; box-sizing: border-box;",  # Altura del 100%
+          uiOutput(ns("tarjeta03_vars"))
         )
       )
     })
-    
-    
-    ############################################################################
     
     output$tarjeta01_dataset <- renderUI({
       valores_internos_list <- reactiveValuesToList(internal_DATASET_SELECTOR)
@@ -281,38 +261,12 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     })
     
     
-    output$card02_user_selection <- renderUI({
-      div(
-        style = "height: 100%; display: flex;",  # Altura del contenedor (100% del contenedor padre)
-        div(
-          style = "flex: 1 1 50%; max-width: 50%; padding: 10px; box-sizing: border-box; height: 100%;",  # Altura del 100%
-          uiOutput(ns("tarjeta01_dataset")),
-          uiOutput(ns("agregado_tools")),
-          uiOutput(ns("tarjeta02_tools"))
-        ),
-        div(
-          style = "flex: 1 1 50%; max-width: 50%; height: 100%; overflow-y: auto; padding: 10px; box-sizing: border-box;",  # Altura del 100%
-          uiOutput(ns("tarjeta03_vars"))
-        )
-      )
-    })
     
     
     ############################################################################
     
     
-    # GeneralLM_fix_anova1_MM_output_server(id = "the_output")
-
-    # output$card03_botonera_output   <- renderUI({
-    #   GeneralLM_fix_anova1_MM_output_ui(id = ns("aver"))
-    # })
-    
-    # str_server <- reactiveVal(NULL)
-    # str_ui <- reactiveVal(NULL)
-    # my_id <- reactiveVal(NULL)
-# 
-    
-    
+    # # # # CONTROL POINT # # # # 
     OK_ALL_ACTIVE <- reactive({
       req(active_DATASET_SELECTOR, active_TOOLS_SELECTOR, 
           active_VARIABLE_SELECTOR, active_PLAY_SELECTOR)
@@ -325,13 +279,34 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       return(TRUE)
       
     })
+    
+    # Si esta todo OK, vamos a la pestania "output"
+    observeEvent(active_PLAY_SELECTOR$"check_output", {
+      
+      # Mostrar a cuál pestaña intentamos cambiar
+      el_check <- active_PLAY_SELECTOR$"check_output"
+      mi_ventana <- ifelse(test = el_check, yes = "output", no = "user_selection")
+      # print(paste("Intentando cambiar a la pestaña:", mi_ventana))
+      
+      # Cambiar la pestaña usando updateTabsetPanel en lugar de nav_select
+      updateTabsetPanel(session, inputId = "mynav", selected = mi_ventana)
+      
+      
+    })
+    
+    
+    ############################################################################
+  
+    # Card 03) "output"
+    
+    the_R_objects <- reactiveVal(NULL)
     observe({
       req(OK_ALL_ACTIVE())
       req(my_list_str_rv())
-      str_selected_modulo <- my_list_str_rv()$"str_04_MM_output"
+      str_selected_modulo <- my_list_str_rv()$"str_04_MM_run_code"
       new_server <- paste0(str_selected_modulo, "_server")
       new_ui <- paste0(str_selected_modulo, "_ui")
-      new_id <- "the_output"
+      new_id <- "the_run_code"
 
       # print(new_server)
       # str_server(new_server)
@@ -350,7 +325,8 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       # print(str_server())
       # Verificar si la función existe y ejecutarla
       if (check_in) {
-        do.call(new_server, args)
+        the_results <- do.call(new_server, args)
+        the_R_objects(the_results())
         # print(resultado)  # Output: 5
       } else {
         print("El modulo no existe.")
@@ -358,15 +334,137 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
 
 
     })
-#     
+     
+    
+    crear_outputs_y_ui33 <- function(prefix, mis_valores_reactive, output, ns) {
+      
+      the_names <- names(mis_valores_reactive())
+      the_names <- na.omit(the_names)
+      # the_names <- the_names[1:10]
+      # Identifico plot y text
+      dt_plots <- grepl("^plot", the_names)
+      dt_text <- !dt_plots
+      
+      vector_render <- rep(NA, length(the_names))
+      vector_render[dt_plots] <- "plotly"
+      vector_render[dt_text] <- "text"
+      
+
+      # Crea los outputs en bucle, en ámbitos independientes para evitar sobrescrituras
+      for (i in seq_along(the_names)) {
+        id_output <- paste0(prefix, i)
+        obj_name <- the_names[i]
+        el_render <- vector_render[i]
+        
+        # Crear un ámbito local para que cada output sea independiente
+        local({
+          n <- i
+          id <- id_output
+          obj <- obj_name
+          
+          if(el_render == "text"){
+              output[[id]] <- renderPrint({
+                req(mis_valores_reactive())
+                mis_valores_reactive()[obj]
+              })
+          }
+          
+          # if(el_render == "plotly"){
+          #   output[[id]] <- plotly::renderPlotly({
+          #     req(mis_valores_reactive())
+          #     mis_valores_reactive()[[obj]]
+          #   })
+          # }
+          
+        })
+        
+      }
+      
+      # Crear UI dinámicamente
+      ui_list <- lapply(seq_along(the_names), function(i) {
+        id_output <- paste0(prefix, i)
+        el_render <- vector_render[i]
+        obj_name <- the_names[i]
+        
+        if(el_render == "text"){
+            list(
+              fluidRow(
+              #h4(list_objetos[[i]]$"title"),
+              verbatimTextOutput(ns(id_output)),
+              br()
+              )
+            )
+        }
+        # if(el_render == "plotly"){
+        #   list(
+        #     fluidRow(
+        #     HTML(paste0("<b><u>R plot object:</u></b> ", obj_name)),
+        #     #h4(list_objetos[[i]]$"title"),
+        #     plotlyOutput(ns(id_output)),
+        #     br()
+        #     )
+        #   )
+        # }
+        
+      })
+      
+      return(do.call(tagList, ui_list))
+    }
+    
+    
+    output$crystal01_run_code <- renderUI({
+      req(the_R_objects())
+
+      crear_outputs_y_ui33(prefix = "jajja", mis_valores_reactive = the_R_objects, output, ns)    
+      
+      })
+    
+    ############################################################################
+
+
+    if(TRUE){
+      
+    # Card 04) "script"
+    
+    
+    observe({
+      req(OK_ALL_ACTIVE())
+      req(my_list_str_rv())
+      str_selected_modulo <- my_list_str_rv()$"str_05_MM_output"
+      new_server <- paste0(str_selected_modulo, "_server")
+      new_ui <- paste0(str_selected_modulo, "_ui")
+      new_id <- "the_output"
+      
+      # print(new_server)
+      # str_server(new_server)
+      # str_ui(new_ui)
+      # my_id(new_id)
+      args <- list(id = new_id, show_dev = FALSE,
+                   mis_valores = the_R_objects)
+      
+      vector_funciones <- ls("package:Rscience.GeneralLM")
+      check_in <- new_server %in% vector_funciones
+      # print(check_in)
+      
+      # print(str_server())
+      # Verificar si la función existe y ejecutarla
+      if (check_in) {
+        do.call(new_server, args)
+        # print(resultado)  # Output: 5
+      } else {
+        print("El modulo no existe.")
+      }
+      
+      
+    })
     
     
     # # Renderizar la UI del selector de variables
-    output$card03_botonera_output <- renderUI({
+    output$card05_output<- renderUI({
       req(OK_ALL_ACTIVE())
       req(my_list_str_rv())
       
-      str_selected_modulo <- my_list_str_rv()$"str_04_MM_output"
+      str_selected_modulo <- my_list_str_rv()$"str_05_MM_output"
       new_modulo_ui <- paste0(str_selected_modulo, "_ui")
       new_id <- "the_output"
       
@@ -378,9 +476,11 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         do.call(new_modulo_ui, args)  # Altura del contenido (100% del contenedor padre)
       )
     })
+    }
     
-    # 
-    # 
+    
+    
     ############################################################################
+    
   })
 }
