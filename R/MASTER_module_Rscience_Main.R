@@ -52,6 +52,9 @@ MASTER_module_Rscience_Main_ui <- function(id) {
               ),
               bslib::nav_panel(title = "script",
                                uiOutput(ns("card06_script"))
+              ),
+              bslib::nav_panel(title = "download",
+                               uiOutput(ns("card07_download"))
               )
             )
           )
@@ -151,7 +154,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         str_04_MM_run_code =          "_MM_run_code",
         str_05_MM_output =            "_MM_output",
         str_06_MM_script =            "_MM_script"
-        
+
       )
       vector_names <- names(the_str_list)
       
@@ -297,9 +300,10 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     ############################################################################
   
-    # Card 03) "output"
+    # Crystal01 - the_R_objects
+    active_R_OBJECTS   <- do.call(reactiveValues, default_structure)
     
-    the_R_objects <- reactiveVal(NULL)
+    
     observe({
       req(OK_ALL_ACTIVE())
       req(my_list_str_rv())
@@ -326,7 +330,15 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       # Verificar si la función existe y ejecutarla
       if (check_in) {
         the_results <- do.call(new_server, args)
-        the_R_objects(the_results())
+        
+        fn_shiny_apply_changes_reactiveValues(rv = active_R_OBJECTS,  changes_list = list(
+          "pack_output" = the_results(),
+          "check_output" = TRUE,
+          "button_class" = "confirmed"
+        ))
+        
+
+
         # print(resultado)  # Output: 5
       } else {
         print("El modulo no existe.")
@@ -413,14 +425,16 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     
     output$crystal01_run_code <- renderUI({
-      req(the_R_objects())
-
-      crear_outputs_y_ui33(prefix = "jajja", mis_valores_reactive = the_R_objects, output, ns)    
+      req(active_R_OBJECTS)
+      req(active_R_OBJECTS$"check_output")
+      
+      crear_outputs_y_ui33(prefix = "jajja", mis_valores_reactive = reactive(active_R_OBJECTS$"pack_output"), output, ns)    
       
       })
     
     ############################################################################
 
+  
     
     observe({
       req(OK_ALL_ACTIVE())
@@ -435,7 +449,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       # str_ui(new_ui)
       # my_id(new_id)
       args <- list(id = new_id, show_dev = FALSE,
-                   mis_valores = the_R_objects)
+                   mis_valores = reactive(active_R_OBJECTS$"pack_output"))
       
       vector_funciones <- ls("package:Rscience.GeneralLM")
       check_in <- new_server %in% vector_funciones
@@ -476,8 +490,9 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     
     ############################################################################
-    
-    
+  
+    active_R_CODE   <- do.call(reactiveValues, default_structure)
+      
     
     
     observe({
@@ -496,7 +511,8 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
                    active_DATASET_SELECTOR, 
                    active_TOOLS_SELECTOR,
                    active_VARIABLE_SELECTOR,
-                   active_PLAY_SELECTOR)
+                   active_PLAY_SELECTOR,
+                   active_R_CODE)
       
       vector_funciones <- ls("package:Rscience.GeneralLM")
       check_in <- new_server %in% vector_funciones
@@ -535,8 +551,84 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     
     
+    ############################################################################
+    
+    active_R_CODE   <- do.call(reactiveValues, default_structure)
+    
+    
+    
+    observe({
+      req(OK_ALL_ACTIVE())
+      req(my_list_str_rv())
+      str_selected_modulo <- my_list_str_rv()$"str_06_MM_script"
+      new_server <- paste0(str_selected_modulo, "_server")
+      new_ui <- paste0(str_selected_modulo, "_ui")
+      new_id <- "the_script"
+      
+      # print(new_server)
+      # str_server(new_server)
+      # str_ui(new_ui)
+      # my_id(new_id)
+      args <- list(id = new_id, show_dev = FALSE,
+                   active_DATASET_SELECTOR, 
+                   active_TOOLS_SELECTOR,
+                   active_VARIABLE_SELECTOR,
+                   active_PLAY_SELECTOR,
+                   active_R_CODE)
+      
+      vector_funciones <- ls("package:Rscience.GeneralLM")
+      check_in <- new_server %in% vector_funciones
+      # print(check_in)
+      
+      # print(str_server())
+      # Verificar si la función existe y ejecutarla
+      if (check_in) {
+        do.call(new_server, args)
+        # print(resultado)  # Output: 5
+      } else {
+        print("El modulo no existe.")
+      }
+      
+      
+    })
+    
+    
+    # # Renderizar la UI del selector de variables
+    output$card06_script <- renderUI({
+      req(OK_ALL_ACTIVE())
+      req(my_list_str_rv())
+      
+      str_selected_modulo <- my_list_str_rv()$"str_06_MM_script"
+      new_modulo_ui <- paste0(str_selected_modulo, "_ui")
+      new_id <- "the_script"
+      
+      # print(new_modulo_ui)
+      args <- list(id = ns(new_id))
+      
+      div(
+        style = "height: 100%;",  # Altura del contenedor (100% del contenedor padre)
+        do.call(new_modulo_ui, args)  # Altura del contenido (100% del contenedor padre)
+      )
+    })
     
     ############################################################################
+    
+    # Tab06 - Quarto
+    the_quarto_file <- reactive({
+      # req(mis_valores())
+      GeneralLM_fix_anova1_quarto_file_path()
+    })
+    
+    module_quartoRenderer_server(id="quarto_doc", 
+                                 documento = the_quarto_file(),
+                                 Rcode_script = reactive(active_R_CODE$"pack_output"$"Rcode_script"))
+    
+    output$card07_download <- renderUI({
+      # req(mis_valores())
+      module_quartoRenderer_ui(id=ns("quarto_doc"))
+    })
+    
+    
     
   })
 }

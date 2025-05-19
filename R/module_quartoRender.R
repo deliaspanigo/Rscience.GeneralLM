@@ -13,24 +13,9 @@ module_quartoRenderer_ui <- function(id) {
         
         fluidRow(
           column(6,
-            fluidRow(
-              column(3, "R code"),
-              column(2, actionButton(ns("render_RCode"), "Render", class = "btn-primary")),
-              column(2, "Status"),
-              column(2, downloadButton(ns("download_RCode"), "Download", class = "btn-primary", icon = icon("download"))),
-            ),
-            fluidRow(
-              column(3, "R code and Outputs"),
-              column(2, actionButton(ns("render_RCode_Outputs"), "Render", class = "btn-primary")),
-              column(2, "Status"),
-              column(2, downloadButton(ns("download_RCode_Outputs"), "Download", class = "btn-primary", icon = icon("download"))),
-            ),
-            fluidRow(
-              column(3, "Report"),
-              column(2, actionButton(ns("render_RReport"), "Render", class = "btn-primary")),
-              column(2, "Status"),
-              column(2, actionButton(ns("download_RReport"), "Download", class = "btn-primary", icon = icon("download"))),
-            )
+            uiOutput(ns("set01_RCode")),
+            uiOutput(ns("set02_RLong")),
+            uiOutput(ns("set03_RReport"))
         ),
         column(6, actionButton(ns("download_ALL"), "Download ALL", class = "btn-primary", icon = icon("download"))),
         ),
@@ -60,124 +45,1054 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
-    temp_folder_path_internal <- file.path(tempdir(), "internal_folder")
-    temp_folder_path_external <- file.path(tempdir(), "internal_folder")
+    output$"set01_RCode" <- renderUI({
+      
+      the_class_render   <- internal_01_FILE_RCODE$"button_class"
+#      the_class_download <- internal_01_FILE_RCODE$"button_class"
+      
+      btn_class_render <- switch(the_class_render,
+                          "initial"   = "btn-outline-primary",    # Azul inicial
+                          "confirmed" = "btn-success",    # Verde después de confirmar
+                          "modified"  = "btn-outline-primary") 
+      
+        fluidRow(
+          column(3, "R code"),
+          column(2, actionButton(ns("render_RCode"), "Render", class = btn_class_render)),
+          column(2, "Status"),
+          column(2, downloadButton(ns("download_RCode"), "Download", class = "btn-primary", icon = icon("download"))),
+        )
+    })
     
-    if (!dir.exists(temp_folder_path_internal)) {
-      dir.create(temp_folder_path_internal, recursive = TRUE)
-    } else {
-      # La carpeta existe, borramos todo su contenido
-      archivos <- list.files(temp_folder_path_internal, full.names = TRUE, recursive = TRUE)
-      if (length(archivos) > 0) {
-        file.remove(archivos)
-      }
-    }
+    output$"set02_RLong" <- renderUI({
+      the_class_render   <- internal_02_RLONG$"button_class"
+      #      the_class_download <- internal_01_FILE_RCODE$"button_class"
+      
+      btn_class_render <- switch(the_class_render,
+                                 "initial"   = "btn-outline-primary",    # Azul inicial
+                                 "confirmed" = "btn-success",    # Verde después de confirmar
+                                 "modified"  = "btn-outline-primary") 
+      
+      fluidRow(
+        column(3, "R code and Outputs"),
+        column(2, actionButton(ns("render_RLong"), "Render", class = btn_class_render)),
+        column(2, "Status"),
+        column(2, downloadButton(ns("download_RLong"), "Download", class = "btn-primary", icon = icon("download"))),
+      )
+    })
     
+    output$"set03_RReport" <- renderUI({
+      
+      the_class_render   <- internal_03_RREPORT$"button_class"
+      #      the_class_download <- internal_01_FILE_RCODE$"button_class"
+      
+      btn_class_render <- switch(the_class_render,
+                                 "initial"   = "btn-outline-primary",    # Azul inicial
+                                 "confirmed" = "btn-success",    # Verde después de confirmar
+                                 "modified"  = "btn-outline-primary") 
+      
+      fluidRow(
+        column(3, "Report"),
+        column(2, actionButton(ns("render_RReport"), "Render", class = btn_class_render)),
+        column(2, "Status"),
+        column(2, actionButton(ns("download_RReport"), "Download", class = "btn-primary", icon = icon("download"))),
+      )
+    })
+    
+    # 1) PK - Folder and file, names and paths
+    # the_package_path <- find.package("Rscience.GeneralLM")
+    # the_folder_path <- file.path(the_package_path, "quarto")
+    
+    # External input
+    str_sub_folder <- reactive("GeneralLM_fix_anova1")
+    
+    ############################################################################    
+    default_totem <- list(
+      the_sys_time      = "",
+      str_search        = "",
+      folder_path       = "",
+      check_folder_path = FALSE,
+      vector_file_names = NA,
+      vector_check_file_names = NA,
+      check_general = FALSE,
+      button_status = "initial"
+      )
+      
 
-    if (!dir.exists(temp_folder_path_external)) {
-      dir.create(temp_folder_path_external, recursive = TRUE)
-    } else {
-      # La carpeta existe, borramos todo su contenido
-      archivos <- list.files(temp_folder_path_external, full.names = TRUE, recursive = TRUE)
-      if (length(archivos) > 0) {
-        file.remove(archivos)
-      }
-    }
+    internal_01_TOTEM_PK       <- do.call(reactiveValues, default_totem)
+    internal_02_TOTEM_COPY     <- do.call(reactiveValues, default_totem)
+    internal_03_TOTEM_DOWNLOAD <- do.call(reactiveValues, default_totem)
     
     ############################################################################
-    file_name_RCode <- "my_script_anova.R"
-    file_name_RCode_and_Outputs <- "my_html_RCode_and_Outputs.html"
-    file_name_RReport <- "my_html_RReport.html"
+    
+    # internal_01_TOTEM_PK
+    observeEvent(str_sub_folder(),{
+      fn_shiny_apply_changes_reactiveValues(rv = internal_01_TOTEM_PK, changes_list = default_totem)
+      # fn_shiny_apply_changes_reactiveValues(rv = internal_02_TOTEM_COPY, changes_list = default_totem) 
+      # fn_shiny_apply_changes_reactiveValues(rv = internal_03_TOTEM_DOWNLOAD, changes_list = default_totem)  
 
-    file_path_internal_RCode <- file.path(temp_folder_path_internal, file_name_RCode)
-    file_path_external_RCode <- file.path(temp_folder_path_external, file_name_RCode)
+      current_time <- Sys.time()
+      formatted_time <- format(current_time, "%Y_%m_%d_%H_%M_%S")
+      the_sys_time <- formatted_time
+      str_search   <- str_sub_folder()
+      fn_shiny_apply_changes_reactiveValues(rv = internal_01_TOTEM_PK, changes_list = list(
+        the_sys_time = the_sys_time,
+        str_search   = str_search
+      ))
+      
+      # PK folder
+      pk_folder_path_quarto         <- fn_PK_quarto_folder_path()
+      CHECK_PK_FOLDER <- dir.exists(pk_folder_path_quarto)
+      if(!CHECK_PK_FOLDER){
+        # print(pk_folder_path_quarto)
+        showNotification("No encuentra o no existe la carpeta del package.", type = "error")
+        return(NULL)
+      }
+      
+            
+      folder_path <- file.path(pk_folder_path_quarto, str_sub_folder())
+      check_folder_path <- dir.exists(folder_path)
+      if(!check_folder_path){
+        showNotification("No encuentra o no existe la sub carpeta del package.", type = "error")
+        return(NULL)
+      }
+      fn_shiny_apply_changes_reactiveValues(rv = internal_01_TOTEM_PK, changes_list = list(
+        folder_path = folder_path,
+        check_folder_path = check_folder_path
+      ))
+      
+      
+      vector_file_names <- list.files(folder_path, full.names = TRUE, recursive = TRUE)
+      vector_check_file_names <- sapply(vector_file_names, function(x){file.exists(x)})
+      check_general <- all(vector_check_file_names)
+      if(!check_general){
+        showNotification("No se encuentran los archivos de la sub carpeta.", type = "error")
+        return(NULL)
+      }
+      
+      button_status = "confirmed"
+      
+      fn_shiny_apply_changes_reactiveValues(rv = internal_01_TOTEM_PK, changes_list = list(
+        vector_file_names = vector_file_names,
+        vector_check_file_names = vector_check_file_names,
+        check_general = check_general,
+        button_status = button_status
+      ))
+      
+      # print(reactiveValuesToList(internal_01_TOTEM_PK))
+      # print("##################################################")
+    })
     
-    file_path_internal_RCode_and_Outputs <- file.path(temp_folder_path_internal, file_name_RCode_and_Outputs)
-    file_path_external_RCode_and_Outputs <- file.path(temp_folder_path_external, file_name_RCode_and_Outputs)
+    # internal_02_TOTEM_COPY 
+    observeEvent(internal_01_TOTEM_PK,{
+                 
+      req(internal_01_TOTEM_PK$"check_general")
+      
+      fn_shiny_apply_changes_reactiveValues(rv = internal_02_TOTEM_COPY, changes_list = default_totem)
+      
+      the_sys_time <- internal_01_TOTEM_PK$"the_sys_time"
+      str_search   <- internal_01_TOTEM_PK$"str_search"
+      
+      fn_shiny_apply_changes_reactiveValues(rv = internal_02_TOTEM_COPY, changes_list = list(
+        the_sys_time = the_sys_time,
+        str_search   = str_search
+      ))    
+      
+      # 2) Folder path
+      folder_path <- file.path(tempdir(), the_sys_time, str_search)
+      if (dir.exists(folder_path)) unlink(folder_path, recursive = TRUE)
+      dir.create(folder_path, recursive = TRUE)
+      check_folder_path <- dir.exists(folder_path)
+      
+      if (!check_folder_path) {
+        
+      }
+      fn_shiny_apply_changes_reactiveValues(rv = internal_02_TOTEM_COPY, changes_list = list(
+        folder_path = folder_path,
+        check_folder_path   = check_folder_path
+      )) 
+      
+      ##########################################################################
+      TOTEM_PK_folder_path <-  internal_01_TOTEM_PK$"folder_path"
+      all_file_paths_TOTEM_PK <- list.files(TOTEM_PK_folder_path, full.names = TRUE, recursive = TRUE)
+      
+      # Copiar cada archivo a la carpeta destino
+      for (archivo in all_file_paths_TOTEM_PK) {
+        # Crear la ruta de destino manteniendo la estructura de subcarpetas
+        ruta_destino <- file.path(folder_path, basename(archivo))
+        
+        # Copiar el archivo
+        file.copy(archivo, ruta_destino)
+      }
+      
+      vector_file_names <- list.files(folder_path, full.names = TRUE, recursive = TRUE)
+      vector_check_file_names <- sapply(vector_file_names, function(x){file.exists(x)})
+      check_general <- all(vector_check_file_names)
+      if(!check_general){
+        showNotification("No encuentra o no existe la carpeta del package.", type = "error")
+        return(NULL)
+      }
+      
+      button_status = "confirmed"
+      fn_shiny_apply_changes_reactiveValues(rv = internal_02_TOTEM_COPY, changes_list = list(
+        vector_file_names = vector_file_names,
+        vector_check_file_names = vector_check_file_names,
+        check_general = check_general,
+        button_status = button_status
+      ))
+      
+     
+    })
     
-    file_path_internal_RReport <- file.path(temp_folder_path_internal, file_name_RReport)
-    file_path_external_RReport <- file.path(temp_folder_path_external, file_name_RReport)
-    ############################################################################
     
-    check_file_RCode <- reactiveVal(FALSE)
+    observeEvent(internal_02_TOTEM_COPY,{
+      
+      req(internal_02_TOTEM_COPY$"check_general")
+      
+      # fn_shiny_apply_changes_reactiveValues(rv = internal_03_TOTEM_DOWNLOAD, changes_list = default_totem)
+      fn_shiny_apply_changes_reactiveValues(rv = internal_03_TOTEM_DOWNLOAD, 
+                                            changes_list = reactiveValuesToList(internal_02_TOTEM_COPY))
+      
+      
+      
+    })
+    
+    
+    
+  
+    
+    
+    default_structure_file_download <- list(
+      # Stage 1 - Time and str_search
+      the_sys_time            = "",
+      str_search              = "",
+      
+      # Stage 2 - folder input path
+      folder_input_path       = "",
+      check_folder_input_path = FALSE,
+      
+      # Stage 3 - name and path input file
+      name_input_file       = "",
+      path_input_file       = "",
+      check_path_input_file = FALSE,
+      
+      # Stage 4 - folder path output file
+      folder_output_path       = "",
+      check_folder_output_path = FALSE,
+      
+
+      # Stage 5 - fiel anme and file path output file
+      name_output_file   = "",
+      path_output_file   = "",
+      check_path_output_file  = FALSE,
+      
+      button_class = "initial"
+    )   
+    
+    
+    
+    #############################################################################
+    
+    internal_01_FILE_RCODE <- do.call(reactiveValues, default_structure_file_download)
     observeEvent(input$"render_RCode", {
-      print(list.files(temp_folder_path_internal, all.files = TRUE, recursive = TRUE))
       
-      writeLines(Rcode_script(), file_path_internal_RCode)
+      req(internal_03_TOTEM_DOWNLOAD$"check_general")
+          
+      fn_shiny_apply_changes_reactiveValues(rv = internal_01_FILE_RCODE,  
+                                            changes_list = default_structure_file_download
+      )
+      
+
+      # Stage 1 - Time and str_search
+      current_time <- Sys.time()
+      formatted_time <- format(current_time, "%Y_%m_%d_%H_%M_%S")
+      the_sys_time <- formatted_time
+      
+      str_search <- internal_03_TOTEM_DOWNLOAD$"str_search"
+      fn_shiny_apply_changes_reactiveValues(rv = internal_01_FILE_RCODE, changes_list = list(
+        the_sys_time = the_sys_time,
+        str_search = str_search
+      ))
+      
+      
+      # Stage 2 - folder input path
+      folder_input_path <- ""
+      check_folder_input_path <- TRUE
+      fn_shiny_apply_changes_reactiveValues(rv = internal_01_FILE_RCODE, changes_list = list(
+        folder_input_path = folder_input_path,
+        check_folder_input_path = check_folder_input_path
+      ))
+      
+      # Stage 3 - name and path input file
+      name_input_file       <- ""
+      path_input_file       <- ""
+      check_path_input_file <- TRUE
+      fn_shiny_apply_changes_reactiveValues(rv = internal_01_FILE_RCODE, changes_list = list(
+        name_input_file = name_input_file,
+        path_input_file = path_input_file,
+        check_path_input_file = check_path_input_file
+      ))
+      
+      # Stage 4 - folder path output file
+      folder_output_path       <- internal_03_TOTEM_DOWNLOAD$"folder_path"
+      check_folder_output_path <- dir.exists(folder_output_path)
+      if(!check_folder_output_path){
+        showNotification("Problema - File 01 - Stage 4.", type = "error")
+        return(NULL)
+      }
+      fn_shiny_apply_changes_reactiveValues(rv = internal_01_FILE_RCODE, changes_list = list(
+        folder_output_path = folder_output_path,
+        check_folder_output_path = check_folder_output_path
+      ))
+      
+      # Stage 5 - fiel name and file path output file
+      ._str_file_name   <- "anova1way"
+      name_output_file  <- paste0(._str_file_name, "_", the_sys_time, ".R") 
+      path_output_file  <- file.path(folder_output_path, name_output_file)
+      
+      #################################################################
+      
+      writeLines(Rcode_script(), path_output_file)
       Sys.sleep(0.5)
+      file_path <- path_output_file
       
-      # Verificar si el archivo existe después de escribir
-      if (file.exists(file_path_internal_RCode)) {
-        check_file_RCode(TRUE)
-      } else {
-        check_file_RCode(FALSE)
+      # Tiempo máximo de espera en segundos
+      timeout <- 10
+      
+      # Intervalo de verificación en segundos
+      check_interval <- 0.5
+      
+      # Objeto que comienza con un valor (FALSE)
+      check_path_output_file <- FALSE
+      
+      # Contador de tiempo
+      start_time <- Sys.time()
+      
+      # Bucle de verificación
+      while (!file.exists(file_path)) {
+        # Verificar si se ha superado el tiempo máximo de espera
+        if (difftime(Sys.time(), start_time, units = "secs") > timeout) {
+          cat("El archivo no se creó dentro del tiempo esperado.\n")
+          break
+        }
+        
+        # Esperar un intervalo antes de verificar nuevamente
+        Sys.sleep(check_interval)
       }
       
-      print(list.files(temp_folder_path_internal, all.files = TRUE, recursive = TRUE))
+      # # Si el archivo existe, cambiar el valor del objeto
+      # if (file.exists(file_path)) {
+      #   check_path_output_file <- TRUE
+      # }
+      #################################################################
+      
+      check_path_output_file  <- file.exists(path_output_file)
+      if(!check_path_output_file){
+        showNotification("Problema - File 01 - Stage 5.", type = "error")
+        return(NULL)
+      }
+      button_class <- "confirmed"
+      fn_shiny_apply_changes_reactiveValues(rv = internal_01_FILE_RCODE, changes_list = list(
+        name_output_file = name_output_file,
+        path_output_file =  path_output_file,
+        check_path_output_file = check_path_output_file,
+        button_class = button_class
+      ))
+
+      
+      
+      
     })
     
     
     output$visual_RCode <- renderText({
-      if (check_file_RCode()) {
-        paste(readLines(file_path_internal_RCode), collapse = "\n")
-      } else {
-        "El archivo no existe."
-      }
+      req(internal_01_FILE_RCODE)
+      mi_lista <- reactiveValuesToList(internal_01_FILE_RCODE)
+      
+      req(mi_lista$"check_path_output_file")
+      # print(mi_lista)
+      
+      paste(readLines(mi_lista$"path_output_file"), collapse = "\n")
+      
     })
+    
     
     
     output$download_RCode <- downloadHandler(
       filename = function() {
-        file_name_RCode
+        internal_01_FILE_RCODE$"name_output_file"
       },
       content = function(file) {
-        if (file.exists(file_path_internal_RCode)) {
-          file.copy(file_path_internal_RCode, file)
-        } else {
-          stop("El archivo no existe en la ruta esperada.")
-        }
+        req(internal_01_FILE_RCODE$"check_path_output_file")
+        file.copy(internal_01_FILE_RCODE$"path_output_file", file)
       }
     )
     
     
+    ###########################################################################################
+    
+    internal_02_RLONG <- do.call(reactiveValues, default_structure_file_download)
+    observeEvent(input$"render_RLong", {
+      
+      req(internal_03_TOTEM_DOWNLOAD$"check_general")
+      
+      fn_shiny_apply_changes_reactiveValues(rv = internal_02_RLONG,  
+                                            changes_list = default_structure_file_download
+      )
+      
+      
+      # Stage 1 - Time and str_search
+      current_time <- Sys.time()
+      formatted_time <- format(current_time, "%Y_%m_%d_%H_%M_%S")
+      the_sys_time <- formatted_time
+      
+      str_search <- internal_03_TOTEM_DOWNLOAD$"str_search"
+      fn_shiny_apply_changes_reactiveValues(rv = internal_02_RLONG, changes_list = list(
+        the_sys_time = the_sys_time,
+        str_search = str_search
+      ))
+      
+      
+      # Stage 2 - folder input path
+      folder_input_path <- ""
+      check_folder_input_path <- TRUE
+      fn_shiny_apply_changes_reactiveValues(rv = internal_02_RLONG, changes_list = list(
+        folder_input_path = folder_input_path,
+        check_folder_input_path = check_folder_input_path
+      ))
+      
+      # Stage 3 - name and path input file
+      name_input_file       <- ""
+      path_input_file       <- ""
+      check_path_input_file <- TRUE
+      fn_shiny_apply_changes_reactiveValues(rv = internal_02_RLONG, changes_list = list(
+        name_input_file = name_input_file,
+        path_input_file = path_input_file,
+        check_path_input_file = check_path_input_file
+      ))
+      
+      # Stage 4 - folder path output file
+      folder_output_path       <- internal_03_TOTEM_DOWNLOAD$"folder_path"
+      check_folder_output_path <- dir.exists(folder_output_path)
+      if(!check_folder_output_path){
+        showNotification("Problema - File 01 - Stage 4.", type = "error")
+        return(NULL)
+      }
+      fn_shiny_apply_changes_reactiveValues(rv = internal_02_RLONG, changes_list = list(
+        folder_output_path = folder_output_path,
+        check_folder_output_path = check_folder_output_path
+      ))
+      
+      # Stage 5 - fiel name and file path output file
+      ._str_file_name   <- "anova1way"
+      name_output_file  <- paste0(._str_file_name, "_", the_sys_time, ".R") 
+      path_output_file  <- file.path(folder_output_path, name_output_file)
+      
+      #################################################################
+      
+      writeLines(Rcode_script(), path_output_file)
+      Sys.sleep(0.5)
+      file_path <- path_output_file
+      
+      # Tiempo máximo de espera en segundos
+      timeout <- 10
+      
+      # Intervalo de verificación en segundos
+      check_interval <- 0.5
+      
+      # Objeto que comienza con un valor (FALSE)
+      check_path_output_file <- FALSE
+      
+      # Contador de tiempo
+      start_time <- Sys.time()
+      
+      # Bucle de verificación
+      while (!file.exists(file_path)) {
+        # Verificar si se ha superado el tiempo máximo de espera
+        if (difftime(Sys.time(), start_time, units = "secs") > timeout) {
+          cat("El archivo no se creó dentro del tiempo esperado.\n")
+          break
+        }
+        
+        # Esperar un intervalo antes de verificar nuevamente
+        Sys.sleep(check_interval)
+      }
+      
+      # # Si el archivo existe, cambiar el valor del objeto
+      # if (file.exists(file_path)) {
+      #   check_path_output_file <- TRUE
+      # }
+      #################################################################
+      
+      check_path_output_file  <- file.exists(path_output_file)
+      if(!check_path_output_file){
+        showNotification("Problema - File 01 - Stage 5.", type = "error")
+        return(NULL)
+      }
+      button_class <- "confirmed"
+      fn_shiny_apply_changes_reactiveValues(rv = internal_02_RLONG, changes_list = list(
+        name_output_file = name_output_file,
+        path_output_file =  path_output_file,
+        check_path_output_file = check_path_output_file,
+        button_class = button_class
+      ))
+      
+      
+      
+      
+    })
+    
+    
+    output$visual_RLong <- renderText({
+      req(internal_02_RLONG)
+      mi_lista <- reactiveValuesToList(internal_02_RLONG)
+      
+      req(mi_lista$"check_path_output_file")
+      # print(mi_lista)
+      
+      paste(readLines(mi_lista$"path_output_file"), collapse = "\n")
+      
+    })
+    
+    
+    
+    output$download_RLong <- downloadHandler(
+      filename = function() {
+        internal_02_RLONG$"name_output_file"
+      },
+      content = function(file) {
+        req(internal_02_RLONG$"check_path_output_file")
+        file.copy(internal_02_RLONG$"path_output_file", file)
+      }
+    )
+    
+    
+    ###########################################################################################
+    
+    
+    internal_03_RREPORT    <- do.call(reactiveValues, default_structure_file_download)
+    observeEvent(input$"render_RReport", {
+      
+      req(internal_03_TOTEM_DOWNLOAD$"check_general")
+      
+      fn_shiny_apply_changes_reactiveValues(rv = internal_03_RREPORT,  
+                                            changes_list = default_structure_file_download
+      )
+      
+      
+      # Stage 1 - Time and str_search
+      current_time <- Sys.time()
+      formatted_time <- format(current_time, "%Y_%m_%d_%H_%M_%S")
+      the_sys_time <- formatted_time
+      
+      str_search <- internal_03_TOTEM_DOWNLOAD$"str_search"
+      fn_shiny_apply_changes_reactiveValues(rv = internal_03_RREPORT, changes_list = list(
+        the_sys_time = the_sys_time,
+        str_search = str_search
+      ))
+      
+      
+      # Stage 2 - folder input path
+      folder_input_path <- ""
+      check_folder_input_path <- TRUE
+      fn_shiny_apply_changes_reactiveValues(rv = internal_03_RREPORT, changes_list = list(
+        folder_input_path = folder_input_path,
+        check_folder_input_path = check_folder_input_path
+      ))
+      
+      # Stage 3 - name and path input file
+      name_input_file       <- ""
+      path_input_file       <- ""
+      check_path_input_file <- TRUE
+      fn_shiny_apply_changes_reactiveValues(rv = internal_03_RREPORT, changes_list = list(
+        name_input_file = name_input_file,
+        path_input_file = path_input_file,
+        check_path_input_file = check_path_input_file
+      ))
+      
+      # Stage 4 - folder path output file
+      folder_output_path       <- internal_03_TOTEM_DOWNLOAD$"folder_path"
+      check_folder_output_path <- dir.exists(folder_output_path)
+      if(!check_folder_output_path){
+        showNotification("Problema - File 01 - Stage 4.", type = "error")
+        return(NULL)
+      }
+      fn_shiny_apply_changes_reactiveValues(rv = internal_03_RREPORT, changes_list = list(
+        folder_output_path = folder_output_path,
+        check_folder_output_path = check_folder_output_path
+      ))
+      
+      # Stage 5 - fiel name and file path output file
+      ._str_file_name   <- "anova1way"
+      name_output_file  <- paste0(._str_file_name, "_", the_sys_time, ".R") 
+      path_output_file  <- file.path(folder_output_path, name_output_file)
+      
+      #################################################################
+      
+      writeLines(Rcode_script(), path_output_file)
+      Sys.sleep(0.5)
+      file_path <- path_output_file
+      
+      # Tiempo máximo de espera en segundos
+      timeout <- 10
+      
+      # Intervalo de verificación en segundos
+      check_interval <- 0.5
+      
+      # Objeto que comienza con un valor (FALSE)
+      check_path_output_file <- FALSE
+      
+      # Contador de tiempo
+      start_time <- Sys.time()
+      
+      # Bucle de verificación
+      while (!file.exists(file_path)) {
+        # Verificar si se ha superado el tiempo máximo de espera
+        if (difftime(Sys.time(), start_time, units = "secs") > timeout) {
+          cat("El archivo no se creó dentro del tiempo esperado.\n")
+          break
+        }
+        
+        # Esperar un intervalo antes de verificar nuevamente
+        Sys.sleep(check_interval)
+      }
+      
+      # # Si el archivo existe, cambiar el valor del objeto
+      # if (file.exists(file_path)) {
+      #   check_path_output_file <- TRUE
+      # }
+      #################################################################
+      
+      check_path_output_file  <- file.exists(path_output_file)
+      if(!check_path_output_file){
+        showNotification("Problema - File 01 - Stage 5.", type = "error")
+        return(NULL)
+      }
+      button_class <- "confirmed"
+      fn_shiny_apply_changes_reactiveValues(rv = internal_03_RREPORT, changes_list = list(
+        name_output_file = name_output_file,
+        path_output_file =  path_output_file,
+        check_path_output_file = check_path_output_file,
+        button_class = button_class
+      ))
+      
+      
+      
+      
+    })
+    
+    
+    output$visual_RReport <- renderText({
+      req(internal_03_RREPORT)
+      mi_lista <- reactiveValuesToList(internal_03_RREPORT)
+      
+      req(mi_lista$"check_path_output_file")
+      # print(mi_lista)
+      
+      paste(readLines(mi_lista$"path_output_file"), collapse = "\n")
+      
+    })
+    
+    
+    
+    output$download_RReport <- downloadHandler(
+      filename = function() {
+        internal_03_RREPORT$"name_output_file"
+      },
+      content = function(file) {
+        req(internal_03_RREPORT$"check_path_output_file")
+        file.copy(internal_03_RREPORT$"path_output_file", file)
+      }
+    )
+    
+    
+    ###########################################################################################
+    
+    output$"visual_para_archivos" <- renderUI({
+      
+      
+      bslib::navset_card_tab(
+        # title = "R for Science",
+        id = ns("mynav"),
+        height = "100%",  # Especificar altura explícitamente
+        bslib::nav_panel(title = "R Code",
+                         verbatimTextOutput(ns("visual_RCode"))
+        ),
+        bslib::nav_panel(title = "R Code and Outputs",
+                         verbatimTextOutput(ns("visual_RLong"))# htmlOutput(ns("visual_RLong"))
+        ),
+        bslib::nav_panel(title = "Report",
+                         verbatimTextOutput(ns("visual_RReport"))
+                         # "El RCODE AND OUTPUS")
+        )
+      )
+      
+    })
+    
+    ###########################################################################################
+    ###########################################################################################
+    ###########################################################################################
+    ###########################################################################################
+    ###########################################################################################
+    
+    if(FALSE){
+    ############################################################################################
+    
+    # 2) Output file names
+    # output_file_name_01_RCode_Rfile   <- "my_script33.R"
+    # output_file_name_02_RLong_html    <- paste0(tools::file_path_sans_ext(pk_file_name_02_RLong_qmd),   ".html")
+    # output_file_name_03_RReport_html  <- paste0(tools::file_path_sans_ext(pk_file_name_03_RReport_qmd), ".html")
+    
+    #############################################################################################
+
+    # 3) Temporal folders
+
+    # Create Temporal Folders
+    temp_folder_path_01_LAB <- file.path(tempdir(), "folder_01_lab")
+    temp_folder_path_02_AWS <- file.path(tempdir(), "folder_02_aws")
+    
+    if (!dir.exists(temp_folder_path_01_LAB)) {
+      dir.create(temp_folder_path_01_LAB, recursive = TRUE)
+    } else {
+      # La carpeta existe, borramos todo su contenido
+      archivos <- list.files(temp_folder_path_01_LAB, full.names = TRUE, recursive = TRUE)
+      if (length(archivos) > 0) {
+        file.remove(archivos)
+      }
+    }
+    
+
+    if (!dir.exists(temp_folder_path_02_AWS)) {
+      dir.create(temp_folder_path_02_AWS, recursive = TRUE)
+    } else {
+      # La carpeta existe, borramos todo su contenido
+      archivos <- list.files(temp_folder_path_02_AWS, full.names = TRUE, recursive = TRUE)
+      if (length(archivos) > 0) {
+        file.remove(archivos)
+      }
+    }
+    
     ############################################################################
     
-    check_file_RReport <- reactiveVal(FALSE)
+    
+    observeEvent(input$"render_RCode", {
+      # print(dir.exists(temp_folder_path_01_LAB))
+      # print(list.files(temp_folder_path_01_LAB, all.files = TRUE, recursive = TRUE))
+      
+      fn_shiny_apply_changes_reactiveValues(rv = internal_01_FILE_RCODE,  
+                                            changes_list = default_structure_download
+      )
+      
+      # internal_01_FILE_RCODE <- do.call(reactiveValues, default_structure_download)
+      
+      # Obtener el tiempo del sistema
+      current_time <- Sys.time()
+      formatted_time <- format(current_time, "%Y_%m_%d_%H_%M_%S")
+      str_file_name <- "GeneralLM_fix_anova1"
+      str_mod <- paste0(str_file_name, "_", formatted_time, ".R") 
+      
+      # 1) Folder input --------------------------------------------------------
+      folder_input_path       <- pk_folder_path_quarto
+      check_folder_input_path <- dir.exists(folder_input_path) 
+      if(!check_folder_input_path){
+        showNotification("La carpeta de entrada no existe.", type = "error")
+      }
+      
+      fn_shiny_apply_changes_reactiveValues(rv = internal_01_FILE_RCODE,  changes_list = list(
+        "folder_input_path" = folder_input_path,
+        "check_folder_input_path" = check_folder_input_path
+        ))
+      
+      
+      # 2) Rscript No tiene archivo inicial #-----------------------------------
+      name_input_file       <- pk_file_name_01_RCode_Rfile
+      path_input_file       <- ""
+      check_path_input_file <- TRUE
+      fn_shiny_apply_changes_reactiveValues(rv = internal_01_FILE_RCODE,  changes_list = list(
+        "name_input_file" = name_input_file,
+        "path_input_file" = path_input_file,
+        "check_path_input_file" = check_path_input_file
+      ))
+      
+      # 3) Output folder -------------------------------------------------------
+      folder_output_path       <- temp_folder_path_01_LAB
+      check_folder_output_path <- dir.exists(folder_output_path)
+      if(!check_folder_output_path){
+        showNotification("La carpeta de salida no existe.", type = "error")
+        
+      }
+      fn_shiny_apply_changes_reactiveValues(rv = internal_01_FILE_RCODE,  changes_list = list(
+        "folder_output_path" = folder_output_path,
+        "check_folder_output_path" = check_folder_output_path
+      ))
+      
+      
+      # 4) Output file name ----------------------------------------------------
+      name_output_file   <- str_mod
+      path_output_file   <- file.path(folder_output_path, name_output_file)
+      fn_shiny_apply_changes_reactiveValues(rv = internal_01_FILE_RCODE,  changes_list = list(
+        "name_output_file" = name_output_file,
+        "path_output_file" = path_output_file
+      ))
+      
+      writeLines(Rcode_script(), path_output_file)
+      Sys.sleep(0.5)
+      
+      #################################################################
+      file_path <- path_output_file
+      
+      # Tiempo máximo de espera en segundos
+      timeout <- 10
+      
+      # Intervalo de verificación en segundos
+      check_interval <- 0.5
+      
+      # Objeto que comienza con un valor (FALSE)
+      check_path_output_file <- FALSE
+      
+      # Contador de tiempo
+      start_time <- Sys.time()
+      
+      # Bucle de verificación
+      while (!file.exists(file_path)) {
+        # Verificar si se ha superado el tiempo máximo de espera
+        if (difftime(Sys.time(), start_time, units = "secs") > timeout) {
+          cat("El archivo no se creó dentro del tiempo esperado.\n")
+          break
+        }
+        
+        # Esperar un intervalo antes de verificar nuevamente
+        Sys.sleep(check_interval)
+      }
+      
+      # Si el archivo existe, cambiar el valor del objeto
+      if (file.exists(file_path)) {
+        check_path_output_file <- TRUE
+      }
+      
+      ################################################################
+      # check_path_output_file <- file.exists(path_output_file)
+      
+      
+      if(!check_path_output_file){
+        showNotification("El archivo de salida no se genero o paso algo.", type = "error")
+        
+      }
+      button_class <- "confirmed"
+      
+      fn_shiny_apply_changes_reactiveValues(rv = internal_01_FILE_RCODE,  changes_list = list(
+        "check_path_output_file" = check_path_output_file,
+        "button_class" = button_class
+      ))
+        
+
+      # print(list.files(temp_folder_path_01_LAB, all.files = TRUE, recursive = TRUE))
+      # print(reactiveValuesToList(internal_01_FILE_RCODE))
+    })
+    
+
+    output$visual_RCode <- renderText({
+      req(internal_01_FILE_RCODE)
+      mi_lista <- reactiveValuesToList(internal_01_FILE_RCODE)
+      
+        req(mi_lista$"check_path_output_file")
+        # print(mi_lista)
+        
+        paste(readLines(mi_lista$"path_output_file"), collapse = "\n")
+     
+    })
+    
+
+
+      output$download_RCode <- downloadHandler(
+        filename = function() {
+          internal_01_FILE_RCODE$"name_output_file"
+        },
+        content = function(file) {
+          req(internal_01_FILE_RCODE$"check_path_output_file")
+          file.copy(internal_01_FILE_RCODE$"path_output_file", file)
+        }
+      )
+      
+    
+    
+    
+    ############################################################################
+    
+    
+      observeEvent(input$"render_RReport", {
+        # print(dir.exists(temp_folder_path_01_LAB))
+        # print(list.files(temp_folder_path_01_LAB, all.files = TRUE, recursive = TRUE))
+        
+        fn_shiny_apply_changes_reactiveValues(rv = internal_03_RREPORT,  
+                                              changes_list = default_structure_download
+        )
+        
+        # Inputs
+        original_pk_file_path <- pk_file_path_03_RReport_qmd
+        ext_output <- ".html"
+        the_temp_output_folder_path <- temp_folder_path_01_LAB
+        
+        # Basics
+        original_pk_file_name <- basename(original_pk_file_path)
+        original_pk_folder_path <- dirname(original_pk_file_path)
+        
+        
+        # Obtener el tiempo del sistema
+        current_time <- Sys.time()
+        formatted_time <- format(current_time, "%Y_%m_%d_%H_%M_%S")
+        str_file_name <- tools::file_path_sans_ext(original_pk_file_name)
+        str_mod <- paste0(str_file_name, "_", formatted_time, ext_output) 
+        
+        # 1) Folder input --------------------------------------------------------
+        folder_input_path       <- original_pk_folder_path
+        check_folder_input_path <- dir.exists(folder_input_path) 
+        if(!check_folder_input_path){
+          showNotification("La carpeta de entrada no existe.", type = "error")
+        }
+        
+        fn_shiny_apply_changes_reactiveValues(rv = internal_03_RREPORT,  changes_list = list(
+          "folder_input_path" = folder_input_path,
+          "check_folder_input_path" = check_folder_input_path
+        ))
+        
+        
+        # 2) File Input #-----------------------------------
+        name_input_file       <- original_pk_file_name
+        path_input_file       <- original_pk_file_path
+        check_path_input_file <- file.exists(path_input_file) 
+        if(!check_path_input_file){
+          showNotification("El path del archivo de entrada no existe.", type = "error")
+        }
+        fn_shiny_apply_changes_reactiveValues(rv = internal_03_RREPORT,  changes_list = list(
+          "name_input_file" = name_input_file,
+          "path_input_file" = path_input_file,
+          "check_path_input_file" = check_path_input_file
+        ))
+        
+        # 3) Output folder -------------------------------------------------------
+        folder_output_path       <- the_temp_output_folder_path
+        check_folder_output_path <- dir.exists(folder_output_path)
+        if(!check_folder_output_path){
+          showNotification("La carpeta de salida no existe.", type = "error")
+          
+        }
+        fn_shiny_apply_changes_reactiveValues(rv = internal_03_RREPORT,  changes_list = list(
+          "folder_output_path" = folder_output_path,
+          "check_folder_output_path" = check_folder_output_path
+        ))
+        
+        
+        # 4) Output file name ----------------------------------------------------
+        name_output_file   <- str_mod
+        path_output_file   <- file.path(folder_output_path, name_output_file)
+        fn_shiny_apply_changes_reactiveValues(rv = internal_03_RREPORT,  changes_list = list(
+          "name_output_file" = name_output_file,
+          "path_output_file" = path_output_file
+        ))
+        
+        # writeLines(Rcode_script(), path_output_file)
+        file.copy(from = path_input_file, 
+                    to = path_output_file, overwrite = TRUE)
+        
+        dir_actual <- getwd()
+        
+        # Cambiar al directorio temporal
+        setwd(folder_output_path)
+        
+        # Ejecutar el comando quarto render
+        # comando_render <- paste0("quarto render ", nombre_archivo)
+        # sistema_output <- system(comando_render, intern = TRUE)
+        
+        quarto::quarto_render(input = name_output_file)
+        
+        # Volver al directorio original
+        setwd(dir_actual)
+        
+        Sys.sleep(0.5)
+        
+        #################################################################
+        file_path <- path_output_file
+        
+        # Tiempo máximo de espera en segundos
+        timeout <- 10
+        
+        # Intervalo de verificación en segundos
+        check_interval <- 0.5
+        
+        # Objeto que comienza con un valor (FALSE)
+        check_path_output_file <- FALSE
+        
+        # Contador de tiempo
+        start_time <- Sys.time()
+        
+        # Bucle de verificación
+        while (!file.exists(file_path)) {
+          # Verificar si se ha superado el tiempo máximo de espera
+          if (difftime(Sys.time(), start_time, units = "secs") > timeout) {
+            cat("El archivo no se creó dentro del tiempo esperado.\n")
+            break
+          }
+          
+          # Esperar un intervalo antes de verificar nuevamente
+          Sys.sleep(check_interval)
+        }
+        
+        # Si el archivo existe, cambiar el valor del objeto
+        if (file.exists(file_path)) {
+          check_path_output_file <- TRUE
+        }
+        
+        ################################################################
+        # check_path_output_file <- file.exists(path_output_file)
+        
+        
+        if(!check_path_output_file){
+          showNotification("El archivo de salida no se genero o paso algo.", type = "error")
+          
+        }
+        button_class <- "confirmed"
+        
+        fn_shiny_apply_changes_reactiveValues(rv = internal_03_RREPORT,  changes_list = list(
+          "check_path_output_file" = check_path_output_file,
+          "button_class" = button_class
+        ))
+        
+        
+        # print(list.files(temp_folder_path_01_LAB, all.files = TRUE, recursive = TRUE))
+        # print(reactiveValuesToList(internal_03_RREPORT))
+      })
+      
     observeEvent(input$"render_RReport", {
-      print(list.files(temp_folder_path_internal, all.files = T, recursive = T))
+      # print(list.files(temp_folder_path_01_LAB, all.files = T, recursive = T))
       
-      ruta_quarto <- documento
-      
-      # Extraer el nombre del archivo sin la ruta
-      nombre_archivo <- basename(ruta_quarto)
-      
-      # Copiar el archivo .qmd a la carpeta temporal
-      #archivo_temp <- file.path(dir_temp, nombre_archivo)
-      # archivo_temp <- file_path_internal_RReport
-      archivo_temp <- file.path(temp_folder_path_internal, nombre_archivo)
-      file.copy(from = ruta_quarto, to = archivo_temp, overwrite = TRUE)
+
+      file.copy(from = pk_file_path_03_RReport_qmd , 
+                  to = input_path_file_temporal, overwrite = TRUE)
       ###
       # Guardar el directorio actual
       dir_actual <- getwd()
       
       # Cambiar al directorio temporal
-      setwd(temp_folder_path_internal)
+      setwd(temp_folder_path_01_LAB)
       
       # Ejecutar el comando quarto render
-      comando_render <- paste0("quarto render ", nombre_archivo)
-      sistema_output <- system(comando_render, intern = TRUE)
+      # comando_render <- paste0("quarto render ", nombre_archivo)
+      # sistema_output <- system(comando_render, intern = TRUE)
+      
+      quarto::quarto_render(input = input_file_name_qmd, 
+                            output_file = output_file_name_html)
       
       # Volver al directorio original
       setwd(dir_actual)
       ###
       
       # Verificar si el archivo existe después de escribir
-      if (file.exists(archivo_temp)) {
+      if (file.exists(output_path_file_html)) {
         check_file_RReport(TRUE)
       } else {
         check_file_RReport(FALSE)
       }
-      print(list.files(temp_folder_path_internal, all.files = T, recursive = T))
+      # print(list.files(temp_folder_path_01_LAB, all.files = T, recursive = T))
     })
     
     output$visual_RReport <- renderText({
@@ -185,7 +1100,7 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script) {
       req(check_file_RReport())
       
       file_name_html <- "anova.html"
-      dir_temp <- temp_folder_path_internal
+      dir_temp <- temp_folder_path_01_LAB
       
       # check_file_RReport()
       addResourcePath(prefix = "output_temp_folder", directoryPath = dir_temp)
@@ -195,6 +1110,19 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script) {
       
       return(armado_v)
     })
+    
+    output$download_RReport <- downloadHandler(
+      filename = function() {
+        output_file_name_RReport
+      },
+      content = function(file) {
+        if (file.exists(outputfile_path_internal_RReport)) {
+          file.copy(file_path_internal_RReport, file)
+        } else {
+          stop("El archivo no existe en la ruta esperada.")
+        }
+      }
+    )
     ############################################################################
     
     
@@ -218,6 +1146,18 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script) {
           
     
     })
+    
+    
+    
+    
+    
+    
+    
+    
+    ############################################################################
+    ############################################################################
+    ############################################################################
+    ############################################################################
     
     # Estado del renderizado
     estado_renderizado <- reactiveVal("no_iniciado") # Puede ser: no_iniciado, en_proceso, finalizado, error
@@ -638,5 +1578,12 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script) {
         )
       }
     })
+    
+    } # FIN IF
+    
+    
   })
+  
+
 }
+

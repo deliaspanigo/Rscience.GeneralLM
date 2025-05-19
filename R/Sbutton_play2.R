@@ -136,7 +136,7 @@ Sbutton_play2_server <- function(id, internal_DATASET_SELECTOR,  active_DATASET_
         
        
         
-        fn_shiny_apply_changes_reactiveValues(rv = active_DATASET_SELECTOR, changes_list  = internal_DATASET_SELECTOR)
+        fn_shiny_apply_changes_reactiveValues(rv = active_DATASET_SELECTOR,  changes_list = internal_DATASET_SELECTOR)
         fn_shiny_apply_changes_reactiveValues(rv = active_TOOLS_SELECTOR,    changes_list = internal_TOOLS_SELECTOR)
         fn_shiny_apply_changes_reactiveValues(rv = active_VARIABLE_SELECTOR, changes_list = internal_VARIABLE_SELECTOR)
         fn_shiny_apply_changes_reactiveValues(rv = active_PLAY_SELECTOR,     changes_list = internal_PLAY_SELECTOR)

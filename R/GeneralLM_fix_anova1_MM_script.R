@@ -13,7 +13,8 @@ GeneralLM_fix_anova1_MM_script_server <- function(id, show_dev,
                                                   active_DATASET_SELECTOR, 
                                                   active_TOOLS_SELECTOR,
                                                   active_VARIABLE_SELECTOR,
-                                                  active_PLAY_SELECTOR) {
+                                                  active_PLAY_SELECTOR,
+                                                  active_R_CODE) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
@@ -75,6 +76,19 @@ GeneralLM_fix_anova1_MM_script_server <- function(id, show_dev,
       the_code
       
     })
+    
+    pack_code <- reactive({
+      list(Rcode_original = Rcode_original(),
+           Rcode_script = Rcode_script(),
+           Rcode_quarto = Rcode_quarto())
+      })
+    
+    
+    fn_shiny_apply_changes_reactiveValues(rv = active_R_CODE,  changes_list = list(
+      "pack_output" = pack_code(),
+      "check_output" = TRUE,
+      "button_class" = "confirmed"
+    ))
     
     ############################################################################
     
