@@ -2,6 +2,9 @@
 title: "EL R LONGGGGGGGGGGGGG"
 format: 
   html:
+    page-layout: custom
+    margin-left: 5%
+    margin-right: 5%
     theme: cosmo
     toc: false
     embed-resources: true

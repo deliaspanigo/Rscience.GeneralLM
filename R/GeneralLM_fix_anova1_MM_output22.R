@@ -1,15 +1,15 @@
 
 #' @export
-GeneralLM_fix_anova1_MM_output_ui <- function(id) {
+GeneralLM_fix_anova1_MM_output22_ui <- function(id) {
   ns <- NS(id)
   
   uiOutput(ns("SUPER_OUTPUT"))
   
- 
+  
 }
 
 #' @export
-GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev, 
+GeneralLM_fix_anova1_MM_output22_server <- function(id, show_dev, 
                                                   mis_valores) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
@@ -143,39 +143,39 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
         class = "d-flex",  # Contenedor flexible
         style = "height: 90%",  # Altura del contenedor principal (80% de la ventana)
         div(
-            style = "flex: 0 0 50%; max-width: 50%; padding: 10px; height: 50%;",
-        card(
-          card_header("Summary anova"),
-          card_body(
-            div(
-              DTOutput(ns("df_summary_anova"))
-            )
-          )
-        ),
-        card(
-          card_header("Interpretation"),
-          card_body(
-            div(
+          style = "flex: 0 0 50%; max-width: 50%; padding: 10px; height: 50%;",
+          card(
+            card_header("Summary anova"),
+            card_body(
               div(
-                tags$div(mis_valores()$"phrase_shapiro_selected"),
-                tags$div(mis_valores()$"phrase_bartlett_selected"),
-                tags$div(mis_valores()$"phrase_requeriments_selected"),
-                tags$div(mis_valores()$"phrase_anova_selected")
+                DTOutput(ns("df_summary_anova"))
+              )
+            )
+          ),
+          card(
+            card_header("Interpretation"),
+            card_body(
+              div(
+                div(
+                  tags$div(mis_valores()$"phrase_shapiro_selected"),
+                  tags$div(mis_valores()$"phrase_bartlett_selected"),
+                  tags$div(mis_valores()$"phrase_requeriments_selected"),
+                  tags$div(mis_valores()$"phrase_anova_selected")
+                )
               )
             )
           )
-        )
         ),
         div(
           style = "flex: 0 0 50%; max-width: 50%; padding: 10px; height: 50%;",
-        card(
-          card_header("Plot"),
-          card_body(
-            div(
-              plotlyOutput(ns("the_plot"))
+          card(
+            card_header("Plot"),
+            card_body(
+              div(
+                plotlyOutput(ns("the_plot"))
+              )
             )
           )
-        )
         )
       )
       
@@ -189,10 +189,10 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
     # Define la información de los botones con grupo y orden
     botones_info <- list( 
       list(id = "boton_1",  label = "Summary",                class = "btn-outline-primary",         grupo = 1, orden = 1, content = "mini_resumen", show_always = TRUE),
-      # list(id = "boton_2",  label = "Full Analysis",          class = "btn-outline-primary",       grupo = 1, orden = 2, content = "mega_tabs", show_always = TRUE),
+      list(id = "boton_2",  label = "Full Analysis",          class = "btn-outline-primary",       grupo = 1, orden = 2, content = "mega_tabs", show_always = TRUE),
       list(id = "boton_3",  label = "Descriptive Statistics", class = "btn-outline-primary",         grupo = 1, orden = 3, content = "3", show_always = TRUE),
-      # list(id = "boton_4",  label = "Script",                 class = "btn-outline-primary",          grupo = 1, orden = 4, content = "shiny_ace_editor_OUTPUT", show_always = TRUE),
-      # list(id = "boton_5",  label = "Download",               class = "btn-warning",         grupo = 1, orden = 5, content = "dynamic_download_quarto", show_always = TRUE),
+      list(id = "boton_4",  label = "Script",                 class = "btn-outline-primary",          grupo = 1, orden = 4, content = "shiny_ace_editor_OUTPUT", show_always = TRUE),
+      list(id = "boton_5",  label = "Download",               class = "btn-warning",         grupo = 1, orden = 5, content = "dynamic_download_quarto", show_always = TRUE),
       list(id = "boton_6",  label = "Hypotheses",             class = "btn-info",            grupo = 2, orden = 1, content = "6", show_always = TRUE),
       list(id = "boton_7",  label = "Theoretical Framework",  class = "btn-light",           grupo = 2, orden = 2, content = "7", show_always = TRUE),
       list(id = "boton_8",  label = "Bibliography",           class = "btn-dark",            grupo = 2, orden = 3, content = "8", show_always = TRUE),
@@ -344,7 +344,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
               fluidRow(
                 column(10, fn_html_cartel(my_text = "Anova 1 way - Fixed Effects - General Linear Model")),
                 column(2, aver)
-                ),
+              ),
               uiOutput(ns(boton$content)),
               botones_info[[boton$id]]
             ),
@@ -359,7 +359,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
       })
     })
     
-   
+    
     
     button_info <- reactive({
       # Aquí puedes devolver información sobre botones presionados si lo necesitas
@@ -374,20 +374,19 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
     
     output$SUPER_OUTPUT <- renderUI({
       div(
-      # style = "",  # Altura del contenedor (100% del contenedor padre)
+        # style = "",  # Altura del contenedor (100% del contenedor padre)
         # card(
-          # style = "height: 100%; display: flex; flex-direction: column;",  # Altura de la card (100% del contenedor padre)
-          # card_header("Resultado"),
-          # div(
-            style = "flex-grow: 1; overflow-y: auto; height: 100%; width: 100%; max-width: 100%; box-sizing: border-box; overflow-x: hidden;",  # Ocupa el espacio restante y añade scroll si es necesario
-            uiOutput(ns("el_cartel")),
-            uiOutput(ns("mega_tabs"))#,
-            # uiOutput(ns("mini_resumen")),
-            # uiOutput(ns("botones_dinamicos")),
-            # textOutput(ns("resultado")),
-            # uiOutput(ns("resultado2"))
-          # )
-        )
+        # style = "height: 100%; display: flex; flex-direction: column;",  # Altura de la card (100% del contenedor padre)
+        # card_header("Resultado"),
+        # div(
+        style = "flex-grow: 1; overflow-y: auto; height: 100%; width: 100%; max-width: 100%; box-sizing: border-box; overflow-x: hidden;",  # Ocupa el espacio restante y añade scroll si es necesario
+        uiOutput(ns("el_cartel")),
+        # uiOutput(ns("mini_resumen")),
+        uiOutput(ns("botones_dinamicos")),
+        textOutput(ns("resultado")),
+        uiOutput(ns("resultado2"))
+        # )
+      )
       # )
       
     })
@@ -519,7 +518,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
                                           "phrase_bartlett_selected", "phrase_requeriments_selected",
                                           "phrase_anova_selected"))
     
-
+    
     output$dynamic_ESPECIAL_ui <- renderUI({
       req(mis_valores())
       crear_outputs_y_ui(list_vec05, "render_tab05_", mis_valores, output, ns)
@@ -533,7 +532,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
       
       #Rcode_script <- GeneralLM_fix_anova1_take_code(my_fn=GeneralLM_fix_anova1_RCode)
       # Calcular la altura adecuada para el editor basado en el número de líneas
-
+      
       
       card(
         card_header("Editor Options"),
@@ -565,27 +564,27 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
       # Asignar aproximadamente 20px por línea para el alto del editor
       editor_height <- paste0(max(300, line_count * 20), "px")
       
-            shinyAce::aceEditor(
-              outputId = "script_part1",
-              value = Rcode_script(),
-              mode = "r",
-              theme = input$"theme", #"chrome",
-              height = editor_height,#"200px",
-              fontSize = input$"fontSize", #14,
-              showLineNumbers = TRUE,
-              readOnly = TRUE,
-              autoScrollEditorIntoView = TRUE,
-              maxLines = 1000,  # Un número grande para evitar scroll
-              minLines = line_count 
-            )
+      shinyAce::aceEditor(
+        outputId = "script_part1",
+        value = Rcode_script(),
+        mode = "r",
+        theme = input$"theme", #"chrome",
+        height = editor_height,#"200px",
+        fontSize = input$"fontSize", #14,
+        showLineNumbers = TRUE,
+        readOnly = TRUE,
+        autoScrollEditorIntoView = TRUE,
+        maxLines = 1000,  # Un número grande para evitar scroll
+        minLines = line_count 
+      )
       
     })
     
     output$shiny_ace_editor_OUTPUT <- renderUI({
       req(mis_valores())
       
-     div(uiOutput(ns("shiny_ace_editor_MENU")),
-         uiOutput(ns("shiny_ace_CODE")))
+      div(uiOutput(ns("shiny_ace_editor_MENU")),
+          uiOutput(ns("shiny_ace_CODE")))
       
     })
     
@@ -600,7 +599,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
     )
     
     
-   
+    
     
     ############################################################################
     
@@ -632,9 +631,9 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
       
     })
     ############################################################################
-
     
     
-
+    
+    
   })
 }

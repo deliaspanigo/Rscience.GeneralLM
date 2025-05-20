@@ -21,17 +21,17 @@ module_quartoRenderer_ui <- function(id) {
         ),
         br(),
         uiOutput(ns("visual_para_archivos")),
-        br(),
-        actionButton(ns("renderizar"), "Render VIEJO", class = "btn-primary"),
+        # br(),
+        # actionButton(ns("renderizar"), "Render VIEJO", class = "btn-primary"),
         
-        uiOutput(ns("render_status")),
+        # uiOutput(ns("render_status")),
         
         # Aquí se mostrará el HTML renderizado
-        div(
-          id = ns("contenedor_html"),
-          #style = "display: none; border: 1px solid #ddd; border-radius: 5px; padding: 15px; margin-top: 20px; overflow: visible; max-height: none;",
-          htmlOutput(ns("quarto_iframe"))
-        )
+        # div(
+        #   id = ns("contenedor_html"),
+        #   #style = "display: none; border: 1px solid #ddd; border-radius: 5px; padding: 15px; margin-top: 20px; overflow: visible; max-height: none;",
+        #   htmlOutput(ns("quarto_iframe"))
+        # )
         
       ),
       # Permitir que el card crezca según sea necesario

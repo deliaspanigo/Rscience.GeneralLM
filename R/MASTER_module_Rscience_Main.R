@@ -39,9 +39,15 @@ MASTER_module_Rscience_Main_ui <- function(id) {
             bslib::navset_card_tab(
               title = "R for Science",
               id = ns("mynav"),
-              #height = "100%",  # Especificar altura explícitamente
+              
+              
+              
+              height = "100%",  # Especificar altura explícitamente
               bslib::nav_panel(title = "user_selection",
                                uiOutput(ns("card02_user_selection"))
+              ),
+              bslib::nav_panel(title = "dataset",
+                               dataTableOutput(ns("visual_dataset"))
               ),
               bslib::nav_panel(title = "crystal01_run_code",
                                uiOutput(ns("crystal01_run_code"))
@@ -49,6 +55,9 @@ MASTER_module_Rscience_Main_ui <- function(id) {
               ),
               bslib::nav_panel(title = "output",
                                uiOutput(ns("card05_output"))
+              ),
+              bslib::nav_panel(title = "output22",
+                               uiOutput(ns("card05_output22"))
               ),
               bslib::nav_panel(title = "script",
                                uiOutput(ns("card06_script"))
@@ -153,6 +162,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         str_03_FN_zocalo =            "_FN_shiny_zocalo",
         str_04_MM_run_code =          "_MM_run_code",
         str_05_MM_output =            "_MM_output",
+        str_05_MM_output22 =            "_MM_output22",
         str_06_MM_script =            "_MM_script"
 
       )
@@ -189,7 +199,15 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     ############################################################################
     
-    
+    output$visual_dataset <- DT::renderDataTable({
+      req(internal_DATASET_SELECTOR)
+      req(internal_DATASET_SELECTOR$"check_output")
+      
+      req(internal_DATASET_SELECTOR$"pack_output"$"database")
+      my_dataset <- internal_DATASET_SELECTOR$"pack_output"$"database"
+      
+      my_dataset
+    })
     
     # Card 02) "user_selection"
     output$card02_user_selection <- renderUI({
@@ -486,7 +504,57 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       )
     })
     
+    ############################################################################
     
+    observe({
+      req(OK_ALL_ACTIVE())
+      req(my_list_str_rv())
+      str_selected_modulo <- my_list_str_rv()$"str_05_MM_output22"
+      new_server <- paste0(str_selected_modulo, "_server")
+      new_ui <- paste0(str_selected_modulo, "_ui")
+      new_id <- "the_output22"
+      
+      # print(new_server)
+      # str_server(new_server)
+      # str_ui(new_ui)
+      # my_id(new_id)
+      args <- list(id = new_id, show_dev = FALSE,
+                   mis_valores = reactive(active_R_OBJECTS$"pack_output"))
+      
+      vector_funciones <- ls("package:Rscience.GeneralLM")
+      check_in <- new_server %in% vector_funciones
+      # print(check_in)
+      
+      # print(str_server())
+      # Verificar si la función existe y ejecutarla
+      if (check_in) {
+        do.call(new_server, args)
+        # print(resultado)  # Output: 5
+      } else {
+        print("El modulo no existe.")
+      }
+      
+      
+    })
+    
+    
+    # # Renderizar la UI del selector de variables
+    output$card05_output22<- renderUI({
+      req(OK_ALL_ACTIVE())
+      req(my_list_str_rv())
+      
+      str_selected_modulo <- my_list_str_rv()$"str_05_MM_output22"
+      new_modulo_ui <- paste0(str_selected_modulo, "_ui")
+      new_id <- "the_output22"
+      
+      # print(new_modulo_ui)
+      args <- list(id = ns(new_id))
+      
+      div(
+        style = "height: 100%;",  # Altura del contenedor (100% del contenedor padre)
+        do.call(new_modulo_ui, args)  # Altura del contenido (100% del contenedor padre)
+      )
+    })
     
     
     ############################################################################
@@ -648,7 +716,8 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
                                  the_pack)
     
     output$card07_download <- renderUI({
-      # req(mis_valores())
+      req(OK_ALL_ACTIVE())
+      req(my_list_str_rv())
       module_quartoRenderer_ui(id=ns("quarto_doc"))
     })
     
