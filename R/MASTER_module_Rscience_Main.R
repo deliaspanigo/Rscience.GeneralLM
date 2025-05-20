@@ -707,7 +707,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
       
     })
-    observe(print(the_pack()))
+    # observe(print(the_pack()))
     
     module_quartoRenderer_server(id="quarto_doc", 
                                  documento = the_quarto_file(),
