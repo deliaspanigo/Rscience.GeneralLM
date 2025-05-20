@@ -619,9 +619,33 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       GeneralLM_fix_anova1_quarto_file_path()
     })
     
+    the_pack <- reactive({
+      req(OK_ALL_ACTIVE())
+      req(my_list_str_rv())
+      
+      # print(reactiveValuesToList(active_DATASET_SELECTOR))
+      
+      shiny_path <- reactiveValuesToList(active_DATASET_SELECTOR)$"pack_output"$"str_import_internal" 
+      my_factor <-  reactiveValuesToList(active_VARIABLE_SELECTOR)$"pack_output"$"factor"
+      my_vr <-      reactiveValuesToList(active_VARIABLE_SELECTOR)$"pack_output"$"respuesta"
+        
+      
+      list_output <- list(shiny_path = shiny_path,
+                          my_factor = my_factor,
+                          my_vr = my_vr)
+      
+      # print(list_output)
+      return(list_output)
+      
+      
+    })
+    observe(print(the_pack()))
+    
     module_quartoRenderer_server(id="quarto_doc", 
                                  documento = the_quarto_file(),
-                                 Rcode_script = reactive(active_R_CODE$"pack_output"$"Rcode_script"))
+                                 Rcode_script = reactive(active_R_CODE$"pack_output"$"Rcode_script"),
+                                 Rcode_quarto = reactive(active_R_CODE$"pack_output"$"Rcode_quarto"),
+                                 the_pack)
     
     output$card07_download <- renderUI({
       # req(mis_valores())

@@ -141,3 +141,9 @@ if(test_norm$p.value > 0.05 && test_var$`Pr(>F)`[1] > 0.05) {
 ```
 
 :::
+
+```{r}
+# Forzar una línea en blanco final para evitar el warning de readLines()
+cat("\n")
+```
+

@@ -62,7 +62,7 @@ GeneralLM_fix_anova1_MM_script_server <- function(id, show_dev,
     Rcode_quarto <-  reactive({
       req(OK_ALL_ACTIVE(), Rcode_original())
       
-      str_import      <- active_DATASET_SELECTOR$"pack_output"$"str_import_external"
+      str_import      <- active_DATASET_SELECTOR$"pack_output"$"str_import_internal"
       var_name_factor <- active_VARIABLE_SELECTOR$"pack_output"$"factor" #valores_internos_list$pack_var_selection$"factor"
       var_name_vr     <- active_VARIABLE_SELECTOR$"pack_output"$"respuesta"  #     #valores_internos_list$pack_var_selection$"respuesta"
       alpha_value     <- 0.05
