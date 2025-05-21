@@ -9,8 +9,8 @@ fn_html_cartel <- function(my_text){
       div(
         class = "d-flex justify-content-between align-items-center",
         div(
-          h3(icon("edit"), my_text, style = "margin: 0; font-weight: 600;"),
-          p("Personaliza tu texto y visualízalo en tiempo real", style = "margin: 5px 0 0 0; opacity: 0.9;")
+          h3(icon("edit"), my_text, style = "margin: 0; font-weight: 600;")#,
+          #p("Personaliza tu texto y visualízalo", style = "margin: 5px 0 0 0; opacity: 0.9;")
         ),
         div(
           icon("boxes-stacked", style = "font-size: 2.5rem; opacity: 0.8;")

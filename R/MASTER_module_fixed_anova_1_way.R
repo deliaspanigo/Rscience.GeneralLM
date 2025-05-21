@@ -236,6 +236,7 @@ MASTER_module_fixed_anova_1_way_server <- function(id, show_dev) {
       card(
         card_header("User selection"),
         card_body(
+          
           uiOutput(ns("tarjeta01_dataset")),
           uiOutput(ns("tarjeta02_tools")),
           uiOutput(ns("tarjeta03_vars"))

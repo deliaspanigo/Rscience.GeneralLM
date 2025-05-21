@@ -13,6 +13,17 @@ GeneralLM_fix_anova1_FN_shiny_zocalo <- function(internal_VARIABLE_SELECTOR){
   new_nrow <-  info_VS$"nrow_minidataset"
   
   div(
+    class = "p-3 rounded shadow-sm",
+    style = "background: linear-gradient(to right, #f8f9fa, #ffffff);",
+    
+    # Título principal
+    h4(
+      class = "mb-3 pb-2",
+      style = "border-bottom: 2px solid #0d6efd; color: #0d6efd;",
+      icon("info-circle"), 
+      "Variables Selection"
+    ),
+  div(
     class = "p-2 rounded",
     style = "background-color: rgba(255, 193, 7, 0.05); border-left: 4px solid #ffc107;",
     
@@ -49,6 +60,7 @@ GeneralLM_fix_anova1_FN_shiny_zocalo <- function(internal_VARIABLE_SELECTOR){
       span(paste0(new_nrow, " rows × ", new_ncol, " columns"),
            style = "font-family: monospace;")
     )
+  )
   )
   
 }

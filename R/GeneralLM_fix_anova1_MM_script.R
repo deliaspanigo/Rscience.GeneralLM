@@ -111,9 +111,7 @@ GeneralLM_fix_anova1_MM_script_server <- function(id, show_dev,
       # Calcular la altura adecuada para el editor basado en el número de líneas
       
       
-      card(
-        card_header("Editor Options"),
-        card_body(
+ 
           
           fluidRow(
             column(3, 
@@ -124,11 +122,10 @@ GeneralLM_fix_anova1_MM_script_server <- function(id, show_dev,
             column(3,
                    sliderInput(ns("fontSize"), "Font Size:", min = 8, max = 40, value = 14, step = 1)
             ),
-            column(3, downloadButton(ns("download_btn"), "Descargar como .R", icon = icon("download")))
+            column(3, downloadButton(ns("download_btn"), "Download", icon = icon("download")))
             
           )
-        )
-      )
+      
       
     })
     
@@ -160,8 +157,16 @@ GeneralLM_fix_anova1_MM_script_server <- function(id, show_dev,
     output$shiny_ace_editor_OUTPUT <- renderUI({
       # req(mis_valores())
       
-      div(uiOutput(ns("shiny_ace_editor_MENU")),
-          uiOutput(ns("shiny_ace_CODE")))
+      div(
+        uiOutput(ns("el_cartel")),
+          card(
+            card_header("Editor Options"),
+            card_body(
+              uiOutput(ns("shiny_ace_editor_MENU")),
+              uiOutput(ns("shiny_ace_CODE"))
+              )
+          )
+      )
       
     })
     

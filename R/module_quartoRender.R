@@ -3,9 +3,10 @@ module_quartoRenderer_ui <- function(id) {
   ns <- NS(id)
   
   div(
+    uiOutput(ns("el_cartel")),
     card(
       card_header(
-        h3("Renderizar documento Quarto")
+        h3("Download")
       ),
       card_body(
         p("Haz clic en el botón para renderizar el documento Quarto."),
@@ -44,6 +45,10 @@ module_quartoRenderer_ui <- function(id) {
 module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quarto, the_pack) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+    output$el_cartel <- renderUI({
+      fn_html_cartel(my_text = "Anova 1 way - Fixed Effects - General Linear Model")
+    })
     
     output$"set01_RCode" <- renderUI({
       

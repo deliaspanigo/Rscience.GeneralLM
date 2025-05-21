@@ -52,7 +52,12 @@ Sbutton_02_tools2_server <- function(id, internal_DATASET_SELECTOR, internal_TOO
     # Module - Server - Button - Tools
     list_user_tool_selection <- Rscience.menu::MASTER_module_tools_server(id ="module_tools")
 
+    check_selected_tool <- reactive({
+      list_user_tool_selection()$"check_selected_tool"
+      
+    })
     
+    # observe(print(list_user_tool_selection()))
      
     # Selección de variables
     observeEvent(input$btn_tools, {
@@ -60,19 +65,20 @@ Sbutton_02_tools2_server <- function(id, internal_DATASET_SELECTOR, internal_TOO
       # Verificar que se haya seleccionado un dataset primero
       if (!internal_DATASET_SELECTOR$check_output) {
         showNotification(
-          "Please, select a dataset first!",
+          "Please, select your dataset!",
           type = "warning"
         )
         return(NULL)  # No hacer nada si no se ha seleccionado una base de datos
       }
       
+     
       # Si ya hay un dataset elegido, mostramos ahora si las opciones para elegir
       # una herramienta estadistica.
       
-      general_topic_name <- "Modelos Lineales Generales"
+      # general_topic_name <- "Modelos Lineales Generales"
       showModal(
         modalDialog(
-          title = paste("Seleccionar una herramienta estadístisca para", general_topic_name),
+          title = paste("Tools"),
           size = "xl",
           easyClose = TRUE,
           tags$div(
@@ -117,7 +123,7 @@ Sbutton_02_tools2_server <- function(id, internal_DATASET_SELECTOR, internal_TOO
           # Instrucciones
           div(
             class = "alert alert-info",
-            "Por favor, seleccione exactamente 1 herramienta."
+            "Please, choose 1 tool."
           ),
           div(
             style = "height: 100%; overflow-y: auto; padding: 15px;", 
@@ -146,6 +152,15 @@ Sbutton_02_tools2_server <- function(id, internal_DATASET_SELECTOR, internal_TOO
     
     # Al confirmar selección de variables
     observeEvent(input$confirmar_tools, {
+      
+      # Verificar que se haya seleccionado un dataset primero
+      if (!check_selected_tool()) {
+        showNotification(
+          "Please, select your tool!",
+          type = "warning"
+        )
+        return(NULL)  # No hacer nada si no se ha seleccionado una base de datos
+      }
       
       # # Verificar que se haya seleccionado una opción válida
       # if (!valores_internos$check_import_dataset) {
