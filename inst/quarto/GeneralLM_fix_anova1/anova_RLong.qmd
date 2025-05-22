@@ -1,5 +1,5 @@
 ---
-title: "EL R LONGGGGGGGGGGGGG"
+title: "Anova 1 Way - Fixed Model - General Linear Models"
 format: 
   html:
     page-layout: custom
@@ -10,8 +10,9 @@ format:
     embed-resources: true
     standalone: true
     code-tools: true  # Añade un botón global para mostrar/ocultar código
-    code-fold: true   # Código plegado por defecto
-    code-summary: "Mostrar código"  # Texto para el botón de despliegue
+    code-fold: false   # Código plegado por defecto
+    code-summary: "Options"  # Texto para el botón de despliegue
+    css: style.css
 ---
 
 ## Análisis ANOVA Básico
@@ -19,7 +20,10 @@ format:
 
 
 
-```{r aver}
+```{r}
+#| label: code
+#| warning: false
+
 # Cargar dataset y extraer variables
 "_mi_codigo_"
 

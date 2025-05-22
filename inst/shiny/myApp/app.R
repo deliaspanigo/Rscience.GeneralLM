@@ -16,6 +16,7 @@ library(shinyAce)
 library(DT)
 library(shinycssloaders)
 library(EnvStats)
+library(crayon)
 
 # library(fontawesome)
 # source("global.R")

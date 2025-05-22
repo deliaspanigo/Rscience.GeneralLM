@@ -83,7 +83,26 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     ns <- session$ns
     
     
+    library(crayon)
     
+    message(green("**********************************************"))
+    message(green("*                                            *"))
+    message(green("*          WELCOME TO THE RSCIENCE WORLD!    *"))
+    message(green("*                                            *"))
+    message(green("**********************************************"))
+    
+    
+    # Obtener fecha y hora actual
+    timestamp <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
+    
+    # Crear el mensaje en inglés
+    mensaje <- paste0(
+      blue("Welcome to Rscience!"), "\n",
+      yellow("Current date and time:"), " ", green(timestamp)
+    )
+    
+    # Mostrar en la consola con el color
+    cat(mensaje, "\n")
     ############################################################################
     
     # Card 01) Botonera "main menu"
@@ -412,29 +431,30 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         shinyjs::delay(2000, {
           removeModal()
         })
+        THE_MODAL(NULL)
       }
       
     })
     ############################################################################
     # Si esta todo OK, vamos a la pestania "output"
-    observeEvent(active_PLAY_SELECTOR$"check_output", {
-
-      req(active_PLAY_SELECTOR$"check_output")
-      # Mostrar a cuál pestaña intentamos cambiar
-      el_check <- active_PLAY_SELECTOR$"check_output"
-      mi_ventana <- ifelse(test = el_check, yes = "output", no = "user_selection")
-      # print(paste("Intentando cambiar a la pestaña:", mi_ventana))
-
-      # Cambiar la pestaña usando updateTabsetPanel en lugar de nav_select
-      updateTabsetPanel(session, inputId = "mynav", selected = mi_ventana)
-
-      # shinyjs::delay(2000, {
-      #   removeModal()
-      # })
-      # THE_MODAL(FALSE)
-      # shinyjs::runjs('$("#miModalEspecifico").modal("hide");')
-      # shinyjs::runjs('$(".modal").modal("hide");')
-    })
+    # observeEvent(active_PLAY_SELECTOR$"check_output", {
+    # 
+    #   req(active_PLAY_SELECTOR$"check_output")
+    #   # Mostrar a cuál pestaña intentamos cambiar
+    #   el_check <- active_PLAY_SELECTOR$"check_output"
+    #   mi_ventana <- ifelse(test = el_check, yes = "output", no = "user_selection")
+    #   # print(paste("Intentando cambiar a la pestaña:", mi_ventana))
+    # 
+    #   # Cambiar la pestaña usando updateTabsetPanel en lugar de nav_select
+    #   updateTabsetPanel(session, inputId = "mynav", selected = mi_ventana)
+    # 
+    #   # shinyjs::delay(2000, {
+    #   #   removeModal()
+    #   # })
+    #   THE_MODAL(FALSE)
+    #   # shinyjs::runjs('$("#miModalEspecifico").modal("hide");')
+    #   # shinyjs::runjs('$(".modal").modal("hide");')
+    # })
     
     
     ############################################################################
@@ -466,21 +486,16 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     
     observe({
-      if(!OK_ALL_ACTIVE()) {
-        fn_shiny_apply_changes_reactiveValues(rv = active_R_OBJECTS, changes_list = default_structure)
-      } else
       
-      if(OK_ALL_ACTIVE()) {
-        
-      # req(my_list_str_rv())
-        
-        # active_R_OBJECTS$"check_init_modal" <- TRUE
-        # THE_MODAL(TRUE)
-        # print(THE_MODAL())
+      # Mostrar modal de carga
+      
+      if (!OK_ALL_ACTIVE()) {
+        fn_shiny_apply_changes_reactiveValues(rv = active_R_OBJECTS, changes_list = default_structure)
+      } else {
         showModal(
           modalDialog(
-            id = "miModalEspecifico",  # Asignar un ID al modal
-            title = "Procesando...",
+            id = "miModalEspecifico2",  # Asignar un ID al modal
+            title = "Processing R code file...",
             # Definición CSS de la animación incluida directamente
             tags$head(
               tags$style("
@@ -496,84 +511,83 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
                 class = "spinner",
                 style = "border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto;"
               ),
-              tags$p("Por favor, espere mientras se completan los cálculos.")
+              tags$p("This may take a few moments. Please wait.")
             ),
             footer = NULL,  # No incluir botones en el modal
             easyClose = FALSE  # Evitar que el usuario cierre el modal manualmente
           )
         )
         
-        showNotification(
-          "Processing...",
-          type = "warning"
-        )
-        # print("ESTOY ACA OTR AVEX")
+      tryCatch({
+        # Todo tu código principal aquí
+  
+          showNotification("Processing...", type = "warning")
+          
+          str_selected_modulo <- my_list_str_rv()$"str_04_MM_run_code"
+          new_server <- paste0(str_selected_modulo, "_server")
+          new_ui <- paste0(str_selected_modulo, "_ui")
+          new_id <- "the_run_code"
+          
+          args <- list(
+            id = new_id, show_dev = FALSE,
+            active_DATASET_SELECTOR, 
+            active_TOOLS_SELECTOR,
+            active_VARIABLE_SELECTOR,
+            active_PLAY_SELECTOR
+          )
+          
+          # Verificación si la función existe
+          vector_funciones <- ls("package:Rscience.GeneralLM")
+          check_in <- new_server %in% vector_funciones
+          
+          the_results <- NULL
+          # Intentar llamar a la función
+          the_results <- do.call(new_server, args)
+          
+          if (!is.null(the_results)) {
+            fn_shiny_apply_changes_reactiveValues(rv = active_R_OBJECTS,  changes_list = list(
+              "pack_output" = the_results(),
+              "check_output" = TRUE,
+              "button_class" = "confirmed"
+            ))
+          }
+          
+          
         
+      }, error = function(e) {
+        # THE_MODAL(FALSE)
         
-      # req(active_R_OBJECTS)
-      str_selected_modulo <- my_list_str_rv()$"str_04_MM_run_code"
-      new_server <- paste0(str_selected_modulo, "_server")
-      new_ui <- paste0(str_selected_modulo, "_ui")
-      new_id <- "the_run_code"
-
-      # print(new_server)
-      # str_server(new_server)
-      # str_ui(new_ui)
-      # my_id(new_id)
-      args <- list(id = new_id, show_dev = FALSE,
-                   active_DATASET_SELECTOR, 
-                   active_TOOLS_SELECTOR,
-                   active_VARIABLE_SELECTOR,
-                   active_PLAY_SELECTOR)
-
-      vector_funciones <- ls("package:Rscience.GeneralLM")
-      check_in <- new_server %in% vector_funciones
-      # print(check_in)
-
-      # print(str_server())
-      # Verificar si la función existe y ejecutarla
-      if (check_in) {
-        # 
-        # THE_MODAL(TRUE)
-        # print(THE_MODAL())
-        the_results <- do.call(new_server, args)
-        
-        fn_shiny_apply_changes_reactiveValues(rv = active_R_OBJECTS,  changes_list = list(
-          "pack_output" = the_results(),
-          "check_output" = TRUE,
-          "button_class" = "confirmed"
+        # Aquí capturamos *todo* error: muestre modal con el mensaje
+        showModal(modalDialog(
+          title = "Error en el procesamiento",
+          paste("Ocurrió un error:", e$message),
+          easyClose = TRUE,
+          footer = modalButton("Cerrar")
         ))
+      })
         
-        
-        # mi_ventana <- "output" #<- ifelse(test = el_check, yes = "output", no = "user_selection")
-        # # print(paste("Intentando cambiar a la pestaña:", mi_ventana))
-        # 
-        # # Cambiar la pestaña usando updateTabsetPanel en lugar de nav_select
-        # updateTabsetPanel(session, inputId = "mynav", selected = mi_ventana)
-        
-        # shinyjs::delay(2000, {
-        #   removeModal()
-        # })
-        THE_MODAL(FALSE)
-        # active_R_OBJECTS$"check_end_modal" <- TRUE
-
-        # print(resultado)  # Output: 5
-      } else {
-        print("El modulo no existe.")
       }
-
-      
-
-      # shinyjs::runjs('$("#miModalEspecifico").modal("hide");')
-      # shinyjs::runjs('$(".modal").modal("hide");')
-      
-      
-      }
-      
-      # print(OK_ALL_ACTIVE())
-      # print(reactiveValuesToList(active_R_OBJECTS))
       
     })
+    
+    
+    observe({
+      
+      if(active_R_OBJECTS$"check_output"){
+      # mi_ventana <- ifelse(test = el_check, yes = "output", no = "user_selection")
+        mi_ventana <- "output"
+      # print(paste("Intentando cambiar a la pestaña:", mi_ventana))
+      
+      # Cambiar la pestaña usando updateTabsetPanel en lugar de nav_select
+      updateTabsetPanel(session, inputId = "mynav", selected = mi_ventana)
+      
+      # shinyjs::delay(2000, {
+      #   removeModal()
+      # })
+      THE_MODAL(FALSE)
+      }
+    })
+    
      
     
     crear_outputs_y_ui33 <- function(prefix, mis_valores_reactive, output, ns) {

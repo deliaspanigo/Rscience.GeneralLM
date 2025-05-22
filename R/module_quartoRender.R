@@ -397,7 +397,13 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
       
       #################################################################
       
+      message(green("Starting process..."))
+      message(green("Please, wait..."))
       writeLines(Rcode_script(), path_output_file)
+      message(green("Process completed!"))
+      message("")
+      
+
       Sys.sleep(0.5)
       file_path <- path_output_file
       
@@ -607,7 +613,13 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
       lineas <- sub(pattern = '"_mi_codigo_"', replacement = codigo_extra, x = lineas)
       writeLines(lineas, name_input_file)
       
-      quarto::quarto_render(input = name_input_file, output_file = name_output_file)
+      message(green("Starting process..."))
+      message(green("Please, wait..."))
+      quarto::quarto_render(input = name_input_file, 
+                            output_file = name_output_file,
+                            quiet = TRUE)
+      message(green("Process completed!"))
+      message("")
       
       # Volver al directorio original
       setwd(dir_actual)
