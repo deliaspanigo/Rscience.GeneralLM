@@ -409,9 +409,9 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       }
       
       if(!THE_MODAL()){
-        # shinyjs::delay(2000, {
+        shinyjs::delay(2000, {
           removeModal()
-        # })
+        })
       }
       
     })
