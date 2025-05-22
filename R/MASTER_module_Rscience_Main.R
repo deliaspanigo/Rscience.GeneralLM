@@ -46,6 +46,9 @@ MASTER_module_Rscience_Main_ui <- function(id) {
               bslib::nav_panel(title = "user_selection",
                                uiOutput(ns("card02_user_selection"))
               ),
+              bslib::nav_panel(title = "crystal02",
+                               uiOutput(ns("crystal02"))
+              ),
               bslib::nav_panel(title = "dataset",
                                dataTableOutput(ns("visual_dataset"))
               ),
@@ -191,14 +194,83 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     
     Sbutton_play2_server(id = "play2", 
+                         default_structure, 
                          internal_DATASET_SELECTOR,  active_DATASET_SELECTOR,
                          internal_TOOLS_SELECTOR,    active_TOOLS_SELECTOR,
                          internal_VARIABLE_SELECTOR, active_VARIABLE_SELECTOR,
                          internal_PLAY_SELECTOR,     active_PLAY_SELECTOR)
     
     
-    ############################################################################
     
+    # observe({
+    #   my_list <- reactiveValuesToList(active_PLAY_SELECTOR)
+    #   
+    #   req(!my_list$"check_output")
+    #   
+    #     fn_shiny_apply_changes_reactiveValues(rv = active_DATASET_SELECTOR,  changes_list = default_structure)
+    #     fn_shiny_apply_changes_reactiveValues(rv = active_TOOLS_SELECTOR,    changes_list = default_structure)
+    #     fn_shiny_apply_changes_reactiveValues(rv = active_VARIABLE_SELECTOR, changes_list = default_structure)
+    #     # fn_shiny_apply_changes_reactiveValues(rv = active_PLAY_SELECTOR,     changes_list = default_structure)
+    #     
+    # })
+    
+    
+    
+    ############################################################################
+    output[["internal_DATASET_SELECTOR"]] <- renderPrint({ reactiveValuesToList(internal_DATASET_SELECTOR) })
+    output[["active_DATASET_SELECTOR"]] <- renderPrint({ reactiveValuesToList(active_DATASET_SELECTOR) })
+    
+    output[["internal_TOOLS_SELECTOR"]] <- renderPrint({ reactiveValuesToList(internal_TOOLS_SELECTOR) })
+    output[["active_TOOLS_SELECTOR"]] <- renderPrint({ reactiveValuesToList(active_TOOLS_SELECTOR) })
+    
+    output[["internal_VARIABLE_SELECTOR"]] <- renderPrint({ reactiveValuesToList(internal_VARIABLE_SELECTOR) })
+    output[["active_VARIABLE_SELECTOR"]] <- renderPrint({ reactiveValuesToList(active_VARIABLE_SELECTOR) })
+    
+    output[["internal_PLAY_SELECTOR"]] <- renderPrint({ reactiveValuesToList(internal_PLAY_SELECTOR) })
+    output[["active_PLAY_SELECTOR"]] <- renderPrint({ reactiveValuesToList(active_PLAY_SELECTOR) })
+    
+    
+    output$"crystal02" <- renderUI({
+    
+      div(
+      fluidRow(
+        column(3, 
+               h2("Internal Dataset"), 
+                  verbatimTextOutput(ns("internal_DATASET_SELECTOR"))),
+        column(3, 
+               h2("Internal Tools"), 
+               verbatimTextOutput(ns("internal_TOOLS_SELECTOR"))),
+        column(3, 
+               h2("Internal Variable"), 
+                  verbatimTextOutput(ns("internal_VARIABLE_SELECTOR"))),
+        column(3, 
+               h2("Internal Play"),
+                  verbatimTextOutput(ns("internal_PLAY_SELECTOR")))
+        
+      ),
+      hr(),
+      fluidRow(
+        column(3, 
+               h2("External Dataset"), 
+               verbatimTextOutput(ns("active_DATASET_SELECTOR"))),
+        column(3, 
+               h2("External Tools"), 
+               verbatimTextOutput(ns("active_TOOLS_SELECTOR"))),
+        column(3, 
+               h2("External Variable"), 
+               verbatimTextOutput(ns("active_VARIABLE_SELECTOR"))),
+        column(3, 
+               h2("External Play"), 
+               verbatimTextOutput(ns("active_PLAY_SELECTOR")))
+        
+      )
+      )
+      
+    })
+    
+    
+    
+    ############################################################################
     output$visual_dataset <- DT::renderDataTable({
       req(internal_DATASET_SELECTOR)
       req(internal_DATASET_SELECTOR$"check_output")
@@ -292,39 +364,153 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       req(active_DATASET_SELECTOR, active_TOOLS_SELECTOR, 
           active_VARIABLE_SELECTOR, active_PLAY_SELECTOR)
       
-      req(active_DATASET_SELECTOR$"check_output", 
-          active_TOOLS_SELECTOR$"check_output",
-          active_VARIABLE_SELECTOR$"check_output",
-          active_PLAY_SELECTOR$"check_output")
+      vector_check <- c(active_DATASET_SELECTOR$"check_output", 
+                        active_TOOLS_SELECTOR$"check_output",
+                        active_VARIABLE_SELECTOR$"check_output",
+                        active_PLAY_SELECTOR$"check_output")
       
-      return(TRUE)
+      the_final_value <- all(vector_check)
+      the_final_value
+    })
+    ############################################################################
+    
+    THE_MODAL <- reactiveVal(NULL)
+    
+    observeEvent(THE_MODAL(),{
+      
+      if(THE_MODAL()){
+        # Mostrar el modal de carga
+        # Mostrar el modal de carga con un spinner
+        showModal(
+          modalDialog(
+            id = "miModalEspecifico",  # Asignar un ID al modal
+            title = "Procesando...",
+            # Definición CSS de la animación incluida directamente
+            tags$head(
+              tags$style("
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          ")
+            ),
+            tags$div(
+              style = "text-align: center;",
+              tags$div(
+                class = "spinner",
+                style = "border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto;"
+              ),
+              tags$p("Por favor, espere mientras se completan los cálculos.")
+            ),
+            footer = NULL,  # No incluir botones en el modal
+            easyClose = FALSE  # Evitar que el usuario cierre el modal manualmente
+          )
+        )
+      }
+      
+      if(!THE_MODAL()){
+        shinyjs::delay(2000, {
+          removeModal()
+        })
+      }
       
     })
-    
+    ############################################################################
     # Si esta todo OK, vamos a la pestania "output"
     observeEvent(active_PLAY_SELECTOR$"check_output", {
-      
+
+      req(active_PLAY_SELECTOR$"check_output")
       # Mostrar a cuál pestaña intentamos cambiar
       el_check <- active_PLAY_SELECTOR$"check_output"
       mi_ventana <- ifelse(test = el_check, yes = "output", no = "user_selection")
       # print(paste("Intentando cambiar a la pestaña:", mi_ventana))
-      
+
       # Cambiar la pestaña usando updateTabsetPanel en lugar de nav_select
       updateTabsetPanel(session, inputId = "mynav", selected = mi_ventana)
-      
-      
+
+      # shinyjs::delay(2000, {
+      #   removeModal()
+      # })
+      # THE_MODAL(FALSE)
+      # shinyjs::runjs('$("#miModalEspecifico").modal("hide");')
+      # shinyjs::runjs('$(".modal").modal("hide");')
     })
     
     
     ############################################################################
   
     # Crystal01 - the_R_objects
-    active_R_OBJECTS   <- do.call(reactiveValues, default_structure)
+    # AQUI ESTAN LAS SALIDAS ESTADISTICAS!!!!
+    default_R_OBJECTS <- list(
+      check_previous_items = FALSE,
+      check_init_modal     = FALSE,
+      check_init_proc      = FALSE,
+      check_end_proc       = FALSE,
+      output = "",
+      check_output         = FALSE,
+      check_end_modal      = FALSE,
+      check_general        = FALSE,
+      button_class = "initial"
+    )
+    
+    active_R_OBJECTS   <- do.call(reactiveValues, default_R_OBJECTS)
+    
+   
+    
+    # observe({
+    #   req(!OK_ALL_ACTIVE())
+    #   fn_shiny_apply_changes_reactiveValues(rv = active_R_OBJECTS, changes_list = default_structure)
+    # })
+    
+
     
     
     observe({
-      req(OK_ALL_ACTIVE())
-      req(my_list_str_rv())
+      if(!OK_ALL_ACTIVE()) {
+        fn_shiny_apply_changes_reactiveValues(rv = active_R_OBJECTS, changes_list = default_structure)
+      } else
+      
+      if(OK_ALL_ACTIVE()) {
+        
+      # req(my_list_str_rv())
+        
+        # active_R_OBJECTS$"check_init_modal" <- TRUE
+        # THE_MODAL(TRUE)
+        # print(THE_MODAL())
+        showModal(
+          modalDialog(
+            id = "miModalEspecifico",  # Asignar un ID al modal
+            title = "Procesando...",
+            # Definición CSS de la animación incluida directamente
+            tags$head(
+              tags$style("
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          ")
+            ),
+            tags$div(
+              style = "text-align: center;",
+              tags$div(
+                class = "spinner",
+                style = "border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto;"
+              ),
+              tags$p("Por favor, espere mientras se completan los cálculos.")
+            ),
+            footer = NULL,  # No incluir botones en el modal
+            easyClose = FALSE  # Evitar que el usuario cierre el modal manualmente
+          )
+        )
+        
+        showNotification(
+          "Processing...",
+          type = "warning"
+        )
+        # print("ESTOY ACA OTR AVEX")
+        
+        
+      # req(active_R_OBJECTS)
       str_selected_modulo <- my_list_str_rv()$"str_04_MM_run_code"
       new_server <- paste0(str_selected_modulo, "_server")
       new_ui <- paste0(str_selected_modulo, "_ui")
@@ -347,6 +533,9 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       # print(str_server())
       # Verificar si la función existe y ejecutarla
       if (check_in) {
+        # 
+        # THE_MODAL(TRUE)
+        # print(THE_MODAL())
         the_results <- do.call(new_server, args)
         
         fn_shiny_apply_changes_reactiveValues(rv = active_R_OBJECTS,  changes_list = list(
@@ -355,14 +544,35 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
           "button_class" = "confirmed"
         ))
         
-
+        
+        # mi_ventana <- "output" #<- ifelse(test = el_check, yes = "output", no = "user_selection")
+        # # print(paste("Intentando cambiar a la pestaña:", mi_ventana))
+        # 
+        # # Cambiar la pestaña usando updateTabsetPanel en lugar de nav_select
+        # updateTabsetPanel(session, inputId = "mynav", selected = mi_ventana)
+        
+        # shinyjs::delay(2000, {
+        #   removeModal()
+        # })
+        THE_MODAL(FALSE)
+        # active_R_OBJECTS$"check_end_modal" <- TRUE
 
         # print(resultado)  # Output: 5
       } else {
         print("El modulo no existe.")
       }
 
+      
 
+      # shinyjs::runjs('$("#miModalEspecifico").modal("hide");')
+      # shinyjs::runjs('$(".modal").modal("hide");')
+      
+      
+      }
+      
+      # print(OK_ALL_ACTIVE())
+      # print(reactiveValuesToList(active_R_OBJECTS))
+      
     })
      
     
@@ -443,10 +653,11 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     
     output$crystal01_run_code <- renderUI({
-      req(active_R_OBJECTS)
-      req(active_R_OBJECTS$"check_output")
-      
+      # req(active_R_OBJECTS)
+      # req(active_R_OBJECTS$"check_output")
+      if(active_R_OBJECTS$"check_output"){
       crear_outputs_y_ui33(prefix = "jajja", mis_valores_reactive = reactive(active_R_OBJECTS$"pack_output"), output, ns)    
+      } else "NADA"
       
       })
     
@@ -467,7 +678,9 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       # str_ui(new_ui)
       # my_id(new_id)
       args <- list(id = new_id, show_dev = FALSE,
-                   mis_valores = reactive(active_R_OBJECTS$"pack_output"))
+                   mis_valores = reactive(active_R_OBJECTS$"pack_output"),
+                   active_TOOLS_SELECTOR = active_TOOLS_SELECTOR
+      )
       
       vector_funciones <- ls("package:Rscience.GeneralLM")
       check_in <- new_server %in% vector_funciones
@@ -696,11 +909,12 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       shiny_path <- reactiveValuesToList(active_DATASET_SELECTOR)$"pack_output"$"str_import_internal" 
       my_factor <-  reactiveValuesToList(active_VARIABLE_SELECTOR)$"pack_output"$"factor"
       my_vr <-      reactiveValuesToList(active_VARIABLE_SELECTOR)$"pack_output"$"respuesta"
-        
-      
+      my_cartel <-  reactiveValuesToList(active_TOOLS_SELECTOR)$"pack_output"$"selected_cartel"
+
       list_output <- list(shiny_path = shiny_path,
                           my_factor = my_factor,
-                          my_vr = my_vr)
+                          my_vr = my_vr,
+                          my_cartel = my_cartel)
       
       # print(list_output)
       return(list_output)
@@ -713,7 +927,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
                                  documento = the_quarto_file(),
                                  Rcode_script = reactive(active_R_CODE$"pack_output"$"Rcode_script"),
                                  Rcode_quarto = reactive(active_R_CODE$"pack_output"$"Rcode_quarto"),
-                                 the_pack)
+                                 active_TOOLS_SELECTOR)
     
     output$card07_download <- renderUI({
       req(OK_ALL_ACTIVE())

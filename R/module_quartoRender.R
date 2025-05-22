@@ -9,16 +9,15 @@ module_quartoRenderer_ui <- function(id) {
         h3("Download")
       ),
       card_body(
-        p("Haz clic en el botón para renderizar el documento Quarto."),
-        fluidRow("Anova 1 way - Fixed Models - General Linear Model - Rscience"),
-        
         fluidRow(
-          column(6,
+          column(10,
             uiOutput(ns("set01_RCode")),
+            hr(),
             uiOutput(ns("set02_RLong")),
-            uiOutput(ns("set03_RReport"))
-        ),
-        column(6, actionButton(ns("download_ALL"), "Download ALL", class = "btn-primary", icon = icon("download"))),
+            hr()#,
+            #uiOutput(ns("set03_RReport"))
+        )#,
+        # column(6, actionButton(ns("download_ALL"), "Download ALL", class = "btn-primary", icon = icon("download"))),
         ),
         br(),
         uiOutput(ns("visual_para_archivos")),
@@ -42,12 +41,13 @@ module_quartoRenderer_ui <- function(id) {
 }
 
 #' @export
-module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quarto, the_pack) {
+module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quarto, active_TOOLS_SELECTOR) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
     output$el_cartel <- renderUI({
-      fn_html_cartel(my_text = "Anova 1 way - Fixed Effects - General Linear Model")
+      my_cartel <- reactiveValuesToList(active_TOOLS_SELECTOR)$"pack_output"$"selected_cartel"
+      fn_html_cartel(my_text = my_cartel)
     })
     
     output$"set01_RCode" <- renderUI({
@@ -63,7 +63,7 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
         fluidRow(
           column(3, "R code"),
           column(2, actionButton(ns("render_RCode"), "Render", class = btn_class_render)),
-          column(2, "Status"),
+          # column(2, "Status"),
           column(2, downloadButton(ns("download_RCode"), "Download", class = "btn-primary", icon = icon("download"))),
         )
     })
@@ -80,29 +80,29 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
       fluidRow(
         column(3, "R code and Outputs"),
         column(2, actionButton(ns("render_RLong"), "Render", class = btn_class_render)),
-        column(2, "Status"),
+        # column(2, "Status"),
         column(2, downloadButton(ns("download_RLong"), "Download", class = "btn-primary", icon = icon("download"))),
       )
     })
     
-    output$"set03_RReport" <- renderUI({
-      
-      the_class_render   <- internal_03_RREPORT$"button_class"
-      #      the_class_download <- internal_01_FILE_RCODE$"button_class"
-      
-      btn_class_render <- switch(the_class_render,
-                                 "initial"   = "btn-outline-primary",    # Azul inicial
-                                 "confirmed" = "btn-success",    # Verde después de confirmar
-                                 "modified"  = "btn-outline-primary") 
-      
-      fluidRow(
-        column(3, "Report"),
-        column(2, actionButton(ns("render_RReport"), "Render", class = btn_class_render)),
-        column(2, "Status"),
-        column(2, actionButton(ns("download_RReport"), "Download", class = "btn-primary", icon = icon("download"))),
-      )
-    })
-    
+    # output$"set03_RReport" <- renderUI({
+    #   
+    #   the_class_render   <- internal_03_RREPORT$"button_class"
+    #   #      the_class_download <- internal_01_FILE_RCODE$"button_class"
+    #   
+    #   btn_class_render <- switch(the_class_render,
+    #                              "initial"   = "btn-outline-primary",    # Azul inicial
+    #                              "confirmed" = "btn-success",    # Verde después de confirmar
+    #                              "modified"  = "btn-outline-primary") 
+    #   
+    #   fluidRow(
+    #     column(3, "Report"),
+    #     column(2, actionButton(ns("render_RReport"), "Render", class = btn_class_render)),
+    #     column(2, "Status"),
+    #     column(2, actionButton(ns("download_RReport"), "Download", class = "btn-primary", icon = icon("download"))),
+    #   )
+    # })
+    # 
     # 1) PK - Folder and file, names and paths
     # the_package_path <- find.package("Rscience.GeneralLM")
     # the_folder_path <- file.path(the_package_path, "quarto")
@@ -296,6 +296,23 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
     
     
     #############################################################################
+    THE_MODAL_RCODE <- reactiveVal(NULL)
+    observeEvent(THE_MODAL_RCODE(),{
+      
+      if(THE_MODAL_RCODE()){
+        # Mostrar el modal de carga
+        # Mostrar el modal de carga con un spinner
+        
+      }
+      
+      if(!THE_MODAL_RCODE()){
+        shinyjs::delay(2000, {
+          removeModal()
+        })
+        THE_MODAL_RCODE(NULL)
+      }
+      
+    })
     
     internal_01_FILE_RCODE <- do.call(reactiveValues, default_structure_file_download)
     observeEvent(input$"render_RCode", {
@@ -306,7 +323,31 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
                                             changes_list = default_structure_file_download
       )
       
-
+      showModal(
+        modalDialog(
+          id = "miModalEspecifico2",  # Asignar un ID al modal
+          title = "Processing R code file...",
+          # Definición CSS de la animación incluida directamente
+          tags$head(
+            tags$style("
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          ")
+          ),
+          tags$div(
+            style = "text-align: center;",
+            tags$div(
+              class = "spinner",
+              style = "border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto;"
+            ),
+            tags$p("This may take a few moments. Please wait.")
+          ),
+          footer = NULL,  # No incluir botones en el modal
+          easyClose = FALSE  # Evitar que el usuario cierre el modal manualmente
+        )
+      )
       # Stage 1 - Time and str_search
       current_time <- Sys.time()
       formatted_time <- format(current_time, "%Y_%m_%d_%H_%M_%S")
@@ -405,7 +446,7 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
 
       
       
-      
+      THE_MODAL_RCODE(FALSE)
     })
     
     
@@ -437,6 +478,26 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
     
     internal_02_RLONG <- do.call(reactiveValues, default_structure_file_download)
 
+    THE_MODAL_RLong <- reactiveVal(NULL)
+    observeEvent(THE_MODAL_RLong(),{
+      
+      if(THE_MODAL_RLong()){
+        # Mostrar el modal de carga
+        # Mostrar el modal de carga con un spinner
+      
+      }
+      
+      if(!THE_MODAL_RLong()){
+        shinyjs::delay(2000, {
+          removeModal()
+        })
+        THE_MODAL_RLong(NULL)
+      }
+      
+    })
+
+    
+        
     observeEvent(input$"render_RLong", {
       
       req(internal_03_TOTEM_DOWNLOAD$"check_general")
@@ -445,6 +506,32 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
                                             changes_list = default_structure_file_download
       )
       
+      showModal(
+        modalDialog(
+          id = "miModalEspecifico2",  # Asignar un ID al modal
+          title = "Procesando RLong...",
+          # Definición CSS de la animación incluida directamente
+          tags$head(
+            tags$style("
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          ")
+          ),
+          tags$div(
+            style = "text-align: center;",
+            tags$div(
+              class = "spinner",
+              style = "border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto;"
+            ),
+            tags$p("This may take a few moments. Please wait."),
+            tags$p("It might take more than a minute. Please wait.")
+          ),
+          footer = NULL,  # No incluir botones en el modal
+          easyClose = FALSE  # Evitar que el usuario cierre el modal manualmente
+        )
+      )
       
       ###
       # Stage 1 - Time and str_search
@@ -572,7 +659,7 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
       
       
       
-      
+      THE_MODAL_RLong(FALSE)
     })
     
     
@@ -802,12 +889,12 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
         ),
         bslib::nav_panel(title = "R Code and Outputs",
                          htmlOutput(ns("visual_RLong"))# htmlOutput(ns("visual_RLong"))
-        ),
-        bslib::nav_panel(title = "Report",
-                         # uiOutput(ns("visual_RReport"))
-                         htmlOutput(ns("visual_RReport"))
-                         # "El RCODE AND OUTPUS")
-        )
+        )#,
+        # bslib::nav_panel(title = "Report",
+        #                  # uiOutput(ns("visual_RReport"))
+        #                  htmlOutput(ns("visual_RReport"))
+        #                  # "El RCODE AND OUTPUS")
+        # )
       )
       
     })
@@ -1042,13 +1129,13 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
             # title = "R for Science",
             id = ns("mynav"),
             height = "100%",  # Especificar altura explícitamente
-            bslib::nav_panel(title = "R Code",
+            bslib::nav_panel(title = "R code",
                              verbatimTextOutput(ns("visual_RCode"))
             ),
             bslib::nav_panel(title = "R Code and Outputs",
-                             "El RCODE AND OUTPUS"),
-            bslib::nav_panel(title = "Report",
-                             htmlOutput(ns("visual_RReport")))
+                             "R code + Outputs + Plots (html)")#,
+            # bslib::nav_panel(title = "Report",
+            #                  htmlOutput(ns("visual_RReport")))
           )
           
     

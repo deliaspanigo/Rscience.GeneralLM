@@ -10,7 +10,7 @@ GeneralLM_fix_anova1_MM_output_ui <- function(id) {
 
 #' @export
 GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev, 
-                                                  mis_valores) {
+                                                  mis_valores, active_TOOLS_SELECTOR) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
@@ -48,7 +48,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
         id_output <- paste0(prefix, i)
         list(
           h4(list_objetos[[i]]$"title"),
-          verbatimTextOutput(ns(id_output)),
+          shinycssloaders::withSpinner(verbatimTextOutput(ns(id_output))),
           br()
         )
       })
@@ -94,8 +94,8 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
           h4(list_objetos[[i]]$"title"),
           HTML(paste0("<b><u>R plot object:</u></b> ", obj_name_plot)),
           fluidRow(
-            column(6, plotlyOutput(ns(id_output_plot))),
-            column(6, verbatimTextOutput(ns(id_output_table)))
+            column(6, shinycssloaders::withSpinner(plotlyOutput(ns(id_output_plot)))),
+            column(6, shinycssloaders::withSpinner(verbatimTextOutput(ns(id_output_table))))
           ),
           hr(),
           br(), br(), br()
@@ -368,7 +368,10 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
     
     
     output$el_cartel <- renderUI({
-      fn_html_cartel(my_text = "Anova 1 way - Fixed Effects - General Linear Model")
+      
+      # internal_TOOLS_SELECTOR$ $selected_cartel
+      mi_cartel <- active_TOOLS_SELECTOR$"pack_output"$selected_cartel
+      fn_html_cartel(my_text = mi_cartel)
     })
     # style = "height: 100%; width: 100%; max-width: 100%; box-sizing: border-box; overflow-x: hidden;",  # Ajustes para evitar el scroll horizontal
     
@@ -508,7 +511,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
     output$dynamic_tab04_ui <- renderUI({
       req(mis_valores())
       
-      crear_outputs_y_ui2(list_vec03, "render_tab04_", mis_valores, output, ns)
+      crear_outputs_y_ui2(list_vec04, "render_tab04_", mis_valores, output, ns)
     })
     ##############################################################################
     
@@ -523,6 +526,30 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
     output$dynamic_ESPECIAL_ui <- renderUI({
       req(mis_valores())
       crear_outputs_y_ui(list_vec05, "render_tab05_", mis_valores, output, ns)
+    })
+    
+    ##############################################################################
+    
+    
+
+    output$dynamic_FULL_results_ui <- renderUI({
+      req(mis_valores())
+      
+      # Tab05 - Summary Special
+      the_names <- names(mis_valores())
+      the_names <- na.omit(the_names)
+      # the_names <- the_names[1:10]
+      # Identifico plot y text
+      dt_plots <- grepl("^plot", the_names)
+      dt_text <- !dt_plots
+      the_names <- the_names[dt_text]
+
+      list_vec06 <- list()
+      list_vec06[[1]] <- list("title" = "1) Summary Anova", 
+                              "objects" = the_names)
+      
+      
+      crear_outputs_y_ui(list_vec06, "render_tab06_", mis_valores, output, ns)
     })
     
     ##############################################################################
@@ -627,7 +654,8 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
         tabPanel(title = "Requeriments",      uiOutput(ns("dynamic_tab02_ui"))),
         tabPanel(title = "Plots - Raw Data",  uiOutput(ns("dynamic_tab03_ui"))),
         tabPanel(title = "Plots - Residuals", uiOutput(ns("dynamic_tab04_ui"))),
-        tabPanel(title = "Summary",           uiOutput(ns("dynamic_ESPECIAL_ui")))
+        tabPanel(title = "Summary",           uiOutput(ns("dynamic_ESPECIAL_ui"))),
+        tabPanel(title = "Full Results",      uiOutput(ns("dynamic_FULL_results_ui")))
       )
       
     })

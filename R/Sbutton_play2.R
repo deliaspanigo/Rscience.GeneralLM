@@ -10,7 +10,9 @@ Sbutton_play2_ui <- function(id) {
 }
 
 #' @export
-Sbutton_play2_server <- function(id, internal_DATASET_SELECTOR,  active_DATASET_SELECTOR,
+Sbutton_play2_server <- function(id, 
+                                 default_structure,
+                                 internal_DATASET_SELECTOR,  active_DATASET_SELECTOR,
                                  internal_TOOLS_SELECTOR,    active_TOOLS_SELECTOR,
                                  internal_VARIABLE_SELECTOR, active_VARIABLE_SELECTOR,
                                  internal_PLAY_SELECTOR,     active_PLAY_SELECTOR) {
@@ -24,6 +26,22 @@ Sbutton_play2_server <- function(id, internal_DATASET_SELECTOR,  active_DATASET_
     observe({
       button_state(internal_PLAY_SELECTOR$button_class)
       # if(!valores_internos$check_import_dataset) button_state("initial")
+    })
+    
+    observe({
+      if(!internal_PLAY_SELECTOR$"check_output"){
+
+
+
+        fn_shiny_apply_changes_reactiveValues(rv = active_DATASET_SELECTOR,  changes_list = default_structure)
+        fn_shiny_apply_changes_reactiveValues(rv = active_TOOLS_SELECTOR,    changes_list = default_structure)
+        fn_shiny_apply_changes_reactiveValues(rv = active_VARIABLE_SELECTOR, changes_list = default_structure)
+        # fn_shiny_apply_changes_reactiveValues(rv = active_PLAY_SELECTOR,     changes_list = default_structure)
+
+
+
+
+      }
     })
     
     output$my_action_button <- renderUI({
@@ -135,6 +153,9 @@ Sbutton_play2_server <- function(id, internal_DATASET_SELECTOR,  active_DATASET_
       if(internal_PLAY_SELECTOR$"check_output"){
         
        
+        req(internal_PLAY_SELECTOR$"check_output")
+        req(!active_PLAY_SELECTOR$"check_output")
+        # De esta forma solo continua si es la primera vez que da clic en el boton.
         
         fn_shiny_apply_changes_reactiveValues(rv = active_DATASET_SELECTOR,  changes_list = internal_DATASET_SELECTOR)
         fn_shiny_apply_changes_reactiveValues(rv = active_TOOLS_SELECTOR,    changes_list = internal_TOOLS_SELECTOR)
@@ -142,28 +163,7 @@ Sbutton_play2_server <- function(id, internal_DATASET_SELECTOR,  active_DATASET_
         fn_shiny_apply_changes_reactiveValues(rv = active_PLAY_SELECTOR,     changes_list = internal_PLAY_SELECTOR)
         
               
-        # valores_activos$pack_import_dataset <- valores_internos$pack_import_dataset
-        # valores_activos$check_import_dataset <- valores_internos$check_import_dataset
-        # valores_activos$pack_tool_selection <-  valores_internos$pack_tool_selection
-        # valores_activos$check_tool_selection <- valores_internos$check_tool_selection
-        # valores_activos$pack_var_selection <- valores_internos$pack_var_selection
-        # valores_activos$check_var_selection <- valores_internos$check_var_selection
-        # valores_activos$check_play <- valores_internos$check_play
-        # valores_activos$the_results <- valores_internos$the_results
-        
-        
-        
-        # Actualizar valores_internos activos
-        # valores_internos$seleccion_activa <- TRUE
-        # valores_internos$dataset_activo <- valores_internos$dataset_name
-        # valores_internos$variables_activas <- valores_internos$var_selection_col_names
-        # valores_internos$datos_activos <- valores_internos$dataset_df
-        # valores_activos <- do.call(reactiveValues, default_structure)
-        
-        # Cambiar el color del botón usando jQuery para asegurar que funcione
-        ### runjs(sprintf("$('#%s').css('border', 'none');", ns("btn_play")))
-        # runjs(sprintf("$('#%s').removeClass('btn-primary').addClass('btn-success');", ns("btn_play")))
-        
+       
         showNotification(
           ui = tags$div(
             style = "background-color: #d1e7dd; color: #0f5132; font-size: 15px; font-weight: bold; padding: 10px; border-radius: 4px; border-left: 5px solid #0f5132; display: flex; align-items: center;",
@@ -179,6 +179,9 @@ Sbutton_play2_server <- function(id, internal_DATASET_SELECTOR,  active_DATASET_
         
       }
     
+      
+      
+      
     })
       
       

@@ -12,6 +12,7 @@ RoxygenNote: 7.3.2
 Imports: 
     car,
     DT,
+    EnvStats,
     fontawesome,
     openxlsx,
     quarto,
@@ -19,4 +20,5 @@ Imports:
     Rscience.import,
     Rscience.menu,
     shinyAce,
+    shinycssloaders,
     shinyjs

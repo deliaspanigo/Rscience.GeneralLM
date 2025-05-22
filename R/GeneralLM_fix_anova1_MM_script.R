@@ -96,7 +96,8 @@ GeneralLM_fix_anova1_MM_script_server <- function(id, show_dev,
     
     
     output$el_cartel <- renderUI({
-      fn_html_cartel(my_text = "Anova 1 way - Fixed Effects - General Linear Model")
+      my_cartel <- reactiveValuesToList(active_TOOLS_SELECTOR)$"pack_output"$"selected_cartel"
+      fn_html_cartel(my_text = my_cartel)
     })
     # style = "height: 100%; width: 100%; max-width: 100%; box-sizing: border-box; overflow-x: hidden;",  # Ajustes para evitar el scroll horizontal
     

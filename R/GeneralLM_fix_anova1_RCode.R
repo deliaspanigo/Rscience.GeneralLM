@@ -878,7 +878,414 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, a
   # # # Plot output
   plot007_factor
   
+  #######----
   
+  # # # Create a new plot...
+  plot001_residuals <- plotly::plot_ly()
+  
+  # # # Plot001 - Scatter plot for VR and FACTOR on minibase_mod *****************
+  plot001_residuals <- plotly::add_trace(p = plot001_residuals,
+                                         type = "scatter",
+                                         mode = "markers",
+                                         x = minibase_mod$FACTOR,
+                                         y = minibase_mod$residuals,
+                                         color = minibase_mod$FACTOR,
+                                         colors = df_factor_info$color,
+                                         marker = list(size = 15, opacity = 0.7))
+  
+  # # # Title and settings...
+  plot001_residuals <-   plotly::layout(p = plot001_residuals,
+                                        title = "Plot 001 - Scatterplot - Residuals",
+                                        font = list(size = 20),
+                                        margin = list(t = 100))
+  
+  
+  # # # Without zerolines
+  plot001_residuals <-   plotly::layout(p = plot001_residuals,
+                                        xaxis = list(zeroline = FALSE),
+                                        yaxis = list(zeroline = TRUE))
+  
+  
+  # # # Plot output
+  plot001_residuals
+  
+  
+  
+  
+  
+  #library(plotly)
+  plot002_residuals <- plotly::plot_ly()
+  
+  # Add traces
+  plot002_residuals <- plotly::add_trace(p = plot002_residuals,
+                                         type = "violin",
+                                         y = minibase_mod$residuals,
+                                         x = minibase_mod$FACTOR,
+                                         showlegend = TRUE,
+                                         side = "positive",
+                                         points = "all",
+                                         name = "Violinplot",
+                                         color = minibase_mod$FACTOR,
+                                         colors = df_table_residuals_plot002$color)
+  
+  
+  
+  # # # Title and settings...
+  plot002_residuals <- plotly::layout(p = plot002_residuals,
+                                      title = "Plot 002 - Residuals - Scatterplot + Jitter +  Smoothed",
+                                      font = list(size = 20),
+                                      margin = list(t = 100))
+  
+  
+  # # # Without zerolines...
+  plot002_residuals <- plotly::layout(p = plot002_residuals,
+                                      xaxis = list(zeroline = FALSE),
+                                      yaxis = list(zeroline = FALSE))
+  
+  # # # Output plot003_anova...
+  plot002_residuals
+  
+  
+  
+  
+  
+  
+  plot003_residuals <- plotly::plot_ly()
+  
+  # Add traces
+  plot003_residuals <- plotly::add_trace(p = plot003_residuals,
+                                         type = "violin",
+                                         x = minibase_mod$residuals,
+                                         showlegend = TRUE,
+                                         side = "positive",
+                                         points = FALSE,
+                                         #name = levels(minibase_mod$FACTOR)[minibase_mod$lvl_order_number],
+                                         color = minibase_mod$FACTOR,
+                                         colors = df_table_residuals_plot003$color)
+  
+  
+  
+  # # # Title and settings...
+  plot003_residuals <- plotly::layout(p = plot003_residuals,
+                                      title = "Plot 003 - Residuals - Scatterplot + Jitter +  Smoothed",
+                                      font = list(size = 20),
+                                      margin = list(t = 100))
+  
+  
+  # # # Without zerolines...
+  plot003residuals <- plotly::layout(p = plot003_residuals,
+                                     xaxis = list(zeroline = FALSE),
+                                     yaxis = list(zeroline = FALSE))
+  
+  # # # Output plot003_anova...
+  plot003_residuals
+  
+  
+  
+  
+  
+  plot004_residuals <- plotly::plot_ly()
+  
+  # Add traces
+  plot004_residuals <- plotly::add_trace(p = plot004_residuals,
+                                         type = "violin",
+                                         x = minibase_mod$residuals,
+                                         #x = minibase_mod$FACTOR,
+                                         showlegend = TRUE,
+                                         side = "positive",
+                                         points = "all",
+                                         name = " ")#
+  #color = minibase_mod$FACTOR,
+  #colors = df_table_factor_plot006$color)
+  
+  
+  
+  # # # Title and settings...
+  plot004_residuals <- plotly::layout(p = plot004_residuals,
+                                      title = "Plot 004 - Residuals",
+                                      font = list(size = 20),
+                                      margin = list(t = 100))
+  
+  
+  # # # Without zerolines...
+  plot004_residuals <- plotly::layout(p = plot004_residuals,
+                                      xaxis = list(zeroline = TRUE),
+                                      yaxis = list(zeroline = FALSE))
+  
+  # # # Output plot003_anova...
+  plot004_residuals
+  
+  
+  
+  
+  # - el 5
+  qq_info <- EnvStats::qqPlot(x = minibase_mod$residuals, plot.it = F,
+                              param.list = list(mean = mean(minibase_mod$residuals),
+                                                sd = sd(minibase_mod$residuals)))
+  
+  cuantiles_teoricos <- qq_info$x
+  cuantiles_observados <- qq_info$y
+  
+  #library(plotly)
+  plot005_residuals <- plotly::plot_ly()
+  
+  # Crear el gráfico QQ plot
+  plot005_residuals <-add_trace(p = plot005_residuals,
+                                x = cuantiles_teoricos,
+                                y = cuantiles_observados,
+                                type = 'scatter', mode = 'markers',
+                                marker = list(color = 'blue'),
+                                name = "points")
+  
+  # Agregar la línea de identidad
+  pendiente <- 1
+  intercepto <- 0
+  
+  # Calcular las coordenadas de los extremos de la línea de identidad
+  x_extremos <- range(cuantiles_teoricos)
+  y_extremos <- pendiente * x_extremos + intercepto
+  
+  # Agregar la recta de identidad
+  plot005_residuals <- add_trace(p = plot005_residuals,
+                                 x = x_extremos,
+                                 y = y_extremos,
+                                 type = 'scatter',
+                                 mode = 'lines',
+                                 line = list(color = 'red'),
+                                 name = "identity")
+  
+  
+  # Establecer etiquetas de los ejes
+  # plot007_residuals <- layout(p = plot007_residuals,
+  #                             xaxis = list(title = 'Expected quantiles'),
+  #                             yaxis = list(title = 'Observed quantiles'))
+  
+  plot005_residuals <- plotly::layout(p = plot005_residuals,
+                                      title = "Plot 005 - QQ Plot Residuals",
+                                      font = list(size = 20),
+                                      margin = list(t = 100))
+  
+  # Mostrar el gráfico
+  plot005_residuals
+  # - Fin el 5
+  
+  
+  
+  # # # Create a new plot...
+  plot006_residuals <- plotly::plot_ly()
+  
+  # # # Plot001 - Scatter plot for VR and FACTOR on minibase_mod *****************
+  plot006_residuals <- plotly::add_trace(p = plot006_residuals,
+                                         type = "scatter",
+                                         mode = "markers",
+                                         x = minibase_mod$fitted.values,
+                                         y = minibase_mod$residuals,
+                                         color = minibase_mod$FACTOR,
+                                         colors = df_factor_info$color,
+                                         marker = list(size = 15, opacity = 0.7))
+  
+  # # # Title and settings...
+  plot006_residuals <-   plotly::layout(p = plot006_residuals,
+                                        title = "Plot 006 - Scatterplot - Residuals vs Fitted.values",
+                                        font = list(size = 20),
+                                        margin = list(t = 100))
+  
+  
+  # # # Without zerolines
+  plot006_residuals <-   plotly::layout(p = plot006_residuals,
+                                        xaxis = list(zeroline = FALSE),
+                                        yaxis = list(zeroline = TRUE))
+  
+  
+  # # # Plot output
+  plot006_residuals
+  
+  
+  
+  
+  # # # Create a new plot...
+  plot007_residuals <- plotly::plot_ly()
+  
+  # # # Plot001 - Scatter plot for VR and FACTOR on minibase_mod *****************
+  plot007_residuals <- plotly::add_trace(p = plot007_residuals,
+                                         type = "scatter",
+                                         mode = "markers",
+                                         x = minibase_mod$FACTOR,
+                                         y = minibase_mod$studres,
+                                         color = minibase_mod$FACTOR,
+                                         colors = df_factor_info$color,
+                                         marker = list(size = 15, opacity = 0.7))
+  
+  # # # Title and settings...
+  plot007_residuals <-   plotly::layout(p = plot007_residuals,
+                                        title = "Plot 007 - Scatterplot - Studentized Residuals",
+                                        font = list(size = 20),
+                                        margin = list(t = 100))
+  
+  
+  # # # Without zerolines
+  plot007_residuals <-   plotly::layout(p = plot007_residuals,
+                                        xaxis = list(zeroline = FALSE),
+                                        yaxis = list(zeroline = TRUE))
+  
+  
+  # # # Plot output
+  plot007_residuals
+  
+  
+  
+  
+  
+  
+  
+  #library(plotly)
+  plot008_residuals <- plotly::plot_ly()
+  
+  # Add traces
+  plot008_residuals <- plotly::add_trace(p = plot008_residuals,
+                                         type = "violin",
+                                         x = minibase_mod$studres,
+                                         #x = minibase_mod$FACTOR,
+                                         showlegend = TRUE,
+                                         side = "positive",
+                                         points = "all",
+                                         name = " ")#
+  #color = minibase_mod$FACTOR,
+  #colors = df_table_factor_plot006$color)
+  
+  
+  
+  # # # Title and settings...
+  plot008_residuals <- plotly::layout(p = plot008_residuals,
+                                      title = "Plot 008 - Studentized Residuals",
+                                      font = list(size = 20),
+                                      margin = list(t = 100))
+  
+  
+  # # # Without zerolines...
+  plot008_residuals <- plotly::layout(p = plot008_residuals,
+                                      xaxis = list(zeroline = TRUE),
+                                      yaxis = list(zeroline = FALSE))
+  
+  # # # Output plot003_anova...
+  plot008_residuals
+  
+  
+  
+  
+  # el 9
+  
+  x <- seq(-4, 4, length.out = 100)
+  y <- dnorm(x, mean = 0, 1)
+  #  x <- x*model_error_sd
+  densidad_suavizada <- density(x, kernel = "gaussian", adjust = 0.5)
+  hist_data_studres <- hist(minibase_mod$studres, plot = FALSE)
+  hist_data_studres$"rel_frec" <- hist_data_studres$counts/sum(hist_data_studres$counts)
+  
+  densidad_studres <-  density(x = minibase_mod$studres, kernel = "gaussian", adjust =0.5)
+  
+  #library(plotly)
+  plot009_residuals <- plotly::plot_ly()
+  
+  
+  # plot005_residuals <- add_trace(p = plot005_residuals,
+  #                                x = densidad_studres$x,
+  #                                y = densidad_studres$y,
+  #                                type = 'scatter',
+  #                                mode = 'lines',
+  #                                name = 'densidad_studres')
+  
+  plot009_residuals <- add_trace(p = plot009_residuals,
+                                 x = x,
+                                 y = y,
+                                 type = 'scatter',
+                                 mode = 'lines',
+                                 name = 'Normal Standard')
+  
+  
+  
+  
+  
+  # # Add traces
+  # plot005_residuals <- plotly::add_trace(p = plot005_residuals,
+  #                                        type = "violin",
+  #                                        x = minibase_mod$residuals,
+  #                                        #x = minibase_mod$FACTOR,
+  #                                        showlegend = TRUE,
+  #                                        side = "positive",
+  #                                        points = FALSE,
+  #                                        name = "violinplot")#
+  
+  plot009_residuals <- plotly::add_trace(p = plot009_residuals,
+                                         type = "bar",
+                                         x = hist_data_studres$"mids",
+                                         y = hist_data_studres$"density",
+                                         name = "hist - studres")
+  
+  plot009_residuals <- plotly::layout(p = plot009_residuals,
+                                      bargap = 0)
+  
+  plot009_residuals <- plotly::layout(p = plot009_residuals,
+                                      title = "Plot 009 - Studres Distribution",
+                                      font = list(size = 20),
+                                      margin = list(t = 100))
+  
+  plot009_residuals
+  # fin el 9
+  
+  
+  
+  
+  qq_info <- EnvStats::qqPlot(x = minibase_mod$studres, plot.it = F,
+                              param.list = list(mean = 0,
+                                                sd = 1))
+  
+  cuantiles_teoricos <- qq_info$x
+  cuantiles_observados <- qq_info$y
+  
+  #library(plotly)
+  plot010_residuals <- plotly::plot_ly()
+  
+  # Crear el gráfico QQ plot
+  plot010_residuals <-add_trace(p = plot010_residuals,
+                                x = cuantiles_teoricos,
+                                y = cuantiles_observados,
+                                type = 'scatter', mode = 'markers',
+                                marker = list(color = 'blue'),
+                                name = "points")
+  
+  # Agregar la línea de identidad
+  pendiente <- 1
+  intercepto <- 0
+  
+  # Calcular las coordenadas de los extremos de la línea de identidad
+  x_extremos <- range(cuantiles_teoricos)
+  y_extremos <- pendiente * x_extremos + intercepto
+  
+  # Agregar la recta de identidad
+  plot010_residuals <- add_trace(p = plot010_residuals,
+                                 x = x_extremos,
+                                 y = y_extremos,
+                                 type = 'scatter',
+                                 mode = 'lines',
+                                 line = list(color = 'red'),
+                                 name = "identity")
+  
+  
+  # Establecer etiquetas de los ejes
+  # plot007_residuals <- layout(p = plot007_residuals,
+  #                             xaxis = list(title = 'Expected quantiles'),
+  #                             yaxis = list(title = 'Observed quantiles'))
+  
+  plot010_residuals <- plotly::layout(p = plot010_residuals,
+                                      title = "Plot 010 - QQ Plot - studres",
+                                      font = list(size = 20),
+                                      margin = list(t = 100))
+  
+  # Mostrar el gráfico
+  plot010_residuals
+  
+  #####---
   
   #._ Capturar todos los objetos del entorno actual
   ._obj_names <- ls()
