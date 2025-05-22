@@ -50,7 +50,7 @@ MASTER_module_Rscience_Main_ui <- function(id) {
                                uiOutput(ns("crystal02"))
               ),
               bslib::nav_panel(title = "dataset",
-                               dataTableOutput(ns("visual_dataset"))
+                               DT::DTOutput(ns("visual_dataset"))
               ),
               bslib::nav_panel(title = "crystal01_run_code",
                                uiOutput(ns("crystal01_run_code"))
@@ -409,9 +409,9 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       }
       
       if(!THE_MODAL()){
-        shinyjs::delay(2000, {
+        # shinyjs::delay(2000, {
           removeModal()
-        })
+        # })
       }
       
     })
