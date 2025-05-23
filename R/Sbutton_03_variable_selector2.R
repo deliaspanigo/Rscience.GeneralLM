@@ -215,6 +215,7 @@ Sbutton_03_variable_selector2_server <- function(id, my_list_str_rv, internal_DA
       ))
     })
     
+    
     # Al confirmar selección de variables
     observeEvent(input$confirmar_variables, {
       

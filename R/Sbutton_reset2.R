@@ -89,30 +89,29 @@ Sbutton_reset2_server <- function(id, default_structure,
     
     
     observeEvent(internal_DATASET_SELECTOR$pack_output,{
-      for (nombre in names(default_structure)) {
-        fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, default_structure)
+
         fn_shiny_apply_changes_reactiveValues(rv = active_TOOLS_SELECTOR, default_structure)
-      }
+        fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, default_structure)
+
     })
     
     # 
     # 
     observeEvent(internal_TOOLS_SELECTOR$pack_output,{
-      for (nombre in names(default_structure)) {
+
         
-        fn_shiny_apply_changes_reactiveValues(rv = internal_VARIABLE_SELECTOR, default_structure)
         fn_shiny_apply_changes_reactiveValues(rv = active_VARIABLE_SELECTOR, default_structure)
+        fn_shiny_apply_changes_reactiveValues(rv = internal_VARIABLE_SELECTOR, default_structure)
       
-      }
+        
       
     })
     # 
     observeEvent(internal_VARIABLE_SELECTOR$pack_output,{
-      for (nombre in names(default_structure)) {
-  
-        fn_shiny_apply_changes_reactiveValues(rv = internal_PLAY_SELECTOR, default_structure)
+
         fn_shiny_apply_changes_reactiveValues(rv = active_PLAY_SELECTOR, default_structure)
-      }
+        fn_shiny_apply_changes_reactiveValues(rv = internal_PLAY_SELECTOR, default_structure)
+
       
     })
     
