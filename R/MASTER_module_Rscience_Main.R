@@ -184,7 +184,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         str_03_FN_zocalo =            "_FN_shiny_zocalo",
         str_04_MM_run_code =          "_MM_run_code",
         str_05_MM_output =            "_MM_output",
-        str_05_MM_output22 =            "_MM_output22",
+        str_05_MM_output22 =          "_MM_output22",
         str_06_MM_script =            "_MM_script"
 
       )
@@ -398,33 +398,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     observeEvent(THE_MODAL(),{
       
       if(THE_MODAL()){
-        # Mostrar el modal de carga
-        # Mostrar el modal de carga con un spinner
-        showModal(
-          modalDialog(
-            id = "miModalEspecifico",  # Asignar un ID al modal
-            title = "Procesando...",
-            # Definición CSS de la animación incluida directamente
-            tags$head(
-              tags$style("
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          ")
-            ),
-            tags$div(
-              style = "text-align: center;",
-              tags$div(
-                class = "spinner",
-                style = "border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto;"
-              ),
-              tags$p("Por favor, espere mientras se completan los cálculos.")
-            ),
-            footer = NULL,  # No incluir botones en el modal
-            easyClose = FALSE  # Evitar que el usuario cierre el modal manualmente
-          )
-        )
+       
       }
       
       if(!THE_MODAL()){
@@ -492,6 +466,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       if (!OK_ALL_ACTIVE()) {
         fn_shiny_apply_changes_reactiveValues(rv = active_R_OBJECTS, changes_list = default_structure)
       } else {
+        if(FALSE){
         showModal(
           modalDialog(
             id = "miModalEspecifico2",  # Asignar un ID al modal
@@ -517,7 +492,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
             easyClose = FALSE  # Evitar que el usuario cierre el modal manualmente
           )
         )
-        
+        }
       tryCatch({
         # Todo tu código principal aquí
   
@@ -559,7 +534,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         
         # Aquí capturamos *todo* error: muestre modal con el mensaje
         showModal(modalDialog(
-          title = "Error en el procesamiento",
+          title = paste0("Error en el procesamiento de: ", str_selected_modulo),
           paste("Ocurrió un error:", e$message),
           easyClose = TRUE,
           footer = modalButton("Cerrar")
