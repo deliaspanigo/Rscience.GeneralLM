@@ -13,31 +13,23 @@ Sbutton_03_variable_selector2_ui <- function(id) {
 
 
 #' @export
-Sbutton_03_variable_selector2_server <- function(id, my_list_str_rv, internal_DATASET_SELECTOR, 
-                                                 internal_TOOLS_SELECTOR, internal_VARIABLE_SELECTOR) {
+Sbutton_03_variable_selector2_server <- function(id, 
+                                                 internal_DATASET_SELECTOR, 
+                                                 internal_TOOLS_SELECTOR, 
+                                                 internal_STR, 
+                                                 internal_VARIABLE_SELECTOR) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
     
-    output_list_variable_selector_rv <- reactiveVal(NULL)
-    str_01_MM_variable_selector <- reactiveVal(NULL)
-    str_02_FN_validate_vars <- reactiveVal(NULL)
-    
-    str_server <- reactiveVal(NULL)
-    str_ui <- reactiveVal(NULL)
-    
-    # My button
+    # UI BUTTON
     button_state <- reactiveVal(NULL)
-    
     observe({
-      # req(my_list_str_rv())
-      button_state(internal_VARIABLE_SELECTOR$button_class)
-      
-      str_01_MM_variable_selector(my_list_str_rv()$"str_01_MM_variable_selector")
-      str_02_FN_validate_vars(my_list_str_rv()$"str_02_FN_validate_vars")
-    })
+      button_state(internal_VARIABLE_SELECTOR$"button_class")
+     })
     
     output$my_action_button <- renderUI({
+      # req(local_OK())
       # btn_class <- switch(button_state(),
       #                     "initial"   = "btn-primary",    # Azul inicial
       #                     "confirmed" = "btn-success",    # Verde después de confirmar
@@ -58,65 +50,104 @@ Sbutton_03_variable_selector2_server <- function(id, my_list_str_rv, internal_DA
       )
     })
     
+    #---------------------------------------------------------------------------
+    
+    
+    
+    
+    
+    # Button actions
+    local_OK <- reactive({
+      vector_all <- c(internal_STR$"check_output",
+                      internal_TOOLS_SELECTOR$"check_output")
+      
+      the_final <- all(vector_all)
+      the_final
+    })
+    
+    my_str_MM_server <- reactiveVal(NULL)
+    my_str_MM_ui <- reactiveVal(NULL)
+    my_str_FN <- reactiveVal(NULL)
+    local_id <- reactiveVal(NULL)
+    output_list_variable_selector_rv <- reactiveVal(NULL)
+    
+    observe({
+      req(local_OK())
+
+      mi_super_lista <- reactiveValuesToList(internal_STR) #print(paste0("AVER: ", internal_STR$"pack_output"$"vector_str"$"str_01_MM_variable_selector"))
+      
+      # Hardcoded --------------------------------------------------------------
+      my_df <- mi_super_lista$"pack_output"$"df_01_settings"
+      vector_short_names  <- my_df$"short_name"
+      vector_full_names   <- my_df$"resource_name"
+      str_local_id  <- "the_settings"
+      str_MM_server <- "MM_server"
+      str_MM_ui     <- "MM_ui"
+      str_FN        <- "FN_validate_vars"
+      # ------------------------------------------------------------------------
+      
+      # MM server
+      dt_str_MM_server    <- vector_short_names == str_MM_server
+      full_name_MM_server <- vector_full_names[dt_str_MM_server]
+      # print(full_name_MM_server)
+      
+      # MM ui
+      dt_str_MM_ui    <- vector_short_names == str_MM_ui
+      full_name_MM_ui <- vector_full_names[dt_str_MM_ui]
+      # print(full_name_MM_ui)
+      
+      # FN
+      dt_str_FN    <- vector_short_names == str_FN
+      full_name_FN <- vector_full_names[dt_str_FN]
+      
+      # Filling ReactiveValues
+      my_str_MM_server(full_name_MM_server)
+      my_str_MM_ui(full_name_MM_ui)
+      my_str_FN(full_name_FN)
+      local_id(str_local_id)
+    })
+    
+
+    
     # Usar str_01_MM_variable_selector dinámicamente
     observe({
-      req(str_01_MM_variable_selector())  # Asegurarse de que str_01_MM_variable_selector tenga un valor
-      req(internal_DATASET_SELECTOR)
+      req(local_OK())
+      req(my_str_MM_server())
       req(internal_DATASET_SELECTOR$"pack_output")
       req(internal_DATASET_SELECTOR$"pack_output"$"database")
       
-      new_server <- paste0(str_01_MM_variable_selector(), "_server")
-      new_ui <- paste0(str_01_MM_variable_selector(), "_ui")
+      my_dataset <- internal_DATASET_SELECTOR$"pack_output"$"database"
       
-      str_server(new_server)
-      str_ui(new_ui)
-      
-      args <- list(id = "the_selection", my_dataset = internal_DATASET_SELECTOR$"pack_output"$"database")
+      args <- list(id = "the_selection", 
+                   my_dataset = my_dataset)
 
-      vector_funciones <- ls("package:Rscience.GeneralLM")
+      # print(my_str_MM_server())
+      resultado <- do.call(my_str_MM_server(), args)
+      output_list_variable_selector_rv(resultado)
       
-      # Verificar si la función existe y ejecutarla
-      if (str_server() %in% vector_funciones ) {
-        resultado <- do.call(str_server(), args)
-        output_list_variable_selector_rv(resultado)
-        # print(resultado)  # Output: 5
-      } else {
-        print("La función no existe.")
-      }
-      
-      # # Construir la cadena de la función
-      # str_server <- paste0(
-      #   str_01_MM_variable_selector(), "_server",
-      #   '(id = "the_selection", my_dataset = internal_DATASET_SELECTOR$"pack_output"$"database")'
-      # )
-      # 
-      # # Ejecutar la función dinámicamente
-      # output_list_variable_selector_rv(eval(parse(text = str_server)))
+    
     })
     
     # Renderizar la UI del selector de variables
-    output$salida_general <- renderUI({
-      req(str_01_MM_variable_selector())  # Asegurarse de que str_01_MM_variable_selector tenga un valor
+    output$menu_show_output <- renderUI({
+      req(local_OK())
+      # print(local_OK())
+      
+      req(my_str_MM_ui())
+      # req(my_str_MM_ui())  # Asegurarse de que str_01_MM_variable_selector tenga un valor
+      # print(my_str_MM_ui())
       
       # str_ui(new_ui)
       args <- list(id = ns("the_selection"))
-      resultado <- do.call(str_ui(), args)
+      resultado <- do.call(my_str_MM_ui(), args)
       resultado
       
-      # # Construir la cadena de la función UI
-      # str_ui <- paste0(
-      #   str_01_MM_variable_selector(),  # Nombre de la función
-      #   '_ui(id = ns("the_selection"))'
-      # )
-      # 
-      # # Ejecutar la función dinámicamente
-      # eval(parse(text = str_ui))
+     
     })
     
-    # factor
-    # respuesta
-    # vector_selected_vars
-    # check_not_equal
+    
+    #---------------------------------------------------------------------------
+    
     
     # Selección de variables
     observeEvent(input$btn_variables, {
@@ -138,9 +169,7 @@ Sbutton_03_variable_selector2_server <- function(id, my_list_str_rv, internal_DA
       }
       
       
-      # Obtener las columnas disponibles en el dataset seleccionado
-      #columnas <- names(valores_internos$dataset_df)
-      
+     
       
       #columnas <- colnames(valores_internos$pack_import_dataset$"database")
       base_name <- internal_DATASET_SELECTOR$"pack_output"$"original_file_name"
@@ -195,7 +224,7 @@ Sbutton_03_variable_selector2_server <- function(id, my_list_str_rv, internal_DA
         ),
         div(
           style = "height: 100%; overflow-y: auto; padding: 15px;", 
-          uiOutput(ns("salida_general"))
+          uiOutput(ns("menu_show_output"))
         ),
         footer = tags$div(
           style = "display: flex; justify-content: center; width: 100%; gap: 10px;",
@@ -233,7 +262,7 @@ Sbutton_03_variable_selector2_server <- function(id, my_list_str_rv, internal_DA
       
       args <- list(output_list_variable_selector_rv = output_list_variable_selector_rv)
       # print(str_02_FN_validate_vars())
-      resultado <- do.call(str_02_FN_validate_vars(), args)
+      resultado <- do.call(my_str_FN(), args)
       resultado
         
       # resultado <- GeneralLM_fix_anova1_FN_validate_vars(output_list_variable_selector_rv = output_list_variable_selector_rv)
@@ -243,43 +272,7 @@ Sbutton_03_variable_selector2_server <- function(id, my_list_str_rv, internal_DA
         return()
       }
       
-      # vector_names_espected <- c("factor", "respuesta", "vector_selected_vars",
-      #                            "check_not_equal", "nrow_minidataset", "ncol_minidataset")
-      # 
-      # vector_names_espected <- unname(vector_names_espected)
-      # vector_names_observed <- names(variables_seleccionadas)
-      # vector_names_observed <- unname(vector_names_observed)
-      # 
-      # vector_cantidad_espected <- c(1, 1, 2, 1, 1, 1)
-      # vector_cantidad_observed <- sapply(variables_seleccionadas, length)
-      
-      # # print(vector_names_espected)
-      # # print(vector_names_observed)
-      # # Verificar que se haya seleccionado una opción válida
-      # if (!all(vector_names_espected == vector_names_observed)) {
-      #   #print(vector_names_espected == vector_names_observed)
-      #   internal_VARIABLE_SELECTOR$"pack_input"   = ""
-      #   internal_VARIABLE_SELECTOR$"check_input"  = FALSE
-      #   internal_VARIABLE_SELECTOR$"pack_output"  = ""
-      #   internal_VARIABLE_SELECTOR$"check_output" = FALSE
-      #   internal_VARIABLE_SELECTOR$"button_class" = "initial"
-      #   showNotification("Inconvenientes en la eleccion de Variables para ANOVA.", type = "warning")
-      #   return()  # No hacer nada si no se seleccionó nada
-      # }
-      # 
-      # # Verificar que se haya seleccionado una opción válida
-      # if (!all(vector_cantidad_espected == vector_cantidad_observed)) {
-      #   internal_VARIABLE_SELECTOR$"pack_input"   = ""
-      #   internal_VARIABLE_SELECTOR$"check_input"  = FALSE
-      #   internal_VARIABLE_SELECTOR$"pack_output"  = ""
-      #   internal_VARIABLE_SELECTOR$"check_output" = FALSE
-      #   internal_VARIABLE_SELECTOR$"button_class" = "initial"
-      #   showNotification("Inconvenientes en la eleccion de Variables para ANOVA.
-      #                    No coincide la cantidad de elementos.", type = "warning")
-      #   return()  # No hacer nada si no se seleccionó nada
-      # }
-      # 
-      # 
+    
       
       fn_shiny_apply_changes_reactiveValues(rv = internal_VARIABLE_SELECTOR, list(
         "pack_input"   = resultado$output_list,
@@ -288,60 +281,11 @@ Sbutton_03_variable_selector2_server <- function(id, my_list_str_rv, internal_DA
         "check_output" = resultado$status,
         "button_class" = "confirmed"))
       
-      # internal_VARIABLE_SELECTOR$"pack_input"   = variables_seleccionadas
-      # internal_VARIABLE_SELECTOR$"check_input"  = TRUE
-      # internal_VARIABLE_SELECTOR$"pack_output"  = variables_seleccionadas
-      # internal_VARIABLE_SELECTOR$"check_output" = TRUE
-      # internal_VARIABLE_SELECTOR$"button_class" = "confirmed"
-      
-      # # Guardar las variables seleccionadas
-      # valores_internos$pack_var_selection         <- variables_seleccionadas
-      # valores_internos$check_var_selection        <- TRUE
-      # valores_internos$button_class_var_selection <- "confirmed"
-      
-      
-      if(FALSE){
-        # Cambiar el color del botón usando jQuery para asegurar que funcione
-        runjs(sprintf("$('#%s').css('border', 'none');", ns("btn_variables")))
-        runjs(sprintf("$('#%s').removeClass('btn-primary').addClass('btn-success');", ns("btn_variables")))
-        
-        showNotification(
-          ui = tags$div(
-            style = "background-color: #d1e7dd; color: #0f5132; font-size: 15px; font-weight: bold; padding: 10px; border-radius: 4px; border-left: 5px solid #0f5132; display: flex; align-items: center;",
-            tags$i(
-              class = "fa fa-check-circle",
-              style = "font-size: 50px; margin-right: 5px;"  # Tamaño de ícono más grande
-            ),
-            "Variables seleccionadas exitosamente."
-          ),
-          duration = 3,
-          closeButton = TRUE
-        )
-        
-        
-        
-        # showNotification(
-        #   ui = tags$div(
-        #     style = "background-color: #d1e7dd; color: #0f5132; font-size: 15px; font-weight: bold; padding: 10px; border-radius: 4px; border-left: 5px solid #0f5132;",
-        #     icon("check-circle"), "Variables seleccionadas exitosamente."
-        #   ),
-        #   duration = 15,
-        #   closeButton = TRUE
-        # )
-        
-        #showNotification("Variables seleccionadas.", type = "default")
-        
-      }
+
       removeModal()
     })
     
     return(NULL)
-    # Función para restablecer este botón (accesible desde el exterior)
-    # return(list(
-    #   reset = function() {
-    #     runjs(sprintf("$('#%s').css('border', 'none');", ns("btn_variables")))
-    #     runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", ns("btn_variables")))
-    #   }
-    # ))
+   
   })
 }

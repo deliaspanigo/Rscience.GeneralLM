@@ -11,7 +11,11 @@ Sbutton_02_tools2_ui <- function(id) {
 }
 
 #' @export
-Sbutton_02_tools2_server <- function(id, internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR) {
+Sbutton_02_tools2_server <- function(id, 
+                                     default_structure, 
+                                     internal_DATASET_SELECTOR, 
+                                     internal_TOOLS_SELECTOR, 
+                                     internal_PLAY_SELECTOR) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
@@ -167,6 +171,10 @@ Sbutton_02_tools2_server <- function(id, internal_DATASET_SELECTOR, internal_TOO
       #   showNotification("Por favor, seleccione una base de datos.", type = "warning")
       #   return()  # No hacer nada si no se seleccionó nada
       # }
+      
+      
+      fn_shiny_apply_changes_reactiveValues(rv = internal_PLAY_SELECTOR, default_structure)
+      
       
       obj_intermedio <- list_user_tool_selection()
       

@@ -23,9 +23,11 @@ Sbutton_reset2_ui <- function(id) {
 }
 
 #' @export
-Sbutton_reset2_server <- function(id, default_structure, 
+Sbutton_reset2_server <- function(id, 
+                                  default_structure, 
                                   internal_DATASET_SELECTOR,  active_DATASET_SELECTOR,
                                   internal_TOOLS_SELECTOR,    active_TOOLS_SELECTOR,
+                                  internal_STR,               active_STR,
                                   internal_VARIABLE_SELECTOR, active_VARIABLE_SELECTOR,
                                   internal_PLAY_SELECTOR,     active_PLAY_SELECTOR) {
   moduleServer(id, function(input, output, session) {
@@ -54,29 +56,16 @@ Sbutton_reset2_server <- function(id, default_structure,
       fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, default_structure)
       fn_shiny_apply_changes_reactiveValues(rv = active_TOOLS_SELECTOR, default_structure)
       
+      fn_shiny_apply_changes_reactiveValues(rv = internal_STR, default_structure)
+      fn_shiny_apply_changes_reactiveValues(rv = active_STR, default_structure)
+      
       fn_shiny_apply_changes_reactiveValues(rv = internal_VARIABLE_SELECTOR, default_structure)
       fn_shiny_apply_changes_reactiveValues(rv = active_VARIABLE_SELECTOR, default_structure)
       
       fn_shiny_apply_changes_reactiveValues(rv = internal_PLAY_SELECTOR, default_structure)
       fn_shiny_apply_changes_reactiveValues(rv = active_PLAY_SELECTOR, default_structure)
       
-      # # Restaurar todos los valores_internos a los predeterminados
-      # for (nombre in names(default_structure)) {
-      #   internal_DATASET_SELECTOR[[nombre]] <- default_structure[[nombre]]
-      #   active_DATASET_SELECTOR[[nombre]]   <- default_structure[[nombre]]
-      #   
-      #   internal_TOOLS_SELECTOR[[nombre]] <- default_structure[[nombre]]
-      #   active_TOOLS_SELECTOR[[nombre]]   <- default_structure[[nombre]]
-      #   
-      #   internal_PLAY_SELECTOR[[nombre]] <- default_structure[[nombre]]
-      #   active_PLAY_SELECTOR[[nombre]]   <- default_structure[[nombre]]
-      #   #valores_activos[[nombre]]  <- default_structure[[nombre]]
-      # }
-      
-      # # Llamar a todos los callbacks de reseteo
-      # for (callback in reset_callbacks) {
-      #   callback()
-      # }
+     
       
       # Mostrar mensaje de éxito
       showNotification(
@@ -92,7 +81,9 @@ Sbutton_reset2_server <- function(id, default_structure,
 
         fn_shiny_apply_changes_reactiveValues(rv = active_TOOLS_SELECTOR, default_structure)
         fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, default_structure)
-
+        
+        fn_shiny_apply_changes_reactiveValues(rv = internal_STR, default_structure)
+        fn_shiny_apply_changes_reactiveValues(rv = active_STR, default_structure)
     })
     
     # 

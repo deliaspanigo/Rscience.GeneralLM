@@ -11,9 +11,10 @@ Sbutton_play2_ui <- function(id) {
 
 #' @export
 Sbutton_play2_server <- function(id, 
-                                 default_structure,
+                                 default_structure, 
                                  internal_DATASET_SELECTOR,  active_DATASET_SELECTOR,
                                  internal_TOOLS_SELECTOR,    active_TOOLS_SELECTOR,
+                                 internal_STR,               active_STR,
                                  internal_VARIABLE_SELECTOR, active_VARIABLE_SELECTOR,
                                  internal_PLAY_SELECTOR,     active_PLAY_SELECTOR) {
   moduleServer(id, function(input, output, session) {
@@ -35,6 +36,7 @@ Sbutton_play2_server <- function(id,
 
         fn_shiny_apply_changes_reactiveValues(rv = active_DATASET_SELECTOR,  changes_list = default_structure)
         fn_shiny_apply_changes_reactiveValues(rv = active_TOOLS_SELECTOR,    changes_list = default_structure)
+        fn_shiny_apply_changes_reactiveValues(rv = active_STR,               changes_list = default_structure)
         fn_shiny_apply_changes_reactiveValues(rv = active_VARIABLE_SELECTOR, changes_list = default_structure)
         # fn_shiny_apply_changes_reactiveValues(rv = active_PLAY_SELECTOR,     changes_list = default_structure)
 
@@ -159,6 +161,7 @@ Sbutton_play2_server <- function(id,
         
         fn_shiny_apply_changes_reactiveValues(rv = active_DATASET_SELECTOR,  changes_list = internal_DATASET_SELECTOR)
         fn_shiny_apply_changes_reactiveValues(rv = active_TOOLS_SELECTOR,    changes_list = internal_TOOLS_SELECTOR)
+        fn_shiny_apply_changes_reactiveValues(rv = active_STR,               changes_list = internal_STR)
         fn_shiny_apply_changes_reactiveValues(rv = active_VARIABLE_SELECTOR, changes_list = internal_VARIABLE_SELECTOR)
         fn_shiny_apply_changes_reactiveValues(rv = active_PLAY_SELECTOR,     changes_list = internal_PLAY_SELECTOR)
         
@@ -185,13 +188,7 @@ Sbutton_play2_server <- function(id,
     })
       
       
-      # Función para restablecer este botón (accesible desde el exterior)
-      # return(list(
-      #   reset = function() {
-      #     #runjs(sprintf("$('#%s').css('border', 'none');", ns("btn_play")))
-      #     runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", ns("btn_play")))
-      #   }
-      # ))
+    
       
     })
   }

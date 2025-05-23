@@ -16,7 +16,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
     
     
     OK_ALL_ACTIVE <- reactive({
-      req(mis_valores())
+      req(mis_valores(), active_TOOLS_SELECTOR, active_TOOLS_SELECTOR$"check_output")
       
       return(TRUE)
       
@@ -368,7 +368,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
     
     
     output$el_cartel <- renderUI({
-      
+      OK_ALL_ACTIVE()
       # internal_TOOLS_SELECTOR$ $selected_cartel
       mi_cartel <- active_TOOLS_SELECTOR$"pack_output"$selected_cartel
       fn_html_cartel(my_text = mi_cartel)
