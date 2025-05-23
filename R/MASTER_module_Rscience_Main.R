@@ -249,12 +249,22 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       df_04_ORRS$"resource_exists" <- df_04_ORRS$"resource_name" %in% vector_pk_fn_vector
       check_04_ORRS <- all(df_04_ORRS$"resource_exists")
       # ------------------------------------------------------------------------
-      
+      #
+      # 04) Output R Results on Shiny (ORRS)
+      df_05_theory <- data.frame(
+        "short_name" = c("MM_server", "MM_ui"),
+        "str_end_file" = c("_MM_theory_server",
+                           "_MM_theory_ui")
+      )
+      df_05_theory$"resource_name"   <- paste0(str_selected_tool, df_05_theory$"str_end_file")
+      df_05_theory$"resource_exists" <- df_05_theory$"resource_name" %in% vector_pk_fn_vector
+      check_05_theory <- all(df_05_theory$"resource_exists")
+      # ------------------------------------------------------------------------
       
     
       
     check_all_fn <- all(check_01_settings, check_02_ZSV, 
-                        check_03_RRC, check_04_ORRS)
+                        check_03_RRC, check_04_ORRS, check_05_theory)
       
     output_list <- list(
       "df_01_settings" = df_01_settings,
@@ -265,7 +275,8 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       "check_03_RRC" = check_03_RRC,
       "df_04_ORRS" = df_04_ORRS,
       "check_04_ORRS" = check_04_ORRS,
-      
+      "df_05_theory" = df_05_theory,
+      "check_05_theory" = check_05_theory,
       "check_all_fn" = check_all_fn
       
       )
@@ -399,6 +410,8 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
     })
     
+    ############################################################################
+    
     # Card 02) "user_selection"
     output$card02_user_selection <- renderUI({
       div(
@@ -513,7 +526,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
     })
     
-  
+    ############################################################################
     # Crystal01 - the_R_objects
     # AQUI ESTAN LAS SALIDAS ESTADISTICAS!!!!
     default_R_OBJECTS <- list(
@@ -603,7 +616,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         # And my objects!!!!!!!!
         #
         ### args...
-          args <- list(
+          args_server <- list(
             id = str_local_id, 
             show_dev = FALSE,
             active_DATASET_SELECTOR, 
@@ -614,7 +627,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         #  
         ### Run Run Run
         the_results <- NULL
-        the_results <- do.call(my_str_MM_server, args)
+        the_results <- do.call(my_str_MM_server, args_server)
         
         ### Saving results on active_R_OBJECTS
         if (!is.null(the_results)) {
@@ -751,54 +764,8 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     ############################################################################
 
   
-    if(FALSE){
-    observe({
-      req(OK_ALL_ACTIVE())
-      # req(my_list_str_rv())
-      
-      req(internal_STR$"check_output")
-      mi_super_lista <- reactiveValuesToList(internal_STR) #print(paste0("AVER: ", internal_STR$"pack_output"$"vector_str"$"str_01_MM_variable_selector"))
-      
-      # ----------------------------------------------------------------------
-      #
-      # Hardcoded
-      my_df <- mi_super_lista$"pack_output"$"df_04_ORRS"
-      vector_short_names  <- my_df$"short_name"
-      vector_full_names   <- my_df$"resource_name"
-      str_local_id  <- "the_04_ORRS"
-      str_MM_server <- "MM_server"
-      str_MM_ui     <- "MM_ui"
-      #-----------------------------------------------------------------------
-      #
-      # server and ui
-      ### MM server
-      dt_str_MM_server    <- vector_short_names == str_MM_server
-      full_name_MM_server <- vector_full_names[dt_str_MM_server]
-      my_str_MM_server    <- full_name_MM_server
-      
-      ### MM ui
-      dt_str_MM_ui     <- vector_short_names == str_MM_ui
-      full_name_MM_ui  <- vector_full_names[dt_str_MM_ui]
-      my_str_MM_ui <- full_name_MM_ui
-      #-----------------------------------------------------------------------
-      #
-      ### ARGs
-      args <- list(id = str_local_id, 
-                   show_dev = FALSE,
-                   mis_valores = reactive(active_R_OBJECTS$"pack_output"),
-                   active_TOOLS_SELECTOR = active_TOOLS_SELECTOR
-      )
-      
-      ### Running server module - 04 - ORRS (Output R Results Shiny)
-      do.call(my_str_MM_server, args)
-      
-      args <- list(id = ns(str_local_id))
-      resultado <- do.call(my_str_MM_ui, args)
-      resultado
-    })
-    }
-    
-    # # Renderizar la UI del selector de variables
+    # # Render 04 - ORRS (output R Results Shiny)
+    # Rendedir server and ui modules inside of renderUI!!!!!!
     output$card05_output<- renderUI({
       req(OK_ALL_ACTIVE())
       # req(my_list_str_rv())
@@ -830,37 +797,81 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       #-----------------------------------------------------------------------
       #
       ### ARGs
-      args <- list(id = str_local_id, 
+      args_server <- list(id = str_local_id, 
                    show_dev = FALSE,
                    mis_valores = reactive(active_R_OBJECTS$"pack_output"),
                    active_TOOLS_SELECTOR = active_TOOLS_SELECTOR
       )
       
       ### Running server module - 04 - ORRS (Output R Results Shiny)
-      do.call(my_str_MM_server, args)
+      do.call(my_str_MM_server, args_server)
       
-      args <- list(id = ns(str_local_id))
-      resultado <- do.call(my_str_MM_ui, args)
-      resultado
-    })
-    if(FALSE){
-    output$card05_output<- renderUI({
-      req(OK_ALL_ACTIVE())
-      req(my_list_str_rv())
-      
-      str_selected_modulo <- my_list_str_rv()$"str_05_MM_output"
-      new_modulo_ui <- paste0(str_selected_modulo, "_ui")
-      new_id <- "the_output"
-      
-      # print(new_modulo_ui)
-      args <- list(id = ns(new_id))
+      ### Running ui module - 04 - ORRS (Output R Results Shiny)
+      args_ui <- list(id = ns(str_local_id))
+      the_rendered_iu <- do.call(my_str_MM_ui, args_ui)
       
       div(
-        style = "height: 100%;",  # Altura del contenedor (100% del contenedor padre)
-        do.call(new_modulo_ui, args)  # Altura del contenido (100% del contenedor padre)
+        style = "height: 100%;",  
+        the_rendered_iu  
       )
     })
-    }
+ 
+    ############################################################################
+    
+    # # Render 05 - Theory (output R Results Shiny)
+    # Rendedir server and ui modules inside of renderUI!!!!!!
+    output$card05_output22<- renderUI({
+      req(OK_ALL_ACTIVE())
+      # req(my_list_str_rv())
+      
+      req(internal_STR$"check_output")
+      mi_super_lista <- reactiveValuesToList(internal_STR) #print(paste0("AVER: ", internal_STR$"pack_output"$"vector_str"$"str_01_MM_variable_selector"))
+      
+      # ----------------------------------------------------------------------
+      #
+      # Hardcoded master
+      my_pack_name  <- "df_05_theory"
+      str_local_id  <- "the_05_theory"
+      #
+      # Hardcoded basics
+      my_df <- mi_super_lista$"pack_output"[[my_pack_name]]
+      vector_short_names  <- my_df$"short_name"
+      vector_full_names   <- my_df$"resource_name"
+      str_MM_server <- "MM_server"
+      str_MM_ui     <- "MM_ui"
+      #-----------------------------------------------------------------------
+      #
+      # server and ui
+      ### MM server
+      dt_str_MM_server    <- vector_short_names == str_MM_server
+      full_name_MM_server <- vector_full_names[dt_str_MM_server]
+      my_str_MM_server    <- full_name_MM_server
+      
+      ### MM ui
+      dt_str_MM_ui     <- vector_short_names == str_MM_ui
+      full_name_MM_ui  <- vector_full_names[dt_str_MM_ui]
+      my_str_MM_ui     <- full_name_MM_ui
+      #-----------------------------------------------------------------------
+      #
+      ### ARGs
+      args_server <- list(id = str_local_id, 
+                   show_dev = FALSE,
+                   mis_valores = reactive(active_R_OBJECTS$"pack_output")
+      )
+      
+      ### Running server module - 04 - ORRS (Output R Results Shiny)
+      do.call(my_str_MM_server, args_server)
+      
+      ### Running ui module - 04 - ORRS (Output R Results Shiny)
+      args_ui <- list(id = ns(str_local_id))
+      the_rendered_iu <- do.call(my_str_MM_ui, args_ui)
+      
+      div(
+        style = "height: 100%;",  
+        the_rendered_iu  
+      )
+    })
+    
     ############################################################################
     
     if(FALSE){

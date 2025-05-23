@@ -1,6 +1,6 @@
 
 #' @export
-GeneralLM_fix_slinreg_MM_output22_ui <- function(id) {
+GeneralLM_fix_anova1_MM_theory_ui <- function(id) {
   ns <- NS(id)
   
   uiOutput(ns("SUPER_OUTPUT"))
@@ -9,7 +9,7 @@ GeneralLM_fix_slinreg_MM_output22_ui <- function(id) {
 }
 
 #' @export
-GeneralLM_fix_slinreg_MM_output22_server <- function(id, show_dev, 
+GeneralLM_fix_anova1_MM_theory_server <- function(id, show_dev, 
                                                   mis_valores) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
