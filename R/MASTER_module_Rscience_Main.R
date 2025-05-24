@@ -250,7 +250,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       check_04_ORRS <- all(df_04_ORRS$"resource_exists")
       # ------------------------------------------------------------------------
       #
-      # 04) Output R Results on Shiny (ORRS)
+      # 05) Theory
       df_05_theory <- data.frame(
         "short_name" = c("MM_server", "MM_ui"),
         "str_end_file" = c("_MM_theory_server",
@@ -260,11 +260,23 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       df_05_theory$"resource_exists" <- df_05_theory$"resource_name" %in% vector_pk_fn_vector
       check_05_theory <- all(df_05_theory$"resource_exists")
       # ------------------------------------------------------------------------
+      #
+      # 06) Script
+      df_06_script <- data.frame(
+        "short_name" = c("MM_server", "MM_ui"),
+        "str_end_file" = c("_MM_script_server",
+                           "_MM_script_ui")
+      )
+      df_06_script$"resource_name"   <- paste0(str_selected_tool, df_06_script$"str_end_file")
+      df_06_script$"resource_exists" <- df_05_theory$"resource_name" %in% vector_pk_fn_vector
+      check_06_script <- all(df_06_script$"resource_exists")
+      # ------------------------------------------------------------------------
       
     
       
     check_all_fn <- all(check_01_settings, check_02_ZSV, 
-                        check_03_RRC, check_04_ORRS, check_05_theory)
+                        check_03_RRC, check_04_ORRS, check_05_theory,
+                        check_06_script)
       
     output_list <- list(
       "df_01_settings" = df_01_settings,
@@ -277,6 +289,9 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       "check_04_ORRS" = check_04_ORRS,
       "df_05_theory" = df_05_theory,
       "check_05_theory" = check_05_theory,
+      "df_06_script" = df_06_script,
+      "check_06_script" = check_06_script,
+      
       "check_all_fn" = check_all_fn
       
       )
@@ -766,7 +781,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
   
     # # Render 04 - ORRS (output R Results Shiny)
     # Rendedir server and ui modules inside of renderUI!!!!!!
-    output$card05_output<- renderUI({
+    output$card05_output <- renderUI({
       req(OK_ALL_ACTIVE())
       # req(my_list_str_rv())
       
@@ -820,7 +835,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     # # Render 05 - Theory (output R Results Shiny)
     # Rendedir server and ui modules inside of renderUI!!!!!!
-    output$card05_output22<- renderUI({
+    output$card05_output22 <- renderUI({
       req(OK_ALL_ACTIVE())
       # req(my_list_str_rv())
       
@@ -873,116 +888,66 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     })
     
     ############################################################################
-    
-    if(FALSE){
-    observe({
-      req(OK_ALL_ACTIVE())
-      req(my_list_str_rv())
-      str_selected_modulo <- my_list_str_rv()$"str_05_MM_output22"
-      new_server <- paste0(str_selected_modulo, "_server")
-      new_ui <- paste0(str_selected_modulo, "_ui")
-      new_id <- "the_output22"
-      
-      args <- list(id = new_id, show_dev = FALSE,
-                   mis_valores = reactive(active_R_OBJECTS$"pack_output"))
-      
-      vector_funciones <- ls("package:Rscience.GeneralLM")
-      check_in <- new_server %in% vector_funciones
-      # print(check_in)
-      
-      # print(str_server())
-      # Verificar si la función existe y ejecutarla
-      if (check_in) {
-        do.call(new_server, args)
-        # print(resultado)  # Output: 5
-      } else {
-        print("El modulo no existe.")
-      }
-      
-      
-    })
-    
-    
-    # # Renderizar la UI del selector de variables
-    output$card05_output22<- renderUI({
-      req(OK_ALL_ACTIVE())
-      req(my_list_str_rv())
-      
-      str_selected_modulo <- my_list_str_rv()$"str_05_MM_output22"
-      new_modulo_ui <- paste0(str_selected_modulo, "_ui")
-      new_id <- "the_output22"
-      
-      # print(new_modulo_ui)
-      args <- list(id = ns(new_id))
-      
-      div(
-        style = "height: 100%;",  # Altura del contenedor (100% del contenedor padre)
-        do.call(new_modulo_ui, args)  # Altura del contenido (100% del contenedor padre)
-      )
-    })
-  
-    
-    ############################################################################
-  
     active_R_CODE   <- do.call(reactiveValues, default_structure)
-      
     
-    
-    observe({
-      req(OK_ALL_ACTIVE())
-      req(my_list_str_rv())
-      str_selected_modulo <- my_list_str_rv()$"str_06_MM_script"
-      new_server <- paste0(str_selected_modulo, "_server")
-      new_ui <- paste0(str_selected_modulo, "_ui")
-      new_id <- "the_script"
-      
-      # print(new_server)
-      # str_server(new_server)
-      # str_ui(new_ui)
-      # my_id(new_id)
-      args <- list(id = new_id, show_dev = FALSE,
-                   active_DATASET_SELECTOR, 
-                   active_TOOLS_SELECTOR,
-                   active_VARIABLE_SELECTOR,
-                   active_PLAY_SELECTOR,
-                   active_R_CODE)
-      
-      vector_funciones <- ls("package:Rscience.GeneralLM")
-      check_in <- new_server %in% vector_funciones
-      # print(check_in)
-      
-      # print(str_server())
-      # Verificar si la función existe y ejecutarla
-      if (check_in) {
-        do.call(new_server, args)
-        # print(resultado)  # Output: 5
-      } else {
-        print("El modulo no existe.")
-      }
-      
-      
-    })
-    
-    
-    # # Renderizar la UI del selector de variables
     output$card06_script <- renderUI({
       req(OK_ALL_ACTIVE())
-      req(my_list_str_rv())
+      # req(my_list_str_rv())
       
-      str_selected_modulo <- my_list_str_rv()$"str_06_MM_script"
-      new_modulo_ui <- paste0(str_selected_modulo, "_ui")
-      new_id <- "the_script"
+      req(internal_STR$"check_output")
+      mi_super_lista <- reactiveValuesToList(internal_STR) #print(paste0("AVER: ", internal_STR$"pack_output"$"vector_str"$"str_01_MM_variable_selector"))
       
-      # print(new_modulo_ui)
-      args <- list(id = ns(new_id))
+      # ----------------------------------------------------------------------
+      #
+      # Hardcoded master
+      my_pack_name  <- "df_06_script"
+      str_local_id  <- "the_06_script"
+      #
+      # Hardcoded basics
+      my_df <- mi_super_lista$"pack_output"[[my_pack_name]]
+      vector_short_names  <- my_df$"short_name"
+      vector_full_names   <- my_df$"resource_name"
+      str_MM_server <- "MM_server"
+      str_MM_ui     <- "MM_ui"
+      #-----------------------------------------------------------------------
+      #
+      # server and ui
+      ### MM server
+      dt_str_MM_server    <- vector_short_names == str_MM_server
+      full_name_MM_server <- vector_full_names[dt_str_MM_server]
+      my_str_MM_server    <- full_name_MM_server
+      
+      ### MM ui
+      dt_str_MM_ui     <- vector_short_names == str_MM_ui
+      full_name_MM_ui  <- vector_full_names[dt_str_MM_ui]
+      my_str_MM_ui     <- full_name_MM_ui
+      #-----------------------------------------------------------------------
+      #
+      ### ARGs
+      args_server <- list(id = str_local_id, 
+                          show_dev = FALSE,
+                          active_DATASET_SELECTOR, 
+                          active_TOOLS_SELECTOR,
+                          active_VARIABLE_SELECTOR,
+                          active_PLAY_SELECTOR,
+                          active_R_CODE
+      )
+      
+      ### Running server module - 04 - ORRS (Output R Results Shiny)
+      do.call(my_str_MM_server, args_server)
+      
+      ### Running ui module - 04 - ORRS (Output R Results Shiny)
+      args_ui <- list(id = ns(str_local_id))
+      the_rendered_iu <- do.call(my_str_MM_ui, args_ui)
       
       div(
-        style = "height: 100%;",  # Altura del contenedor (100% del contenedor padre)
-        do.call(new_modulo_ui, args)  # Altura del contenido (100% del contenedor padre)
+        style = "height: 100%;",  
+        the_rendered_iu  
       )
     })
-    
-    
+   
+    if(FALSE){
+   
     
     ############################################################################
     
