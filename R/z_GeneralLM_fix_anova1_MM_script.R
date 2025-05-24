@@ -46,15 +46,15 @@ GeneralLM_fix_anova1_MM_script_server <- function(id, show_dev,
       
       str_import      <- active_DATASET_SELECTOR$"pack_output"$"str_import_external"
       var_name_factor <- active_VARIABLE_SELECTOR$"pack_output"$"factor" #valores_internos_list$pack_var_selection$"factor"
-      var_name_vr     <- active_VARIABLE_SELECTOR$"pack_output"$"respuesta"  #     #valores_internos_list$pack_var_selection$"respuesta"
+      var_name_rv     <- active_VARIABLE_SELECTOR$"pack_output"$"respuesta"  #     #valores_internos_list$pack_var_selection$"respuesta"
       alpha_value     <- active_VARIABLE_SELECTOR$"pack_output"$"alpha_value"
       
       the_code   <- Rcode_original()
-      the_code   <- sub(pattern = "_my_import_sentence_", replacement = str_import, x = the_code)
+      the_code   <- sub(pattern = "_A_my_import_sentence_A_", replacement = str_import, x = the_code)
       the_code   <- gsub(pattern = "#---", replacement = "", x = the_code)
-      the_code   <- sub(pattern = "_var_name_factor_", replacement = var_name_factor, x = the_code)
-      the_code   <- sub(pattern = "_var_name_vr_", replacement = var_name_vr, x = the_code)
-      the_code   <- sub(pattern = "_alpha_value_", replacement = alpha_value, x = the_code)
+      the_code   <- sub(pattern = "_B_var_name_factor_B_", replacement = var_name_factor, x = the_code)
+      the_code   <- sub(pattern = "_B_var_name_rv_B_", replacement = var_name_rv, x = the_code)
+      the_code   <- sub(pattern = "_B_alpha_value_B_", replacement = alpha_value, x = the_code)
       the_code
       
     })
@@ -64,15 +64,15 @@ GeneralLM_fix_anova1_MM_script_server <- function(id, show_dev,
       
       str_import      <- active_DATASET_SELECTOR$"pack_output"$"str_import_internal"
       var_name_factor <- active_VARIABLE_SELECTOR$"pack_output"$"factor" #valores_internos_list$pack_var_selection$"factor"
-      var_name_vr     <- active_VARIABLE_SELECTOR$"pack_output"$"respuesta"  #     #valores_internos_list$pack_var_selection$"respuesta"
+      var_name_rv     <- active_VARIABLE_SELECTOR$"pack_output"$"respuesta"  #     #valores_internos_list$pack_var_selection$"respuesta"
       alpha_value     <- active_VARIABLE_SELECTOR$"pack_output"$"alpha_value"
       
       the_code   <- Rcode_original()
-      the_code   <- sub(pattern = "_my_import_sentence_", replacement = str_import, x = the_code)
+      the_code   <- sub(pattern = "_A_my_import_sentence_A_", replacement = str_import, x = the_code)
       the_code   <- gsub(pattern = "#---", replacement = "", x = the_code)
-      the_code   <- sub(pattern = "_var_name_factor_", replacement = var_name_factor, x = the_code)
-      the_code   <- sub(pattern = "_var_name_vr_", replacement = var_name_vr, x = the_code)
-      the_code   <- sub(pattern = "_alpha_value_", replacement = alpha_value, x = the_code)
+      the_code   <- sub(pattern = "_B_var_name_factor_B_", replacement = var_name_factor, x = the_code)
+      the_code   <- sub(pattern = "_B_var_name_rv_B_", replacement = var_name_rv, x = the_code)
+      the_code   <- sub(pattern = "_B_alpha_value_B_", replacement = alpha_value, x = the_code)
       the_code
       
     })

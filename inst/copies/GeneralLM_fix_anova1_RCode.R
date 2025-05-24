@@ -1,6 +1,6 @@
 
 #' @export
-GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, alpha_value){
+GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, alpha_value){
   
   
   # # # # # Section 01 - Libraries ---------------------------------------------
@@ -13,19 +13,19 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, a
   library("plotly")    # Advanced graphical functions
   
   # # # # # Section 02 - Import dataset ----------------------------------------
-  #---database <- _my_import_sentence_
+  #---database <- _A_my_import_sentence_A_
   head(x = database, n = 5)
   
   # # # # # Section 03 - Settings ----------------------------------------------
-  #---var_name_vr     <- "_var_name_vr_"
-  #---var_name_factor <- "_var_name_factor_"
-  #---alpha_value     <- _alpha_value_
+  #---var_name_rv     <- "_B_var_name_rv_B_"
+  #---var_name_factor <- "_B_var_name_factor_B_"
+  #---alpha_value     <- _B_alpha_value_B_
   
   # # # # # Section 04 - Settings ----------------------------------------------
   database[,var_name_factor] <- as.factor(as.character(database[,var_name_factor]))
   confidence_value <- 1 - alpha_value
   vector_all_var_names <- colnames(database)
-  vector_name_selected_vars <- c(var_name_vr, var_name_factor)
+  vector_name_selected_vars <- c(var_name_rv, var_name_factor)
   vector_rol_vars <- c("VR", "FACTOR")
   
   
@@ -209,7 +209,7 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, a
   df_summary_anova <- data.frame(
     "test" = c("Shapiro-Wilk test", "Bartlett test", "Anova 1 way"),
     "aim"  = c("Normality", "Homogeneity", "Mean"),
-    "variable"    = c("residuals", "residuals", var_name_vr),
+    "variable"    = c("residuals", "residuals", var_name_rv),
     "p_value"     = vector_p_value,
     "alpha_value" = c(alpha_value, alpha_value, alpha_value),
     "Decision"    = vector_ho_decision
@@ -1285,8 +1285,7 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_vr, a
   # Mostrar el gráfico
   plot010_residuals
   
-  
-  
+  #####---
   
   #._ Capturar todos los objetos del entorno actual
   ._obj_names <- ls()
