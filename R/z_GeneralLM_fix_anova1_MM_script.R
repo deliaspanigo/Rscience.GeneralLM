@@ -45,8 +45,8 @@ GeneralLM_fix_anova1_MM_script_server <- function(id, show_dev,
       req(OK_ALL_ACTIVE(), Rcode_original())
       
       str_import      <- active_DATASET_SELECTOR$"pack_output"$"str_import_external"
-      var_name_factor <- active_VARIABLE_SELECTOR$"pack_output"$"factor" #valores_internos_list$pack_var_selection$"factor"
-      var_name_rv     <- active_VARIABLE_SELECTOR$"pack_output"$"respuesta"  #     #valores_internos_list$pack_var_selection$"respuesta"
+      var_name_factor <- active_VARIABLE_SELECTOR$"pack_output"$"var_name_factor" #valores_internos_list$pack_var_selection$"factor"
+      var_name_rv     <- active_VARIABLE_SELECTOR$"pack_output"$"var_name_rv"  #     #valores_internos_list$pack_var_selection$"respuesta"
       alpha_value     <- active_VARIABLE_SELECTOR$"pack_output"$"alpha_value"
       
       the_code   <- Rcode_original()
@@ -63,8 +63,8 @@ GeneralLM_fix_anova1_MM_script_server <- function(id, show_dev,
       req(OK_ALL_ACTIVE(), Rcode_original())
       
       str_import      <- active_DATASET_SELECTOR$"pack_output"$"str_import_internal"
-      var_name_factor <- active_VARIABLE_SELECTOR$"pack_output"$"factor" #valores_internos_list$pack_var_selection$"factor"
-      var_name_rv     <- active_VARIABLE_SELECTOR$"pack_output"$"respuesta"  #     #valores_internos_list$pack_var_selection$"respuesta"
+      var_name_factor <- active_VARIABLE_SELECTOR$"pack_output"$"var_name_factor" #valores_internos_list$pack_var_selection$"factor"
+      var_name_rv     <- active_VARIABLE_SELECTOR$"pack_output"$"var_name_rv"  #     #valores_internos_list$pack_var_selection$"respuesta"
       alpha_value     <- active_VARIABLE_SELECTOR$"pack_output"$"alpha_value"
       
       the_code   <- Rcode_original()

@@ -21,11 +21,11 @@ GeneralLM_fix_anova1_FN_validate_vars <- function(output_list_variable_selector_
   # }
   
   vector_observado <- names(output_list)
-  vector_esperado <- c("factor", "respuesta", "vector_selected_vars",
-                "check_not_equal", "nrow_minidataset", "ncol_minidataset")
+  vector_esperado <- c("var_name_factor", "var_name_rv", "vector_selected_vars",
+                "check_not_equal", "nrow_minidataset", "ncol_minidataset",
+                "alpha_value", "external_alpha_value")
   
-  # print(vector_observado)
-  # print(vector_esperado)
+
   
   if (!all(vector_esperado %in% vector_observado)) {
     return(list(
@@ -35,6 +35,8 @@ GeneralLM_fix_anova1_FN_validate_vars <- function(output_list_variable_selector_
   }
   ##############################################################################
   
-  
-  return(list(status = TRUE, output_list = output_list))
+  output_list <- list(status = TRUE, output_list = output_list)
+  # print("FUNCION DE VALIDACION")
+  # print(output_list)
+  return(output_list)
 }

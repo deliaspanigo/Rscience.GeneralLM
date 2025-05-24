@@ -44,7 +44,7 @@ GeneralLM_fix_anova1_MM_run_code_server <- function(id, show_dev,
       
       the_code   <- Rcode_original()
       str_import <- active_DATASET_SELECTOR$"pack_output"$"str_import_external"
-      the_code   <- sub(pattern = "_my_import_sentence_", replacement = str_import, x = the_code)
+      the_code   <- sub(pattern = "_A_my_import_sentence_A_", replacement = str_import, x = the_code)
       the_code   <- gsub(pattern = "#---", replacement = "", x = the_code)
       the_code   <- gsub(pattern = "#---", replacement = "", x = the_code)
       
@@ -57,16 +57,16 @@ GeneralLM_fix_anova1_MM_run_code_server <- function(id, show_dev,
       req(OK_ALL_ACTIVE(), Rcode_original())
       
       str_import      <- active_DATASET_SELECTOR$"pack_output"$"str_import_external"
-      var_name_factor <- active_VARIABLE_SELECTOR$"pack_output"$"factor" #valores_internos_list$pack_var_selection$"factor"
-      var_name_vr     <- active_VARIABLE_SELECTOR$"pack_output"$"respuesta"  #     #valores_internos_list$pack_var_selection$"respuesta"
-      alpha_value     <- 0.05
+      var_name_factor <- active_VARIABLE_SELECTOR$"pack_output"$"var_name_factor" #valores_internos_list$pack_var_selection$"factor"
+      var_name_rv     <- active_VARIABLE_SELECTOR$"pack_output"$"var_name_rv"  #     #valores_internos_list$pack_var_selection$"respuesta"
+      alpha_value     <- active_VARIABLE_SELECTOR$"pack_output"$"alpha_value"
       
       the_code   <- Rcode_original()
-      the_code   <- sub(pattern = "_my_import_sentence_", replacement = str_import, x = the_code)
+      the_code   <- sub(pattern = "_A_my_import_sentence_A_", replacement = str_import, x = the_code)
       the_code   <- gsub(pattern = "#---", replacement = "", x = the_code)
-      the_code   <- sub(pattern = "_var_name_factor_", replacement = var_name_factor, x = the_code)
-      the_code   <- sub(pattern = "_var_name_vr_", replacement = var_name_vr, x = the_code)
-      the_code   <- sub(pattern = "_alpha_value_", replacement = alpha_value, x = the_code)
+      the_code   <- sub(pattern = "_B_var_name_factor_B_", replacement = var_name_factor, x = the_code)
+      the_code   <- sub(pattern = "_B_var_name_rv_B_", replacement = var_name_rv, x = the_code)
+      the_code   <- sub(pattern = "_B_alpha_value_B_", replacement = alpha_value, x = the_code)
       the_code
       
     })
@@ -79,11 +79,11 @@ GeneralLM_fix_anova1_MM_run_code_server <- function(id, show_dev,
       req(OK_ALL_ACTIVE())
       
       database        <- active_DATASET_SELECTOR$"pack_output"$"database" # mtcars #valores_internos_list$pack_import_dataset$"database"
-      var_name_factor <- active_VARIABLE_SELECTOR$"pack_output"$"factor" #valores_internos_list$pack_var_selection$"factor"
-      var_name_vr     <- active_VARIABLE_SELECTOR$"pack_output"$"respuesta"  #     #valores_internos_list$pack_var_selection$"respuesta"
-      alpha_value     <- 0.05
+      var_name_factor <- active_VARIABLE_SELECTOR$"pack_output"$"var_name_factor" #valores_internos_list$pack_var_selection$"factor"
+      var_name_rv     <- active_VARIABLE_SELECTOR$"pack_output"$"var_name_rv"  #     #valores_internos_list$pack_var_selection$"respuesta"
+      alpha_value     <- active_VARIABLE_SELECTOR$"pack_output"$"alpha_value"
       
-      the_results        <- GeneralLM_fix_anova1_RCode(database, var_name_factor, var_name_vr, alpha_value)
+      the_results        <- GeneralLM_fix_anova1_RCode(database, var_name_factor, var_name_rv, alpha_value)
       vector_order_names <- GeneralLM_fix_anova1_objects_in_order(fn = GeneralLM_fix_anova1_RCode)
       the_results        <- the_results[vector_order_names]
       the_results

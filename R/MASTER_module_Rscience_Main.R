@@ -566,7 +566,8 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       # Mostrar modal de carga
       
       if (!OK_ALL_ACTIVE()) {
-        fn_shiny_apply_changes_reactiveValues(rv = active_R_OBJECTS, changes_list = default_structure)
+        fn_shiny_apply_changes_reactiveValues(rv = active_R_OBJECTS, 
+                                              changes_list = default_structure)
       } else {
         if(FALSE){
         showModal(
@@ -660,7 +661,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         
         # Aquí capturamos *todo* error: muestre modal con el mensaje
         showModal(modalDialog(
-          title = paste0("Error en el procesamiento de: ", str_selected_modulo),
+          title = paste0("Error en el procesamiento de: ", MY_SELECTED_TOOL()),
           paste("Ocurrió un error:", e$message),
           easyClose = TRUE,
           footer = modalButton("Cerrar")
@@ -953,7 +954,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       )
     })
    
-    observe(print(reactiveValuesToList( active_R_CODE)))
+    # observe(print(reactiveValuesToList( active_R_CODE)))
    
     
     ############################################################################
