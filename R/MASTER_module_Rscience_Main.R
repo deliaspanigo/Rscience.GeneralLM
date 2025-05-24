@@ -946,70 +946,14 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       )
     })
    
-    if(FALSE){
+  
    
     
     ############################################################################
     
     active_R_CODE   <- do.call(reactiveValues, default_structure)
     
-    
-    
-    observe({
-      req(OK_ALL_ACTIVE())
-      req(my_list_str_rv())
-      str_selected_modulo <- my_list_str_rv()$"str_06_MM_script"
-      new_server <- paste0(str_selected_modulo, "_server")
-      new_ui <- paste0(str_selected_modulo, "_ui")
-      new_id <- "the_script"
-      
-      # print(new_server)
-      # str_server(new_server)
-      # str_ui(new_ui)
-      # my_id(new_id)
-      args <- list(id = new_id, show_dev = FALSE,
-                   active_DATASET_SELECTOR, 
-                   active_TOOLS_SELECTOR,
-                   active_VARIABLE_SELECTOR,
-                   active_PLAY_SELECTOR,
-                   active_R_CODE)
-      
-      vector_funciones <- ls("package:Rscience.GeneralLM")
-      check_in <- new_server %in% vector_funciones
-      # print(check_in)
-      
-      # print(str_server())
-      # Verificar si la función existe y ejecutarla
-      if (check_in) {
-        do.call(new_server, args)
-        # print(resultado)  # Output: 5
-      } else {
-        print("El modulo no existe.")
-      }
-      
-      
-    })
-    
-    
-    # # Renderizar la UI del selector de variables
-    output$card06_script <- renderUI({
-      req(OK_ALL_ACTIVE())
-      req(my_list_str_rv())
-      
-      str_selected_modulo <- my_list_str_rv()$"str_06_MM_script"
-      new_modulo_ui <- paste0(str_selected_modulo, "_ui")
-      new_id <- "the_script"
-      
-      # print(new_modulo_ui)
-      args <- list(id = ns(new_id))
-      
-      div(
-        style = "height: 100%;",  # Altura del contenedor (100% del contenedor padre)
-        do.call(new_modulo_ui, args)  # Altura del contenido (100% del contenedor padre)
-      )
-    })
-    
-    ############################################################################
+   
     
     # Tab06 - Quarto
     the_quarto_file <- reactive({
@@ -1052,7 +996,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       module_quartoRenderer_ui(id=ns("quarto_doc"))
     })
     
-    }
+    
     
   })
 }
