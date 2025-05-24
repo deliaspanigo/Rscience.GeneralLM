@@ -890,6 +890,8 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     ############################################################################
     active_R_CODE   <- do.call(reactiveValues, default_structure)
     
+    the_RS_UI <- reactiveVal()
+    
     observe({
       req(OK_ALL_ACTIVE())
       # req(my_list_str_rv())
@@ -937,16 +939,17 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       do.call(my_str_MM_server, args_server)
       
       ### Running ui module - 04 - ORRS (Output R Results Shiny)
-      
-      
-    })
-    output$card06_script <- renderUI({
       args_ui <- list(id = ns("the_06_script"))
       the_rendered_iu <- do.call(my_str_MM_ui, args_ui)
+      the_RS_UI(the_rendered_iu)
+    })
+    
+    output$card06_script <- renderUI({
+      req(the_RS_UI)
       
       div(
         style = "height: 100%;",  
-        the_rendered_iu  
+        the_RS_UI()
       )
     })
    

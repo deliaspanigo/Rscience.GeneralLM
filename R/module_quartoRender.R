@@ -135,10 +135,11 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
       # fn_shiny_apply_changes_reactiveValues(rv = internal_02_TOTEM_COPY, changes_list = default_totem) 
       # fn_shiny_apply_changes_reactiveValues(rv = internal_03_TOTEM_DOWNLOAD, changes_list = default_totem)  
 
-      current_time <- Sys.time()
+      current_time   <- Sys.time()
       formatted_time <- format(current_time, "%Y_%m_%d_%H_%M_%S")
-      the_sys_time <- formatted_time
-      str_search   <- str_sub_folder()
+      the_sys_time   <- formatted_time
+      str_search     <- str_sub_folder()
+      
       fn_shiny_apply_changes_reactiveValues(rv = internal_01_TOTEM_PK, changes_list = list(
         the_sys_time = the_sys_time,
         str_search   = str_search
@@ -177,10 +178,10 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
       button_status = "confirmed"
       
       fn_shiny_apply_changes_reactiveValues(rv = internal_01_TOTEM_PK, changes_list = list(
-        vector_file_names = vector_file_names,
-        vector_check_file_names = vector_check_file_names,
-        check_general = check_general,
-        button_status = button_status
+        "vector_file_names" = vector_file_names,
+        "vector_check_file_names" = vector_check_file_names,
+        "check_general" = check_general,
+        "button_status" = button_status
       ))
       
       # print(reactiveValuesToList(internal_01_TOTEM_PK))
@@ -198,8 +199,8 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
       str_search   <- internal_01_TOTEM_PK$"str_search"
       
       fn_shiny_apply_changes_reactiveValues(rv = internal_02_TOTEM_COPY, changes_list = list(
-        the_sys_time = the_sys_time,
-        str_search   = str_search
+        "the_sys_time" = the_sys_time,
+        "str_search"   = str_search
       ))    
       
       # 2) Folder path
@@ -212,8 +213,8 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
         
       }
       fn_shiny_apply_changes_reactiveValues(rv = internal_02_TOTEM_COPY, changes_list = list(
-        folder_path = folder_path,
-        check_folder_path   = check_folder_path
+        "folder_path" = folder_path,
+        "check_folder_path"   = check_folder_path
       )) 
       
       ##########################################################################
@@ -239,10 +240,10 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
       
       button_status = "confirmed"
       fn_shiny_apply_changes_reactiveValues(rv = internal_02_TOTEM_COPY, changes_list = list(
-        vector_file_names = vector_file_names,
-        vector_check_file_names = vector_check_file_names,
-        check_general = check_general,
-        button_status = button_status
+        "vector_file_names" = vector_file_names,
+        "vector_check_file_names" = vector_check_file_names,
+        "check_general" = check_general,
+        "button_status" = button_status
       ))
       
      

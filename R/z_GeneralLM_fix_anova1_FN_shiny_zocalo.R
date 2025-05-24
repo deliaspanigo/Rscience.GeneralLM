@@ -11,6 +11,7 @@ GeneralLM_fix_anova1_FN_shiny_zocalo <- function(internal_VARIABLE_SELECTOR){
   vector_selected_vars <- info_VS$"vector_selected_vars"
   new_ncol <-  info_VS$"ncol_minidataset"
   new_nrow <-  info_VS$"nrow_minidataset"
+  external_alpha_value <- info_VS$"external_alpha_value"
   
   div(
     class = "p-3 rounded shadow-sm",
@@ -47,20 +48,25 @@ GeneralLM_fix_anova1_FN_shiny_zocalo <- function(internal_VARIABLE_SELECTOR){
       class = "d-flex flex-column",
       div(class = "me-4 mb-2",
           span(class = "fw-bold", "Factor: "),
-          span(value_factor, style = "font-family: monospace;")),
+          span(value_factor, style = "font-family: monospace;")
+          ),
       
       div(class = "me-4 mb-2",
           span(class = "fw-bold", "Response Variable: "),
-          span(value_rv, style = "font-family: monospace;"))
-    ),
-    
-    
-    div(
-      span(class = "fw-bold", "Shape: "),
-      span(paste0(new_nrow, " rows × ", new_ncol, " columns"),
+          span(value_rv, style = "font-family: monospace;")
+          ),
+      
+      div(class = "me-4 mb-2",
+        span(class = "fw-bold", "Shape: "),
+        span(paste0(new_nrow, " rows × ", new_ncol, " columns"),
+             style = "font-family: monospace;")
+        ),
+      div(class = "me-4 mb-2",
+        span(class = "fw-bold", "Alpha value: "),
+        span(paste0(external_alpha_value),
            style = "font-family: monospace;")
+        )
     )
   )
   )
-  
 }

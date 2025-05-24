@@ -1,4 +1,4 @@
-
+# 
 
 devtools::load_all()
 devtools::document()  # Actualiza documentación
