@@ -890,7 +890,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     ############################################################################
     active_R_CODE   <- do.call(reactiveValues, default_structure)
     
-    output$card06_script <- renderUI({
+    observe({
       req(OK_ALL_ACTIVE())
       # req(my_list_str_rv())
       
@@ -937,7 +937,11 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       do.call(my_str_MM_server, args_server)
       
       ### Running ui module - 04 - ORRS (Output R Results Shiny)
-      args_ui <- list(id = ns(str_local_id))
+      
+      
+    })
+    output$card06_script <- renderUI({
+      args_ui <- list(id = ns("the_06_script"))
       the_rendered_iu <- do.call(my_str_MM_ui, args_ui)
       
       div(
@@ -946,19 +950,25 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       )
     })
    
-  
+    observe(print(reactiveValuesToList( active_R_CODE)))
    
     
     ############################################################################
     
-    active_R_CODE   <- do.call(reactiveValues, default_structure)
+    # active_R_CODE   <- do.call(reactiveValues, default_structure)
     
    
     
     # Tab06 - Quarto
     the_quarto_file <- reactive({
+      req( MY_SELECTED_TOOL())
+      req(OK_ALL_ACTIVE())
       # req(mis_valores())
-      GeneralLM_fix_anova1_quarto_file_path()
+      # fn_R_pk_folder_path()
+      the_folder_quarto <- fn_PK_quarto_folder_path()
+      str_sub_folder <- MY_SELECTED_TOOL()
+      the_folder_path <- file.path(the_folder_quarto, str_sub_folder)
+        
     })
     
     the_pack <- reactive({
@@ -984,12 +994,17 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     })
     # observe(print(the_pack()))
     
+    observe({
+      req(the_quarto_file())
+      # my_list <- reactiveValuesToList(active_R_CODE)
+      # print(my_list$"pack_output"$"Rcode_script")
+      
     module_quartoRenderer_server(id="quarto_doc", 
                                  documento = the_quarto_file(),
                                  Rcode_script = reactive(active_R_CODE$"pack_output"$"Rcode_script"),
                                  Rcode_quarto = reactive(active_R_CODE$"pack_output"$"Rcode_quarto"),
                                  active_TOOLS_SELECTOR)
-    
+    })
     output$card07_download <- renderUI({
       req(OK_ALL_ACTIVE())
       # req(my_list_str_rv())

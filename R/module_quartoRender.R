@@ -379,6 +379,7 @@ module_quartoRenderer_server <- function(id, documento, Rcode_script, Rcode_quar
       ))
       
       # Stage 4 - folder path output file
+      # print(reactiveValuesToList(internal_03_TOTEM_DOWNLOAD))
       folder_output_path       <- internal_03_TOTEM_DOWNLOAD$"folder_path"
       check_folder_output_path <- dir.exists(folder_output_path)
       if(!check_folder_output_path){
