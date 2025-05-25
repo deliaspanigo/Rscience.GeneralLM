@@ -17,6 +17,7 @@ usethis::use_package("shinycssloaders")
 usethis::use_package("EnvStats")
 usethis::use_package("shinyjs")
 usethis::use_package("crayon")
+usethis::use_package("stringi")
 
 usethis::use_package("dplyr")
 usethis::use_package("ggplot2")

@@ -22,4 +22,5 @@ Imports:
     Rscience.menu,
     shinyAce,
     shinycssloaders,
-    shinyjs
+    shinyjs,
+    stringi

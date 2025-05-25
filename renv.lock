@@ -403,7 +403,7 @@
       "RemoteRepo": "Rscience.import",
       "RemoteUsername": "deliaspanigo",
       "RemoteRef": "HEAD",
-      "RemoteSha": "bccbb01640e92f41ae2c017adc8939a66d737fc9",
+      "RemoteSha": "ed9965d7877dd87e2058471eca4a4784a3a42ed3",
       "NeedsCompilation": "no",
       "Author": "First Last [aut, cre]",
       "Maintainer": "First Last <first.last@example.com>"
@@ -432,7 +432,7 @@
       "RemoteRepo": "Rscience.menu",
       "RemoteUsername": "deliaspanigo",
       "RemoteRef": "HEAD",
-      "RemoteSha": "eb549ab296968467da40a6d1c330d78d89ac678d",
+      "RemoteSha": "5024b5b36cfe6b283c8555f8059b2eb8a5e745f0",
       "NeedsCompilation": "no",
       "Author": "First Last [aut, cre]",
       "Maintainer": "First Last <first.last@example.com>"

@@ -60,6 +60,10 @@ MASTER_module_Rscience_Main_ui <- function(id) {
                                uiOutput(ns("crystal04_ALL"))
                                # verbatimTextOutput(ns("crystal01_run_code"))
               ),
+              bslib::nav_panel(title = "crystal05_ALL",
+                               uiOutput(ns("crystal05_ALL"))
+                               # verbatimTextOutput(ns("crystal01_run_code"))
+              ),
               bslib::nav_panel(title = "output",
                                uiOutput(ns("card05_output"))
               ),
@@ -87,13 +91,12 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     ns <- session$ns
     
     
-    library(crayon)
+    message(crayon::green("**********************************************"))
+    message(crayon::green("*                                            *"))
+    message(crayon::green("*          WELCOME TO THE RSCIENCE WORLD!    *"))
+    message(crayon::green("*                                            *"))
+    message(crayon::green("**********************************************"))
     
-    message(green("**********************************************"))
-    message(green("*                                            *"))
-    message(green("*          WELCOME TO THE RSCIENCE WORLD!    *"))
-    message(green("*                                            *"))
-    message(green("**********************************************"))
     
     
     # Obtener fecha y hora actual
@@ -108,8 +111,15 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     # Mostrar en la consola con el color
     cat(mensaje, "\n")
     ############################################################################
-    
+
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+    # All config tools
+    list_all_config02_tools <- fn_R_load_config02_yaml()
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+    ############################################################################
     # Card 01) Botonera "main menu"
+    
     output$card01_botonera_inicial <- renderUI({
       div(
         style = "height: 100%;",  # Altura del contenedor (100% del contenedor padre)
@@ -122,7 +132,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
               style = "gap: 20px; height: 100%;",  # Altura del cuerpo de la card (100%)
               Sbutton_01_dataselector2_ui(ns("dataset_selector2")), 
               Sbutton_02_tools2_ui(id = ns("tools_selector2")),
-              Sbutton_03_variable_selector2_ui(id = ns("variable_selector2")),
+              Sbutton_03_settings_ui(id = ns("settings")),
               Sbutton_reset2_ui(id = ns("reset2")),
               Sbutton_play2_ui(id = ns("play2"))
             )
@@ -131,6 +141,8 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       )
     })
     
+    #---------------------------------------------------------------------------
+    ### Initialization ---------------------------------------------------------
     
     # Default structure for many objects
     default_structure <- list(
@@ -141,7 +153,6 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       button_class = "initial"
     )    
     
-    ### ### ### Initialization -------------------------------------------------
     MY_SELECTED_TOOL <- reactiveVal(NULL)
     
    
@@ -153,19 +164,24 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     internal_TOOLS_SELECTOR <- do.call(reactiveValues, default_structure)
     active_TOOLS_SELECTOR   <- do.call(reactiveValues, default_structure)
     
+    # Init CFG
+    internal_CFG <- do.call(reactiveValues, default_structure)
+    active_CFG   <- do.call(reactiveValues, default_structure)
+
     # Init STR
-    internal_STR  <- do.call(reactiveValues, default_structure)
-    active_STR    <- do.call(reactiveValues, default_structure)
+    internal_STR <- do.call(reactiveValues, default_structure)
+    active_STR   <- do.call(reactiveValues, default_structure)
     
     # Init Variable
     internal_VARIABLE_SELECTOR <- do.call(reactiveValues, default_structure)
     active_VARIABLE_SELECTOR   <- do.call(reactiveValues, default_structure)
     
     # Init Play
-    internal_PLAY_SELECTOR    <- do.call(reactiveValues, default_structure)
-    active_PLAY_SELECTOR    <- do.call(reactiveValues, default_structure)
+    internal_PLAY_SELECTOR <- do.call(reactiveValues, default_structure)
+    active_PLAY_SELECTOR   <- do.call(reactiveValues, default_structure)
     
-    ### ### ### END Initialization -------------------------------------------------
+    ### ### ### END Initialization ---------------------------------------------
+    #---------------------------------------------------------------------------
     
     
     # Button Dataselect
@@ -187,11 +203,70 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       MY_SELECTED_TOOL(info_output$"selected_tool")
       
       # Reset internal y active STR
-      fn_shiny_apply_changes_reactiveValues(rv = internal_STR, default_structure)
       fn_shiny_apply_changes_reactiveValues(rv = active_STR, default_structure)
+      fn_shiny_apply_changes_reactiveValues(rv = internal_STR, default_structure)
+      
+      
+    })
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+    # CFG
+    observe({
+      req(MY_SELECTED_TOOL()) 
+      
+      # Selected tools
+      str_selected_tool <- MY_SELECTED_TOOL()
+      vector_names_all_tools <- names(list_all_config02_tools)
+      check_tool <- str_selected_tool %in% vector_names_all_tools
+      
+      if (!check_tool) {
+        showNotification(
+          "La herramienta seleccionada no está disponible.",
+          type = "warning"
+        )
+        return()  # Salir del observe
+      }
+      
+      # Preparing delivery...
+      pack_output <- list_all_config02_tools[[str_selected_tool]]
+      check_output <- TRUE
+      button_class <- "confirmed"
+      
+      # Delivery!
+      fn_shiny_apply_changes_reactiveValues(rv = internal_CFG, list(
+        "pack_input"   = "",
+        "check_input"  = TRUE,
+        "pack_output"  = pack_output,
+        "check_output" = check_output,
+        "button_class" = button_class))
+      
       
     })
 
+    output[["crystal05_A"]]  <- renderPrint({ MY_SELECTED_TOOL() })
+    output[["crystal05_B1"]] <- renderPrint({ reactiveValuesToList(internal_CFG) })
+    output[["crystal05_B2"]] <- renderPrint({ reactiveValuesToList(active_CFG) })
+    
+    output$"crystal05_ALL" <- renderUI({
+      
+      div(
+        h2("Selected tool"), 
+        verbatimTextOutput(ns("crystal05_A")),
+        hr(),
+        fluidRow(
+          column(6, 
+                 h2("Internal CFG"),
+                 verbatimTextOutput(ns("crystal05_B1"))
+          ),
+          column(6, 
+                 h2("Active CFG"),
+                 verbatimTextOutput(ns("crystal05_B2"))
+          )
+        )
+      )
+      
+    })
+    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+    
     # Observe - internal_STR
     observe({
          
@@ -204,13 +279,16 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       package_name <- "Rscience.GeneralLM"
       vector_pk_fn_vector <- getNamespaceExports(package_name)
     
+
+      
+
       # ------------------------------------------------------------------------
       #
       # 1) Settings...
       df_01_settings <- data.frame(
         "short_name" = c("MM_server", "MM_ui", "FN_validate_vars"),
-        "str_end_file" = c("_MM_variable_selector_server",
-                           "_MM_variable_selector_ui", 
+        "str_end_file" = c("_MM_settings_server",
+                           "_MM_settings_ui", 
                            "_FN_validate_vars")
       )
       df_01_settings$"resource_name"   <- paste0(str_selected_tool, df_01_settings$"str_end_file")
@@ -264,10 +342,10 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       # 06) Script
       df_06_script <- data.frame(
         "short_name" = c("MM_server", "MM_ui"),
-        "str_end_file" = c("_MM_script_server",
-                           "_MM_script_ui")
+        "str_end_file" = c("_server",
+                           "_ui")
       )
-      df_06_script$"resource_name"   <- paste0(str_selected_tool, df_06_script$"str_end_file")
+      df_06_script$"resource_name"   <- paste0("module_Render_script", df_06_script$"str_end_file")
       df_06_script$"resource_exists" <- df_05_theory$"resource_name" %in% vector_pk_fn_vector
       check_06_script <- all(df_06_script$"resource_exists")
       # ------------------------------------------------------------------------
@@ -305,7 +383,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
     })
     
-    output[["crystal04_A"]] <- renderPrint({ MY_SELECTED_TOOL() })
+    output[["crystal04_A"]]  <- renderPrint({ MY_SELECTED_TOOL() })
     output[["crystal04_B1"]] <- renderPrint({ reactiveValuesToList(internal_STR) })
     output[["crystal04_B2"]] <- renderPrint({ reactiveValuesToList(active_STR) })
     
@@ -333,10 +411,10 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     # # # # # # - - - - - - - - - - - - - - - - - -
     
     
-    Sbutton_03_variable_selector2_server(id = "variable_selector2", 
+    Sbutton_03_settings_server(id = "settings", 
                                          internal_DATASET_SELECTOR, 
-                                         internal_TOOLS_SELECTOR, 
-                                         internal_STR, 
+                                         internal_TOOLS_SELECTOR,
+                                         internal_CFG,
                                          internal_VARIABLE_SELECTOR)
     
     Sbutton_reset2_server(id = "reset2", 
@@ -415,6 +493,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     
     ############################################################################
+    
     output$visual_dataset <- DT::renderDataTable({
       req(internal_DATASET_SELECTOR)
       req(internal_DATASET_SELECTOR$"check_output")
@@ -522,6 +601,76 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       the_final_value <- all(vector_check)
       the_final_value
     })
+    ############################################################################
+    
+    active_R_CODE   <- do.call(reactiveValues, default_structure)
+    
+    the_RS_UI <- reactiveVal()
+    
+    observe({
+      req(OK_ALL_ACTIVE())
+      # req(my_list_str_rv())
+      
+      req(internal_STR$"check_output")
+      mi_super_lista <- reactiveValuesToList(internal_STR) #print(paste0("AVER: ", internal_STR$"pack_output"$"vector_str"$"str_01_MM_variable_selector"))
+      
+      # ----------------------------------------------------------------------
+      #
+      # Hardcoded master
+      my_pack_name  <- "df_06_script"
+      str_local_id  <- "the_06_script"
+      #
+      # Hardcoded basics
+      my_df <- mi_super_lista$"pack_output"[[my_pack_name]]
+      vector_short_names  <- my_df$"short_name"
+      vector_full_names   <- my_df$"resource_name"
+      str_MM_server <- "MM_server"
+      str_MM_ui     <- "MM_ui"
+      #-----------------------------------------------------------------------
+      #
+      # server and ui
+      ### MM server
+      dt_str_MM_server    <- vector_short_names == str_MM_server
+      full_name_MM_server <- vector_full_names[dt_str_MM_server]
+      my_str_MM_server    <- full_name_MM_server
+      
+      ### MM ui
+      dt_str_MM_ui     <- vector_short_names == str_MM_ui
+      full_name_MM_ui  <- vector_full_names[dt_str_MM_ui]
+      my_str_MM_ui     <- full_name_MM_ui
+      #-----------------------------------------------------------------------
+      #
+      ### ARGs
+      args_server <- list(id = str_local_id, 
+                          show_dev = FALSE,
+                          active_DATASET_SELECTOR, 
+                          active_TOOLS_SELECTOR,
+                          active_VARIABLE_SELECTOR,
+                          active_PLAY_SELECTOR,
+                          active_R_CODE
+      )
+      
+      ### Running server module - 04 - ORRS (Output R Results Shiny)
+      do.call(my_str_MM_server, args_server)
+      
+      ### Running ui module - 04 - ORRS (Output R Results Shiny)
+      args_ui <- list(id = ns("the_06_script"))
+      the_rendered_iu <- do.call(my_str_MM_ui, args_ui)
+      the_RS_UI(the_rendered_iu)
+    })
+    
+    output$card06_script <- renderUI({
+      req(the_RS_UI)
+      
+      div(
+        style = "height: 100%;",  
+        the_RS_UI()
+      )
+    })
+    
+    # observe(print(reactiveValuesToList( active_R_CODE)))
+    
+    
     ############################################################################
     
     THE_MODAL <- reactiveVal(NULL)
@@ -638,7 +787,8 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
             active_DATASET_SELECTOR, 
             active_TOOLS_SELECTOR,
             active_VARIABLE_SELECTOR,
-            active_PLAY_SELECTOR
+            active_PLAY_SELECTOR,
+            active_R_CODE
           )
         #  
         ### Run Run Run
@@ -889,75 +1039,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     })
     
     ############################################################################
-    active_R_CODE   <- do.call(reactiveValues, default_structure)
     
-    the_RS_UI <- reactiveVal()
-    
-    observe({
-      req(OK_ALL_ACTIVE())
-      # req(my_list_str_rv())
-      
-      req(internal_STR$"check_output")
-      mi_super_lista <- reactiveValuesToList(internal_STR) #print(paste0("AVER: ", internal_STR$"pack_output"$"vector_str"$"str_01_MM_variable_selector"))
-      
-      # ----------------------------------------------------------------------
-      #
-      # Hardcoded master
-      my_pack_name  <- "df_06_script"
-      str_local_id  <- "the_06_script"
-      #
-      # Hardcoded basics
-      my_df <- mi_super_lista$"pack_output"[[my_pack_name]]
-      vector_short_names  <- my_df$"short_name"
-      vector_full_names   <- my_df$"resource_name"
-      str_MM_server <- "MM_server"
-      str_MM_ui     <- "MM_ui"
-      #-----------------------------------------------------------------------
-      #
-      # server and ui
-      ### MM server
-      dt_str_MM_server    <- vector_short_names == str_MM_server
-      full_name_MM_server <- vector_full_names[dt_str_MM_server]
-      my_str_MM_server    <- full_name_MM_server
-      
-      ### MM ui
-      dt_str_MM_ui     <- vector_short_names == str_MM_ui
-      full_name_MM_ui  <- vector_full_names[dt_str_MM_ui]
-      my_str_MM_ui     <- full_name_MM_ui
-      #-----------------------------------------------------------------------
-      #
-      ### ARGs
-      args_server <- list(id = str_local_id, 
-                          show_dev = FALSE,
-                          active_DATASET_SELECTOR, 
-                          active_TOOLS_SELECTOR,
-                          active_VARIABLE_SELECTOR,
-                          active_PLAY_SELECTOR,
-                          active_R_CODE
-      )
-      
-      ### Running server module - 04 - ORRS (Output R Results Shiny)
-      do.call(my_str_MM_server, args_server)
-      
-      ### Running ui module - 04 - ORRS (Output R Results Shiny)
-      args_ui <- list(id = ns("the_06_script"))
-      the_rendered_iu <- do.call(my_str_MM_ui, args_ui)
-      the_RS_UI(the_rendered_iu)
-    })
-    
-    output$card06_script <- renderUI({
-      req(the_RS_UI)
-      
-      div(
-        style = "height: 100%;",  
-        the_RS_UI()
-      )
-    })
-   
-    # observe(print(reactiveValuesToList( active_R_CODE)))
-   
-    
-    ############################################################################
     
     # active_R_CODE   <- do.call(reactiveValues, default_structure)
     

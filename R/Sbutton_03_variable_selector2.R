@@ -1,5 +1,5 @@
 #' @export
-Sbutton_03_variable_selector2_ui <- function(id) {
+Sbutton_03_settings_ui <- function(id) {
   ns <- NS(id)
   
   # Botón para elegir variables
@@ -13,32 +13,26 @@ Sbutton_03_variable_selector2_ui <- function(id) {
 
 
 #' @export
-Sbutton_03_variable_selector2_server <- function(id, 
+Sbutton_03_settings_server <- function(id, 
                                                  internal_DATASET_SELECTOR, 
                                                  internal_TOOLS_SELECTOR, 
-                                                 internal_STR, 
+                                                 internal_CFG,
                                                  internal_VARIABLE_SELECTOR) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
-    
-    # UI BUTTON
+    #---------------------------------------------------------------------------
+    # UI BUTTON - state button entails a specific color
     button_state <- reactiveVal(NULL)
-    observe({
-      button_state(internal_VARIABLE_SELECTOR$"button_class")
-     })
+    observe({button_state(internal_VARIABLE_SELECTOR$"button_class")})
     
     output$my_action_button <- renderUI({
-      # req(local_OK())
-      # btn_class <- switch(button_state(),
-      #                     "initial"   = "btn-primary",    # Azul inicial
-      #                     "confirmed" = "btn-success",    # Verde después de confirmar
-      #                     "modified"  = "btn-primary")    # Vuelve a azul si se modifica
       
       btn_class <- switch(button_state(),
-                          "initial"   = "btn-outline-primary",    # Azul inicial
-                          "confirmed" = "btn-outline-success",    # Verde después de confirmar
-                          "modified"  = "btn-outline-primary")    # Vuelve a azul si se modifica
+                          "initial"   = "btn-outline-primary",    # Blue - inicial
+                          "confirmed" = "btn-outline-success",    # Green - OK! :)
+                          "modified"  = "btn-outline-primary")    # RED - Error :(
+      
       # Botón para elegir variables
       actionButton(
         ns("btn_variables"),
@@ -49,98 +43,90 @@ Sbutton_03_variable_selector2_server <- function(id,
         title = "Variables Selection"
       )
     })
-    
+    #
     #---------------------------------------------------------------------------
-    
-    
-    
-    
-    
-    # Button actions
+    # Local OK
     local_OK <- reactive({
-      vector_all <- c(internal_STR$"check_output",
-                      internal_TOOLS_SELECTOR$"check_output")
+      
+      vector_all <- c(isTruthy(internal_DATASET_SELECTOR$"check_output"),
+                      isTruthy(internal_TOOLS_SELECTOR$"check_output"),
+                      isTruthy(internal_CFG$"check_output")
+      )
+
       
       the_final <- all(vector_all)
       the_final
     })
-    
+    #
+    #---------------------------------------------------------------------------
+    ### Initialization objects
     my_str_MM_server <- reactiveVal(NULL)
     my_str_MM_ui <- reactiveVal(NULL)
     my_str_FN <- reactiveVal(NULL)
     local_id <- reactiveVal(NULL)
-    output_list_variable_selector_rv <- reactiveVal(NULL)
     
+    ### And for module output
+    output_list_variable_selector_rv <- reactiveVal(NULL)
+    module_uiOutput_settings <- reactiveVal(NULL)
+    
+    ### Finding modules
     observe({
       req(local_OK())
 
-      mi_super_lista <- reactiveValuesToList(internal_STR) #print(paste0("AVER: ", internal_STR$"pack_output"$"vector_str"$"str_01_MM_variable_selector"))
-      
-      # Hardcoded --------------------------------------------------------------
-      my_df <- mi_super_lista$"pack_output"$"df_01_settings"
-      vector_short_names  <- my_df$"short_name"
-      vector_full_names   <- my_df$"resource_name"
+      sub_list_settings <- internal_CFG$"pack_output"$"settings"
+
+      # ------------------------------------------------------------------------
+      # Hardcoded
       str_local_id  <- "the_settings"
-      str_MM_server <- "MM_server"
-      str_MM_ui     <- "MM_ui"
-      str_FN        <- "FN_validate_vars"
+      # ------------------------------------------------------------------------
+      # Preparing delivery
+      full_name_MM_server <- sub_list_settings$"module_server"
+      full_name_MM_ui     <- sub_list_settings$"module_ui"
+      full_name_FN        <- sub_list_settings$"fn_control"
+      # ------------------------------------------------------------------------
+      # Filling ReactiveValues
+      isolate({
+        my_str_MM_server(full_name_MM_server)
+        my_str_MM_ui(full_name_MM_ui)
+        my_str_FN(full_name_FN)
+        local_id(str_local_id)
+      })
       # ------------------------------------------------------------------------
       
-      # MM server
-      dt_str_MM_server    <- vector_short_names == str_MM_server
-      full_name_MM_server <- vector_full_names[dt_str_MM_server]
-      # print(full_name_MM_server)
-      
-      # MM ui
-      dt_str_MM_ui    <- vector_short_names == str_MM_ui
-      full_name_MM_ui <- vector_full_names[dt_str_MM_ui]
-      # print(full_name_MM_ui)
-      
-      # FN
-      dt_str_FN    <- vector_short_names == str_FN
-      full_name_FN <- vector_full_names[dt_str_FN]
-      
-      # Filling ReactiveValues
-      my_str_MM_server(full_name_MM_server)
-      my_str_MM_ui(full_name_MM_ui)
-      my_str_FN(full_name_FN)
-      local_id(str_local_id)
     })
     
-
+    #---------------------------------------------------------------------------
     
-    # Usar str_01_MM_variable_selector dinámicamente
+    # Building modules, ui and server
     observe({
-      req(local_OK())
-      req(my_str_MM_server())
-      req(internal_DATASET_SELECTOR$"pack_output")
-      req(internal_DATASET_SELECTOR$"pack_output"$"database")
+      req(local_OK(), my_str_MM_server(), my_str_MM_ui(), local_id())
       
+      #-------------------------------------------------------------------------
+      # Basics
       my_dataset <- internal_DATASET_SELECTOR$"pack_output"$"database"
       
-      args <- list(id = "the_selection", 
-                   my_dataset = my_dataset)
-
-      # print(my_str_MM_server())
-      resultado <- do.call(my_str_MM_server(), args)
-      output_list_variable_selector_rv(resultado)
+      #
+      #-------------------------------------------------------------------------
+      # Running server module
+      ### Ui execution and taking return (uiOutput offering settings to the user)
+      args_ui <- list(id = ns(local_id()))
+      the_ui_output <- do.call(my_str_MM_ui(), args_ui)
+      module_uiOutput_settings(the_ui_output)
       
-    
+      ### Server execution and taking return (the user selections for settings!!!)
+      args_server <- list(id = local_id(), my_dataset = my_dataset)
+      the_output_server <- do.call(my_str_MM_server(), args_server)
+      output_list_variable_selector_rv(the_output_server)
+      
+      #
+      #-------------------------------------------------------------------------
     })
     
-    # Renderizar la UI del selector de variables
+    # Menu show output
     output$menu_show_output <- renderUI({
-      req(local_OK())
-      # print(local_OK())
-      
-      req(my_str_MM_ui())
-      # req(my_str_MM_ui())  # Asegurarse de que str_01_MM_variable_selector tenga un valor
-      # print(my_str_MM_ui())
-      
-      # str_ui(new_ui)
-      args <- list(id = ns("the_selection"))
-      resultado <- do.call(my_str_MM_ui(), args)
-      resultado
+      req(local_OK(), module_uiOutput_settings())
+
+      module_uiOutput_settings()
       
      
     })
@@ -152,7 +138,7 @@ Sbutton_03_variable_selector2_server <- function(id,
     # Selección de variables
     observeEvent(input$btn_variables, {
       
-      if (!internal_DATASET_SELECTOR$check_output) {
+      if (!internal_DATASET_SELECTOR$"check_output") {
         showNotification(
           "Please, select a dataset first!",
           type = "warning"
@@ -230,14 +216,14 @@ Sbutton_03_variable_selector2_server <- function(id,
           style = "display: flex; justify-content: center; width: 100%; gap: 10px;",
           # Botón Cancelar de ancho completo
           tags$button(
-            id = ns("btn_cancelar"),
+            id = ns("btn_cancel"),
             type = "button",
             class = "btn btn-default",
             style = "width: 50%; height: 45px;", # Aumentado la altura
             "data-bs-dismiss" = "modal",
             "CANCEL"
           ),
-          actionButton(inputId = ns("confirmar_variables"), label = "ADD", 
+          actionButton(inputId = ns("confirm_action"), label = "ADD", 
                        class = "btn-primary", style = "width: 100%; height: 45px;") # Aumentado la altura
           
         )
@@ -246,7 +232,7 @@ Sbutton_03_variable_selector2_server <- function(id,
     
     
     # Al confirmar selección de variables
-    observeEvent(input$confirmar_variables, {
+    observeEvent(input$confirm_action, {
       
       if (is.null(output_list_variable_selector_rv)) {
         # print(output_list_variable_selector_rv)

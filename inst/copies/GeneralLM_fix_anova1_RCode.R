@@ -2,7 +2,7 @@
 #' @export
 GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, alpha_value){
   
-  
+  ### INIT CODE ###
   # # # # # Section 01 - Libraries ---------------------------------------------
   library("plotly")
   library("htmlwidgets")
@@ -1285,7 +1285,8 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   # Mostrar el gráfico
   plot010_residuals
   
-  #####---
+  
+  ### END CODE ###
   
   #._ Capturar todos los objetos del entorno actual
   ._obj_names <- ls()

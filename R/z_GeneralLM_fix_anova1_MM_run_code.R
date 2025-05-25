@@ -12,7 +12,8 @@ GeneralLM_fix_anova1_MM_run_code_server <- function(id, show_dev,
                                                   active_DATASET_SELECTOR, 
                                                   active_TOOLS_SELECTOR,
                                                   active_VARIABLE_SELECTOR,
-                                                  active_PLAY_SELECTOR) {
+                                                  active_PLAY_SELECTOR,
+                                                  active_R_CODE) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
@@ -30,52 +31,18 @@ GeneralLM_fix_anova1_MM_run_code_server <- function(id, show_dev,
       
     })
     
-    ############################################################################
-    # 1) R Code
-    Rcode_original <- reactive({
-      req(OK_ALL_ACTIVE())
-      
-      the_code   <- GeneralLM_fix_anova1_take_code(str_fn_name="GeneralLM_fix_anova1_RCode")
-      the_code
-    })
+    # Nota: si o si debo ejecutar la funcion que arme. 
+    # No puedo ejecutar ni el codigo que tengo como "Rcode_script" ni el codigo
+    # que tengo armard para "Rcode_quarto".
+    # Sucede que esos objetos no maneja una salida, o sea, generan los objetos
+    # pero despues no hay un return armado. Si o si debo ejecutar mi funcion.
     
-    Rcode_script   <- reactive({
-      req(OK_ALL_ACTIVE())
-      
-      the_code   <- Rcode_original()
-      str_import <- active_DATASET_SELECTOR$"pack_output"$"str_import_external"
-      the_code   <- sub(pattern = "_A_my_import_sentence_A_", replacement = str_import, x = the_code)
-      the_code   <- gsub(pattern = "#---", replacement = "", x = the_code)
-      the_code   <- gsub(pattern = "#---", replacement = "", x = the_code)
-      
-      the_code   <- gsub(pattern = "#---", replacement = "", x = the_code)
-      
-      the_code
-    })
-    
-    Rcode_quarto <- Rcode_script   <- reactive({
-      req(OK_ALL_ACTIVE(), Rcode_original())
-      
-      str_import      <- active_DATASET_SELECTOR$"pack_output"$"str_import_external"
-      var_name_factor <- active_VARIABLE_SELECTOR$"pack_output"$"var_name_factor" #valores_internos_list$pack_var_selection$"factor"
-      var_name_rv     <- active_VARIABLE_SELECTOR$"pack_output"$"var_name_rv"  #     #valores_internos_list$pack_var_selection$"respuesta"
-      alpha_value     <- active_VARIABLE_SELECTOR$"pack_output"$"alpha_value"
-      
-      the_code   <- Rcode_original()
-      the_code   <- sub(pattern = "_A_my_import_sentence_A_", replacement = str_import, x = the_code)
-      the_code   <- gsub(pattern = "#---", replacement = "", x = the_code)
-      the_code   <- sub(pattern = "_B_var_name_factor_B_", replacement = var_name_factor, x = the_code)
-      the_code   <- sub(pattern = "_B_var_name_rv_B_", replacement = var_name_rv, x = the_code)
-      the_code   <- sub(pattern = "_B_alpha_value_B_", replacement = alpha_value, x = the_code)
-      the_code
-      
-    })
-    
-    ############################################################################
-    
+    # Nota2: Todas las funciones tienen dataset como primer parametro.
+    # El "dataset" siempre es tomado del activa_DATASET_SELECTOR.
+    # El resto de los parametros es toamdo de active_VARIABLE_SELECTOR.
     # 2) R - Results
     mis_valores <- reactive({
-      
+      # req(Rcode_quarto())
       req(OK_ALL_ACTIVE())
       
       database        <- active_DATASET_SELECTOR$"pack_output"$"database" # mtcars #valores_internos_list$pack_import_dataset$"database"
@@ -83,6 +50,7 @@ GeneralLM_fix_anova1_MM_run_code_server <- function(id, show_dev,
       var_name_rv     <- active_VARIABLE_SELECTOR$"pack_output"$"var_name_rv"  #     #valores_internos_list$pack_var_selection$"respuesta"
       alpha_value     <- active_VARIABLE_SELECTOR$"pack_output"$"alpha_value"
       
+
       the_results        <- GeneralLM_fix_anova1_RCode(database, var_name_factor, var_name_rv, alpha_value)
       vector_order_names <- GeneralLM_fix_anova1_objects_in_order(fn = GeneralLM_fix_anova1_RCode)
       the_results        <- the_results[vector_order_names]
