@@ -130,8 +130,8 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
             div(
               class = "d-flex flex-column align-items-center",  # Para centrar horizontalmente
               style = "gap: 20px; height: 100%;",  # Altura del cuerpo de la card (100%)
-              Sbutton_01_dataselector2_ui(ns("dataset_selector2")), 
-              Sbutton_02_tools2_ui(id = ns("tools_selector2")),
+              Sbutton_01_dataselector_ui(ns("dataset_selector2")), 
+              Sbutton_02_tools_ui(id = ns("tools_selector2")),
               Sbutton_03_settings_ui(id = ns("settings")),
               Sbutton_reset2_ui(id = ns("reset2")),
               Sbutton_play2_ui(id = ns("play2"))
@@ -185,10 +185,10 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     
     # Button Dataselect - Server
-    Sbutton_01_dataselector2_server(id = "dataset_selector2", internal_DATASET_SELECTOR)
+    Sbutton_01_dataselector_server(id = "dataset_selector2", internal_DATASET_SELECTOR)
     
     # Button Tools - Server
-    Sbutton_02_tools2_server(id = "tools_selector2", default_structure, internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR, internal_PLAY_SELECTOR)
+    Sbutton_02_tools_server(id = "tools_selector2", default_structure, internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR, internal_PLAY_SELECTOR)
     
     # # # # # # - - - MY_SELECTED_TOOL - - - - - - - - - - - - - - - - - - - - - 
     # Observe - MY_SELECTED_TOOL()

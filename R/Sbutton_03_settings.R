@@ -28,10 +28,8 @@ Sbutton_03_settings_server <- function(id,
     
     output$my_action_button <- renderUI({
       
-      btn_class <- switch(button_state(),
-                          "initial"   = "btn-outline-primary",    # Blue - inicial
-                          "confirmed" = "btn-outline-success",    # Green - OK! :)
-                          "modified"  = "btn-outline-primary")    # RED - Error :(
+      btn_class <- fn_R_switch_class_from_button_state(button_state = button_state())
+      
       
       # Botón para elegir variables
       actionButton(
@@ -43,6 +41,14 @@ Sbutton_03_settings_server <- function(id,
         title = "Variables Selection"
       )
     })
+    
+    output$the_cartel <- renderUI({
+      the_cartel <- internal_TOOLS_SELECTOR$"pack_output"$"selected_cartel"
+      fn_html_cartel(my_text = the_cartel)
+    })
+    
+    
+    
     #
     #---------------------------------------------------------------------------
     # Local OK
@@ -155,13 +161,17 @@ Sbutton_03_settings_server <- function(id,
       }
       
       
-     
+       # Instrucciones
+      the_title <-   div(
+                      class = "alert alert-info",
+                      "Settings..."
+                      )
       
       #columnas <- colnames(valores_internos$pack_import_dataset$"database")
       base_name <- internal_DATASET_SELECTOR$"pack_output"$"original_file_name"
       
       showModal(modalDialog(
-        title = paste("Seleccionar variables para", base_name),
+        title = "",
         size = "xl",
         easyClose = TRUE,
         
@@ -204,10 +214,12 @@ Sbutton_03_settings_server <- function(id,
         ),
         
         # Instrucciones
-        div(
-          class = "alert alert-info",
-          "Por favor, seleccione exactamente 2 variables."
-        ),
+        # div(
+        #   class = "alert alert-info",
+        #   "Por favor, seleccione exactamente 2 variables."
+        # ),
+        div(uiOutput(ns("the_cartel"))),
+        the_title,
         div(
           style = "height: 100%; overflow-y: auto; padding: 15px;", 
           uiOutput(ns("menu_show_output"))

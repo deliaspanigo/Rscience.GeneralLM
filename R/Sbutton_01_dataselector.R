@@ -1,5 +1,5 @@
 #' @export
-Sbutton_01_dataselector2_ui <- function(id) {
+Sbutton_01_dataselector_ui <- function(id) {
   ns <- NS(id)
   
   # Solo necesitamos el botón para activar el modal
@@ -10,7 +10,7 @@ Sbutton_01_dataselector2_ui <- function(id) {
 }
 
 #' @export
-Sbutton_01_dataselector2_server <- function(id, internal_DATASET_SELECTOR) {
+Sbutton_01_dataselector_server <- function(id, internal_DATASET_SELECTOR) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
@@ -28,16 +28,8 @@ Sbutton_01_dataselector2_server <- function(id, internal_DATASET_SELECTOR) {
     
     output$my_action_button <- renderUI({
      
-      
-      btn_class <- switch(button_state(),
-                          "initial"   = "btn-outline-primary",    # Azul inicial
-                          "confirmed" = "btn-outline-success",    # Verde después de confirmar
-                          "modified"  = "btn-outline-primary")    # Vuelve a azul si se modifica
-      # 
-      # btn_class <- switch(button_state(),
-      #                     "initial"   = "btn-primary",    # Azul inicial
-      #                     "confirmed" = "btn-success",    # Verde después de confirmar
-      #                     "modified"  = "btn-primary")    # Vuelve a azul si se modifica
+      btn_class <- fn_R_switch_class_from_button_state(button_state = button_state())
+
       actionButton(
         ns("btn_dataset"),
         tagList(
@@ -119,14 +111,14 @@ Sbutton_01_dataselector2_server <- function(id, internal_DATASET_SELECTOR) {
             style = "display: flex; justify-content: center; width: 100%; gap: 10px;",
             # Botón Cancelar de ancho completo
             tags$button(
-              id = ns("btn_cancelar"),
+              id = ns("btn_cancel"),
               type = "button",
               class = "btn btn-default",
               style = "width: 50%; height: 45px;", # Aumentado la altura
               "data-bs-dismiss" = "modal",
               "CANCEL"
             ),
-            actionButton(inputId = ns("confirmar_dataset"), label = "ADD", 
+            actionButton(inputId = ns("confirm_action"), label = "ADD", 
                          class = "btn-primary", style = "width: 50%; height: 45px;") # Aumentado la altura
             
           )
@@ -139,7 +131,7 @@ Sbutton_01_dataselector2_server <- function(id, internal_DATASET_SELECTOR) {
     })
     
     # Al confirmar selección, actualizar los valores_internos
-    observeEvent(input$confirmar_dataset, {
+    observeEvent(input$confirm_action, {
       
       # 1) Hacer validaciones sobre la importacion realizada.
       #    Si todo esta bien...
@@ -152,13 +144,14 @@ Sbutton_01_dataselector2_server <- function(id, internal_DATASET_SELECTOR) {
           "Please, select a dataset.",
           type = "warning"
         )
-        return()  # No hacer nada si no se ha seleccionado una base de datos
+        return()  
       }
       
       resultado <- fn_validate_01_dataselector(output_list_database_rv)
       
       if (!resultado$status) {
         showNotification(resultado$message, type = "warning")
+        button_state("error")
         return()
       }
       # 
@@ -171,11 +164,7 @@ Sbutton_01_dataselector2_server <- function(id, internal_DATASET_SELECTOR) {
          "check_output" = resultado$status,
          "button_class" = "confirmed"))
        
-       # internal_DATASET_SELECTOR$"pack_input"   = datos
-       # internal_DATASET_SELECTOR$"check_input"  = resultado$status
-       # internal_DATASET_SELECTOR$"pack_output"  = datos
-       # internal_DATASET_SELECTOR$"check_output" = resultado$status
-       # internal_DATASET_SELECTOR$"button_class" = "confirmed"
+
        
       # 
       # button_state("confirmed")

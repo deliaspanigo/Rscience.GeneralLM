@@ -1,5 +1,5 @@
 #' @export
-Sbutton_02_tools2_ui <- function(id) {
+Sbutton_02_tools_ui <- function(id) {
   ns <- NS(id)
   
 
@@ -11,7 +11,7 @@ Sbutton_02_tools2_ui <- function(id) {
 }
 
 #' @export
-Sbutton_02_tools2_server <- function(id, 
+Sbutton_02_tools_server <- function(id, 
                                      default_structure, 
                                      internal_DATASET_SELECTOR, 
                                      internal_TOOLS_SELECTOR, 
@@ -32,15 +32,8 @@ Sbutton_02_tools2_server <- function(id,
     
     output$my_action_button <- renderUI({
       
-      # btn_class <- switch(button_state(),
-      #                     "initial"   = "btn-primary",    # Azul inicial
-      #                     "confirmed" = "btn-success",    # Verde después de confirmar
-      #                     "modified"  = "btn-primary")    # Vuelve a azul si se modifica
+      btn_class <- fn_R_switch_class_from_button_state(button_state = button_state())
       
-      btn_class <- switch(button_state(),
-                          "initial"   = "btn-outline-primary",    # Azul inicial
-                          "confirmed" = "btn-outline-success",    # Verde después de confirmar
-                          "modified"  = "btn-outline-primary")    # Vuelve a azul si se modifica
       # Botón para elegir variables
       actionButton(
         ns("btn_tools"),
@@ -173,23 +166,28 @@ Sbutton_02_tools2_server <- function(id,
       # }
       
       
-      fn_shiny_apply_changes_reactiveValues(rv = internal_PLAY_SELECTOR, default_structure)
+      fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, default_structure)
       
       
       obj_intermedio <- list_user_tool_selection()
       
+      the_check <- obj_intermedio$"check_selected_tool"
+      selected_tool <- obj_intermedio$"selected_tool"
+      
+      if (!the_check) {
+        texto_error <- "Error on tools selection."
+        showNotification(texto_error, type = "warning")
+        button_state("error")
+        return()
+      }
+      
+      
       fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, list(
         "pack_input"   = obj_intermedio,
-        "check_input"  = TRUE,
+        "check_input"  = the_check,
         "pack_output"  = obj_intermedio,
-        "check_output" = TRUE,
+        "check_output" = the_check,
         "button_class" = "confirmed"))
-      
-      # internal_TOOLS_SELECTOR$"pack_input"   = obj_intermedio
-      # internal_TOOLS_SELECTOR$"check_input"  = TRUE
-      # internal_TOOLS_SELECTOR$"pack_output"  = obj_intermedio
-      # internal_TOOLS_SELECTOR$"check_output" = TRUE
-      # internal_TOOLS_SELECTOR$"button_class" = "confirmed"
       
 
       
@@ -205,12 +203,6 @@ Sbutton_02_tools2_server <- function(id,
     
     # Función para restablecer este botón (accesible desde el exterior)
     return(NULL)
-    # return(list(
-    #   reset = function() {
-    #     runjs(sprintf("$('#%s').css('border', 'none');", ns("btn_tools")))
-    #     runjs(sprintf("$('#%s').removeClass('btn-success').addClass('btn-primary');", ns("btn_tools")))
-    #   }
-    # )
-    # )
+    
   })
 }

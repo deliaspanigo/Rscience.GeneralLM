@@ -41,7 +41,7 @@ GeneralLM_fix_anova1_MM_settings_server <- function(id, my_dataset) {
       
       selectInput(
         ns("var_name_rv"),
-        "Select a response variable:",
+        "Response variable:",
         choices = choices,
         selected = choices[2]
         # selected = if (length(choices) > 0) choices[1] else NULL
@@ -56,7 +56,7 @@ GeneralLM_fix_anova1_MM_settings_server <- function(id, my_dataset) {
       
       selectInput(
         ns("var_name_factor"),
-        "Select a factor:",
+        "Factor:",
         choices = choices,
         selected = choices[3]
         # selected = if (length(choices) > 0) choices[1] else NULL
@@ -78,7 +78,7 @@ GeneralLM_fix_anova1_MM_settings_server <- function(id, my_dataset) {
       
       selectInput(
         ns("alpha_value"),
-        "Select a response variable:",
+        "Alpha value:",
         choices = vector_choices_alpha,
         selected = vector_choices_alpha[2]
       )
