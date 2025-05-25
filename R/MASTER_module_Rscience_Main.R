@@ -184,10 +184,10 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     #---------------------------------------------------------------------------
     
     
-    # Button Dataselect
+    # Button Dataselect - Server
     Sbutton_01_dataselector2_server(id = "dataset_selector2", internal_DATASET_SELECTOR)
     
-    # Button Tools
+    # Button Tools - Server
     Sbutton_02_tools2_server(id = "tools_selector2", default_structure, internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR, internal_PLAY_SELECTOR)
     
     # # # # # # - - - MY_SELECTED_TOOL - - - - - - - - - - - - - - - - - - - - - 
@@ -202,7 +202,10 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
       MY_SELECTED_TOOL(info_output$"selected_tool")
       
-      # Reset internal y active STR
+      # Reset internal y active CFG
+      fn_shiny_apply_changes_reactiveValues(rv = active_CFG, default_structure)
+      fn_shiny_apply_changes_reactiveValues(rv = internal_CFG, default_structure)
+      
       fn_shiny_apply_changes_reactiveValues(rv = active_STR, default_structure)
       fn_shiny_apply_changes_reactiveValues(rv = internal_STR, default_structure)
       
@@ -219,8 +222,11 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       check_tool <- str_selected_tool %in% vector_names_all_tools
       
       if (!check_tool) {
-        showNotification(
-          "La herramienta seleccionada no está disponible.",
+        text_error <- "Rscience error: selected tools is not available.\n
+        Selected tool: _the_tool_"
+        text_error <- sub(pattern = "_the_tool_", replacement = str_selected_tool, text_error)
+        shiny::showNotification(
+          text_error,
           type = "warning"
         )
         return()  # Salir del observe
@@ -228,7 +234,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
       # Preparing delivery...
       pack_output <- list_all_config02_tools[[str_selected_tool]]
-      check_output <- TRUE
+      check_output <- check_tool
       button_class <- "confirmed"
       
       # Delivery!
@@ -282,18 +288,6 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
 
       
 
-      # ------------------------------------------------------------------------
-      #
-      # 1) Settings...
-      df_01_settings <- data.frame(
-        "short_name" = c("MM_server", "MM_ui", "FN_validate_vars"),
-        "str_end_file" = c("_MM_settings_server",
-                           "_MM_settings_ui", 
-                           "_FN_validate_vars")
-      )
-      df_01_settings$"resource_name"   <- paste0(str_selected_tool, df_01_settings$"str_end_file")
-      df_01_settings$"resource_exists" <- df_01_settings$"resource_name" %in% vector_pk_fn_vector
-      check_01_settings <- all(df_01_settings$"resource_exists")
       # ------------------------------------------------------------------------
       #
       # 02) Zocalo selected vars (ZSV)
@@ -352,13 +346,11 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
     
       
-    check_all_fn <- all(check_01_settings, check_02_ZSV, 
+    check_all_fn <- all(check_02_ZSV, 
                         check_03_RRC, check_04_ORRS, check_05_theory,
                         check_06_script)
       
     output_list <- list(
-      "df_01_settings" = df_01_settings,
-      "check_01_settings" = check_01_settings,
       "df_02_ZSV" = df_02_ZSV,
       "check_02_ZSV" = check_02_ZSV,
       "df_03_RRC" = df_03_RRC,
@@ -410,12 +402,12 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     # # # # # # - - - - - - - - - - - - - - - - - -
     # # # # # # - - - - - - - - - - - - - - - - - -
     
-    
+    # Button Settings - Server
     Sbutton_03_settings_server(id = "settings", 
-                                         internal_DATASET_SELECTOR, 
-                                         internal_TOOLS_SELECTOR,
-                                         internal_CFG,
-                                         internal_VARIABLE_SELECTOR)
+                               internal_DATASET_SELECTOR, 
+                               internal_TOOLS_SELECTOR,
+                               internal_CFG,
+                               internal_VARIABLE_SELECTOR)
     
     Sbutton_reset2_server(id = "reset2", 
                           default_structure, 
@@ -431,6 +423,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
                          internal_DATASET_SELECTOR,  active_DATASET_SELECTOR,
                          internal_TOOLS_SELECTOR,    active_TOOLS_SELECTOR,
                          internal_STR,               active_STR,
+                         internal_CFG,               active_CFG,
                          internal_VARIABLE_SELECTOR, active_VARIABLE_SELECTOR,
                          internal_PLAY_SELECTOR,     active_PLAY_SELECTOR)
     
@@ -594,6 +587,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
       vector_check <- c(active_DATASET_SELECTOR$"check_output", 
                         active_TOOLS_SELECTOR$"check_output",
+                        active_CFG$"check_output",
                         active_STR$"check_output",
                         active_VARIABLE_SELECTOR$"check_output",
                         active_PLAY_SELECTOR$"check_output")
