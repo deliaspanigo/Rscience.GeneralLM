@@ -199,7 +199,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
                                 number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM, internal_DATASET_SELECTOR)
 
 
-    # Step 04) Dataset Selector ------------------------------------------------
+    # Step 04) Tool Selector ---------------------------------------------------
     internal_TOOLS_SELECTOR <- do.call(reactiveValues, default_list_button)
     MY_SELECTED_TOOL <- reactiveVal(NULL)
     Sbutton_02_tools_server(id = "tools_selector2", step_pos = 4, number_current_step, internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR)
@@ -219,12 +219,12 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     })
     module_step04_tools_server(id = "step04", step_pos = 4,
                                         number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM, internal_TOOLS_SELECTOR)
+    
+    # Step 06) CFG from selected tool ------------------------------------------
+    internal_CFG <- do.call(reactiveValues, default_list_button)
+    module_step05_cfg_server(id = "step05", step_pos = 5,
+                           number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM, internal_TOOLS_SELECTOR)
     # --------------------------------------------------------------------------
-#     # 
-#     # 
-    # Hacer todo con modulos...
-    # my_modulo_server(id = "LALA", step_module = 2, current_step, APP_TOTEM)
-    # No hay mas objetos intermedios o separados.
     # el detalle "key_obj" es para poder buscar un step en particular aunque
     # se agreguen mas modulos intermedios.
     # por ejemplo el modulo de RUN necesita al modulo de Script, y al modulo de
