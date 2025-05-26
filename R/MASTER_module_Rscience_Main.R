@@ -179,20 +179,20 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     # Button 01 - Import Dataset     
     
     
-    # Button 02 - 
+    # Reset button -------------------------------------------------------------
     Sbutton_reset2_server(id = "reset2", number_current_step, default_list_button, 
                           internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR)
     
     # List steps
-    # Step 01) Initial
+    # Step 01) Initial ---------------------------------------------------------
     module_step01_init_server(id = "step01", step_pos = 1, 
                               number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM)
     
-    # Step 02) Upload
+    # Step 02) Upload ----------------------------------------------------------
     module_step02_upload_server(id = "step02", step_pos = 2, 
                                 number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM)
     
-    # Step 03) Dataset Selector
+    # Step 03) Dataset Selector ------------------------------------------------
     internal_DATASET_SELECTOR <- do.call(reactiveValues, default_list_button)
     Sbutton_01_dataselector_server(id = "dataset_selector2", step_pos = 3, number_current_step, internal_DATASET_SELECTOR)
     module_step03_import_dataset_server(id = "step03", step_pos = 3,
@@ -201,10 +201,25 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
 
     # Step 04) Dataset Selector ------------------------------------------------
     internal_TOOLS_SELECTOR <- do.call(reactiveValues, default_list_button)
+    MY_SELECTED_TOOL <- reactiveVal(NULL)
     Sbutton_02_tools_server(id = "tools_selector2", step_pos = 4, number_current_step, internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR)
+    # Observe - MY_SELECTED_TOOL()
+    observe({
+      req(internal_TOOLS_SELECTOR, internal_TOOLS_SELECTOR)
+      req(internal_TOOLS_SELECTOR$"check_output")
+      
+      MY_SELECTED_TOOL(NULL)
+      valores_internos_list <- reactiveValuesToList(internal_TOOLS_SELECTOR)
+      
+      info_output <- valores_internos_list$"pack_output"
+      
+      req(info_output)
+      
+      MY_SELECTED_TOOL(info_output$"selected_tool")
+    })
     module_step04_tools_server(id = "step04", step_pos = 4,
                                         number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM, internal_TOOLS_SELECTOR)
-    
+    # --------------------------------------------------------------------------
 #     # 
 #     # 
     # Hacer todo con modulos...
@@ -265,12 +280,52 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         h2("Finalizados"),
         verbatimTextOutput(ns("SUPER_B")),
         br(),
+        h2("AVER"),
+        uiOutput(ns("dynamic_tabs")),
+        br(),
         h2("Finalizados"),
         verbatimTextOutput(ns("SUPER_C"))
       )
     })
     ############################################################################
-    
+    # Generar las pestañas y los outputs dinámicamente en un solo renderUI
+    output$dynamic_tabs <- renderUI({
+      the_list <- reactiveValuesToList(APP_TOTEM)
+      the_list <- Filter(Negate(is.null), the_list)
+      # Creamos las pestañas y sus contenidos de forma dinámica
+      tabs <- lapply(1:length(the_list), function(selected_pos) {
+        
+        list_name <- names(the_list)[selected_pos]
+        # Obtenemos el contenido de la lista actual (que ahora es una lista anidada)
+        list_content <- the_list[[list_name]]
+        selected_label <- list_content$"current_label"
+        
+        # Convertimos la lista a formato de texto para mostrar
+        list_text <- capture.output(str(list_content, max.level = 3))
+        
+        # Para cada lista, crear una pestaña con su contenido
+        nav_panel(
+          title = selected_label,
+          div(
+            h4(paste("Contenido de", list_name)),
+            # Mostramos la estructura de la lista anidada
+            pre(
+              code(
+                paste(list_text, collapse = "\n")
+              )
+            )
+          )
+        )
+      })
+      
+      # Devolver el conjunto de pestañas
+      navset_tab(
+        id = "tab_panel",
+        !!!tabs  # Desempaquetar la lista de pestañas
+      )
+    })
+   
+    ###################################################
     
     # UI - Dataset
     output$visual_dataset <- DT::renderDataTable({
@@ -315,124 +370,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
                           internal_VARIABLE_SELECTOR, active_VARIABLE_SELECTOR,
                           internal_PLAY_SELECTOR,     active_PLAY_SELECTOR)
     
-    # Inicialización de casa paso
-    
-    
    
-    
-    #---------------------------------------------------------------------------
-    # Step 01 - Activation
-    # 
-    #
-    #---------------------------------------------------------------------------    
-    # Step02 - Load conf02 yaml
-    ### All config tools
-    
-    
-    ### Step02 - Observe
-    observe({
-      # Requeriments -----------------------------------------------------------
-      
-      
-    })
-    #
-    
-    
-   
-    #---------------------------------------------------------------------------    
-    # Step04 - Tool Selector
-    #
-    ### Internal ReactiveValues
-    internal_TOOLS_SELECTOR <- do.call(reactiveValues, default_structure_internal)
-    active_TOOLS_SELECTOR   <- do.call(reactiveValues, default_structure_internal)
-    
-    ### Button Tool Selector - Server
-    Sbutton_02_tools_server(id = "tools_selector2", default_structure_internal, internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR)
-    
-    # Observe - MY_SELECTED_TOOL()
-    MY_SELECTED_TOOL <- reactiveVal(NULL)
-    observe({
-      req(internal_TOOLS_SELECTOR, active_TOOLS_SELECTOR)
-      req(internal_TOOLS_SELECTOR$"check_output")
-      
-      MY_SELECTED_TOOL(NULL)
-      valores_internos_list <- reactiveValuesToList(internal_TOOLS_SELECTOR)
-      
-      info_output <- valores_internos_list$"pack_output"
-      
-      req(info_output)
-      
-      MY_SELECTED_TOOL(info_output$"selected_tool")
-    })
-
-    ### Step04 - Observe
-    observe({
-      
-      # Requeriments -----------------------------------------------------------
-      req(number_current_step() == 4)
-      req(internal_TOOLS_SELECTOR, active_TOOLS_SELECTOR)
-      req(internal_TOOLS_SELECTOR$"check_output")
-      req(MY_SELECTED_TOOL())
-      
-      # Basics and plague control ----------------------------------------------
-      current_step <- number_current_step()
-      current_step_name <- paste0(STR_STEP_NAME, current_step)
-      fn_shiny_remove_future_steps(APP_TOTEM, current_step = current_step, STR_STEP_NAME)
-      
-      # New list ---------------------------------------------------------------
-      new_list_step <- default_list_step
-      error_message <- ""
-      new_list_step$"current_step"   <- current_step
-      new_list_step$"current_label" <- "Step 04: Tools selection"
-      
-      
-      # Check previous ---------------------------------------------------------
-      my_previous_step <- current_step - 1
-      my_previous_step_name <- paste0(STR_STEP_NAME, my_previous_step)
-      check_previous <- APP_TOTEM[[my_previous_step_name]]$"check_output"
-      new_list_step$"check_previous" <- check_previous
-      
-      # Error message check previous -------------------------------------------
-      if(!check_previous){
-        error_message <- paste0("Step: ", current_step)
-        return()
-      }
-      
-      # Check output -----------------------------------------------------------
-      check_output <- !is.null(internal_TOOLS_SELECTOR)
-      if(!check_output){
-        error_message <- paste0("Step: ", current_step)
-        return()
-      }
-      
-      # Filling new list -------------------------------------------------------
-      new_list_step$"check_output"   <- check_output
-      new_list_step$"pack_output"    <- MY_SELECTED_TOOL()
-      new_list_step$"button_state"   <- "confirmed"
-      new_list_step$"error_message"  <- error_message
-      
-      # Validating the new list ------------------------------------------------
-      check_list <- fn_R_validate_new_list(new_list = new_list_step, 
-                                           ref_list = default_list_step)
-      
-      # Error message for new list ---------------------------------------------
-      if (!check_list) {
-        fn_shiny_show_error_new_list(step_number = current_step, 
-                                     new_list = new_list_step, 
-                                     ref_list = default_list_step)
-        
-        return()  # Stop further execution
-      }
-      
-      # Add --------------------------------------------------------------------
-      isolate({
-        APP_TOTEM[[current_step_name]] <- new_list_step
-        number_current_step(current_step+1)
-        fn_shiny_remove_future_steps(APP_TOTEM, current_step = current_step, STR_STEP_NAME)
-        
-      })
-      
-    })
     #---------------------------------------------------------------------------    
     # Step05 - CFG (config from tool selector)
     #
