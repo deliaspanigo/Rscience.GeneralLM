@@ -11,10 +11,7 @@ Sbutton_02_tools_ui <- function(id) {
 }
 
 #' @export
-Sbutton_02_tools_server <- function(id, 
-                                    default_structure_internal, 
-                                     internal_DATASET_SELECTOR, 
-                                     internal_TOOLS_SELECTOR) {
+Sbutton_02_tools_server <- function(id, step_pos, number_current_step, internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR){
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
@@ -26,7 +23,7 @@ Sbutton_02_tools_server <- function(id,
     button_state <- reactiveVal(NULL)
     
     observe({ 
-      button_state(internal_TOOLS_SELECTOR$"button_class")
+      button_state(internal_TOOLS_SELECTOR$"button_state")
     })
     
     output$my_action_button <- renderUI({
@@ -59,7 +56,7 @@ Sbutton_02_tools_server <- function(id,
     observeEvent(input$btn_tools, {
       
       # Verificar que se haya seleccionado un dataset primero
-      if (!internal_DATASET_SELECTOR$check_output) {
+      if (!internal_DATASET_SELECTOR$"check_output") {
         showNotification(
           "Please, select your dataset!",
           type = "warning"
@@ -165,7 +162,7 @@ Sbutton_02_tools_server <- function(id,
       # }
       
       
-      fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, default_structure_internal)
+      # fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, default_structure_internal)
       
       
       obj_intermedio <- list_user_tool_selection()
@@ -186,7 +183,7 @@ Sbutton_02_tools_server <- function(id,
         "check_input"  = the_check,
         "pack_output"  = obj_intermedio,
         "check_output" = the_check,
-        "button_class" = "confirmed"))
+        "button_state" = "confirmed"))
       
 
       

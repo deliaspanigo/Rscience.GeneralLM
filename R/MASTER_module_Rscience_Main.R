@@ -161,159 +161,52 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     default_list_step <- list(
       "current_step" = NA,
       "current_label" = NA,
-      "key_obj" = NA, 
+      "key" = NA, 
       "check_previous" = FALSE,
       "pack_output" = "",
       "check_output" = FALSE,
-      "button_class" = "initial",
+      "button_state" = "initial",
       "the_time"           = "",
       "error_message" = ""
     )
     
     
+    default_list_button <- list(
+      "pack_output"  = "",
+      "check_output" = FALSE,
+      "button_state" = "initial")
+
+    # Button 01 - Import Dataset     
+    
+    
+    # Button 02 - 
+    Sbutton_reset2_server(id = "reset2", number_current_step, default_list_button, 
+                          internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR)
     
     # List steps
     # Step 01) Initial
-    step01_initial <- reactive({
-      
-      
-      # Requeriments -----------------------------------------------------------
-      req(number_current_step() == 1)
-      print(number_current_step())
-      
-      # Hardcoded --------------------------------------------------------------
-      current_label <- "Step 01 - Initial"
-      current_step <- number_current_step()
-      
-      # Basic for step and plague control --------------------------------------
-      current_step_name <- paste0(STR_STEP_NAME, current_step)
-      fn_shiny_remove_future_steps(APP_TOTEM, current_step, STR_STEP_NAME)
-      
-      # The new list step ------------------------------------------------------
-      new_list_step <- default_list_step
-      new_list_step$"current_step"   <- current_step
-      new_list_step$"current_label"  <- current_label
-      new_list_step$"key_obj"        <- "initial"#sys.function()
-      new_list_step$"check_previous" <- TRUE
-      new_list_step$"pack_output"    <- ""
-      new_list_step$"check_output"   <- TRUE
-      new_list_step$"button_class"   <- "confirmed"
-      new_list_step$"the_time"           <- fn_R_the_time_beauty()
-      new_list_step$"error_message"  <- ""
-      
-      # New list totem 
-      new_list_totem <- new_list_step
-      new_list_totem$"pack_output" <- "Good luck!"
+    module_step01_init_server(id = "step01", step_pos = 1, 
+                              number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM)
+    
+    # Step 02) Upload
+    module_step02_upload_server(id = "step02", step_pos = 2, 
+                                number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM)
+    
+    # Step 03) Dataset Selector
+    internal_DATASET_SELECTOR <- do.call(reactiveValues, default_list_button)
+    Sbutton_01_dataselector_server(id = "dataset_selector2", step_pos = 3, number_current_step, internal_DATASET_SELECTOR)
+    module_step03_import_dataset_server(id = "step03", step_pos = 3,
+                                number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM, internal_DATASET_SELECTOR)
 
-    
-      # Validating the new totem list ------------------------------------------
-      check_list_step <- fn_R_validate_new_list(new_list = new_list_step,  
-                                                 ref_list = default_list_step)
-      
-      # Error message for new list step ----------------------------------------
-      if (!check_list_step) {
-        fn_shiny_show_error_new_list(step_number = current_step, 
-                                     new_list = new_list_step, 
-                                     ref_list = default_list_step)
-        
-        return()  # Stop further execution
-      }
-      
-      # Add --------------------------------------------------------------------
-      isolate({
-        APP_TOTEM[[current_step_name]] <- new_list_step
-        number_current_step(current_step+1)
-      })
-      
-      # Return
-      return(new_list_step)
-      
-    })
-    
-    
-    
-    # 1) Import tool options OK!
-    step02_upload <- reactive({
-      
-      # Requeriments -----------------------------------------------------------
-      req(number_current_step() == 2)
-      print(number_current_step())
-      
-      # Hardcoded --------------------------------------------------------------
-      current_label <- "Step 02: Up resources"
-      current_step <- number_current_step()
-      
-      # Basics and plague control ----------------------------------------------
-      current_step_name <- paste0(STR_STEP_NAME, current_step)
-      fn_shiny_remove_future_steps(APP_TOTEM, current_step, STR_STEP_NAME)
-      
-      # Check previous totem ---------------------------------------------------
-      my_previous_step <- current_step - 1
-      my_previous_step_name <- paste0(STR_STEP_NAME, my_previous_step)
-      check_previous <- APP_TOTEM[[my_previous_step_name]]$"check_output"
 
-      # Error message for check previous totem
-      if(!check_previous){
-        error_message <- paste0("Step: ", current_step)
-        return(NULL)
-      }
-      
-      # Action for this step - Create pack_output!!!!!!!!!! --------------------
-      list_all_config02_tools <- fn_R_load_config02_yaml()
-      pack_output <- list_all_config02_tools
-      
-      # Check output and more --------------------------------------------------
-      check_output <- !is.null(pack_output)
-      button_class <- "confirmed"
-      
-      
-      # Message error for check output -----------------------------------------
-      if(!check_output){
-        error_message <- paste0("Step: ", current_step)
-        return(NULL)
-      }
-      
-      
-      # The new list step ------------------------------------------------------
-      new_list_step <- default_list_step
-      new_list_step$"current_step"   <- current_step
-      new_list_step$"current_label"  <- current_label
-      new_list_step$"key_obj"        <- "upload"#sys.function()
-      new_list_step$"check_previous" <- check_previous
-      new_list_step$"pack_output"    <- pack_output
-      new_list_step$"check_output"   <- check_output
-      new_list_step$"button_class"   <- button_class
-      new_list_step$"the_time"       <- fn_R_the_time_beauty()
-      new_list_step$"error_message"  <- ""
-      
-      # New list totem 
-      new_list_totem <- new_list_step
-      new_list_totem$"pack_output" <- "Good luck!"
-      
-      
-      # Validating the new totem list ------------------------------------------
-      check_list_step <- fn_R_validate_new_list(new_list = new_list_step,  
-                                                ref_list = default_list_step)
-      
-      # Error message for new list step ----------------------------------------
-      if (!check_list_step) {
-        fn_shiny_show_error_new_list(step_number = current_step, 
-                                     new_list = new_list_step, 
-                                     ref_list = default_list_step)
-        
-        return()  # Stop further execution
-      }
-      
-      # Add --------------------------------------------------------------------
-      isolate({
-        APP_TOTEM[[current_step_name]] <- new_list_step
-        number_current_step(current_step+1)
-      })
-      
-      # Return
-      return(new_list_step)
-    })
+    # Step 04) Dataset Selector ------------------------------------------------
+    internal_TOOLS_SELECTOR <- do.call(reactiveValues, default_list_button)
+    Sbutton_02_tools_server(id = "tools_selector2", step_pos = 4, number_current_step, internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR)
+    module_step04_tools_server(id = "step04", step_pos = 4,
+                                        number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM, internal_TOOLS_SELECTOR)
     
+#     # 
+#     # 
     # Hacer todo con modulos...
     # my_modulo_server(id = "LALA", step_module = 2, current_step, APP_TOTEM)
     # No hay mas objetos intermedios o separados.
@@ -328,26 +221,40 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     # una vison de lo que está siendo ejecutado sin tener que ver tooodos los resultados
     # obtendios en cada caso.
     
-    all_step_OK <- reactiveVal()
-    observe({
-      print(step01_initial())
-      print(step02_upload())
-    })
+    # all_step_OK <- reactiveVal()
+    # observe({
+    #   print(step01_initial())
+    #   print(step02_upload())
+    # })
     # Card 01) Botonera "main menu"
     output$"SUPER_A" <- renderPrint({
-      
+
       # "current_step" = NA,
       # "current_label" = NA,
       # "check_previous" = FALSE,
       # "check_output" = FALSE,
       # "pack_output" = "",
-      # "button_class" = "initial",
+      # "button_state" = "initial",
       # "error_message" = ""
-      # 
+      #
       number_current_step()
     })
     output$"SUPER_B" <- renderPrint({
       the_list <- reactiveValuesToList(APP_TOTEM)
+      the_list <- Filter(Negate(is.null), the_list)
+      the_list <- lapply(the_list, function(x){
+        x$"pack_output" <- ""
+        rbind.data.frame(x)
+      })
+      the_list
+      the_df <- do.call(rbind.data.frame, the_list)
+      selected_cols <- c("current_step", "current_label", "key", "button_state", "the_time")
+      the_df[selected_cols]
+    })
+    output$"SUPER_C" <- renderPrint({
+      the_list <- reactiveValuesToList(APP_TOTEM)
+      the_list <- Filter(Negate(is.null), the_list)
+      
       the_list
     })
     output$"SUPER_ALL" <- renderUI({
@@ -356,10 +263,33 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         verbatimTextOutput(ns("SUPER_A")),
         br(),
         h2("Finalizados"),
-        verbatimTextOutput(ns("SUPER_B"))
+        verbatimTextOutput(ns("SUPER_B")),
+        br(),
+        h2("Finalizados"),
+        verbatimTextOutput(ns("SUPER_C"))
       )
     })
     ############################################################################
+    
+    
+    # UI - Dataset
+    output$visual_dataset <- DT::renderDataTable({
+      # Obtener la lista de reactiveValues
+      the_list <- reactiveValuesToList(APP_TOTEM)
+
+      # Intentar acceder al dataset
+      my_dataset <- NULL
+      if (!is.null(the_list[[3]]$"pack_output"$"database")) {
+        my_dataset <- the_list[[3]]$"pack_output"$"database"
+        print(my_dataset)
+      }
+
+      # Solo continuar si my_dataset existe y es válido
+      req(my_dataset)
+      
+      # Devuelve el dataset si existe, si no, no muestra nada
+      my_dataset
+    })
     
     
 
@@ -406,83 +336,9 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
     })
     #
-    #---------------------------------------------------------------------------    
-    # Step03 - Data Selector
-    #
-    ### Internal ReactiveValues
-    internal_DATASET_SELECTOR <- do.call(reactiveValues, default_structure_internal)
-    active_DATASET_SELECTOR   <- do.call(reactiveValues, default_structure_internal)
     
-    ### Button Dataselect - Server
-    Sbutton_01_dataselector_server(id = "dataset_selector2", internal_DATASET_SELECTOR)
     
-    ### Step03 - Observe
-    observe({
-      # Requerments ------------------------------------------------------------
-      req(number_current_step() == 3)
-      req(internal_DATASET_SELECTOR, active_DATASET_SELECTOR)
-      req(internal_DATASET_SELECTOR$"check_output")
-      
-      # Bacis and plague control -----------------------------------------------
-      current_step <- number_current_step()
-      fn_shiny_remove_future_steps(APP_TOTEM, current_step = current_step, STR_STEP_NAME)
-      
-      # New list ---------------------------------------------------------------
-      new_list_step <- default_list_step
-      error_message <- ""
-      new_list_step$"current_step"   <- current_step
-      new_list_step$"current_label" <- "Step 03: Import Dataset"
-      
-      
-      # Check previous ---------------------------------------------------------
-      my_previous_step <- current_step - 1
-      my_previous_step_name <- paste0(STR_STEP_NAME, my_previous_step)
-      check_previous <- APP_TOTEM[[my_previous_step_name]]$"check_output"
-      new_list_step$"check_previous" <- check_previous
-      if(!check_previous){
-        error_message <- paste0("Step: ", current_step)
-        
-      }
-      
-      # Check output -----------------------------------------------------------
-      check_output <- !is.null(internal_DATASET_SELECTOR)
-      
-      # Message error for check output -----------------------------------------
-      if(!check_output){
-        error_message <- paste0("Step: ", current_step)
-        
-      }
-      
-      # Filling new list -------------------------------------------------------
-      new_list_step$"check_output"   <- check_output
-      new_list_step$"pack_output"    <- ""
-      new_list_step$"button_class"   <- "confirmed"
-      new_list_step$"error_message"  <- error_message
-      
-      # Validate the list ------------------------------------------------------
-      check_list <- fn_R_validate_new_list(new_list = new_list_step, 
-                                           ref_list = default_list_step)
-      
-      # Message for error on new list-- ----------------------------------------
-      if (!check_list) {
-        fn_shiny_show_error_new_list(step_number = current_step, 
-                                     new_list = new_list_step, 
-                                     ref_list = default_list_step)
-        
-        return()  # Stop further execution
-      }
-      
-      # Add --------------------------------------------------------------------
-      isolate({
-        current_step_name <- paste0(STR_STEP_NAME, current_step)
-        APP_TOTEM[[current_step_name]] <- new_list_step
-        number_current_step(current_step+1)
-        fn_shiny_remove_future_steps(APP_TOTEM, current_step = current_step, STR_STEP_NAME)
-        
-      })
-      
-    })
-    #
+   
     #---------------------------------------------------------------------------    
     # Step04 - Tool Selector
     #
@@ -552,7 +408,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       # Filling new list -------------------------------------------------------
       new_list_step$"check_output"   <- check_output
       new_list_step$"pack_output"    <- MY_SELECTED_TOOL()
-      new_list_step$"button_class"   <- "confirmed"
+      new_list_step$"button_state"   <- "confirmed"
       new_list_step$"error_message"  <- error_message
       
       # Validating the new list ------------------------------------------------
@@ -621,7 +477,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       vector_names_all_tools <- names(list_all_config02_tools)
       check_output <- str_selected_tool %in% vector_names_all_tools
       pack_output <- list_all_config02_tools[[str_selected_tool]]
-      button_class <- "confirmed"
+      button_state <- "confirmed"
       
       # Error message for check_output -----------------------------------------
       if (!check_output) {
@@ -641,12 +497,12 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         "check_input"  = TRUE,
         "pack_output"  = pack_output,
         "check_output" = check_output,
-        "button_class" = button_class))
+        "button_state" = button_state))
       
       # Filling new list -------------------------------------------------------
       new_list_step$"check_output"   <- check_output
       new_list_step$"pack_output"    <- ""
-      new_list_step$"button_class"   <- button_class
+      new_list_step$"button_state"   <- button_state
       new_list_step$"error_message"  <- error_message
       
       # Check new list ---------------------------------------------------------
@@ -729,7 +585,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       # Filling new_list -------------------------------------------------------
       new_list_step$"check_output"   <- check_output
       new_list_step$"pack_output"    <- ""
-      new_list_step$"button_class"   <- "confirmed"
+      new_list_step$"button_state"   <- "confirmed"
       new_list_step$"error_message"  <- error_message
       
       # Validating new list ----------------------------------------------------
@@ -856,7 +712,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
 
       # Check output -----------------------------------------------------------
       check_output <- !is.null(pack_output)
-      button_class <- "confirmed"
+      button_state <- "confirmed"
       
       # Error message for check output -----------------------------------------
       if(!check_output){
@@ -870,12 +726,12 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         "check_input"  = TRUE,
         "pack_output"  = pack_output,
         "check_output" = check_output,
-        "button_class" = button_class))
+        "button_state" = button_state))
       
       # Filling new list -------------------------------------------------------
       new_list_step$"check_output"   <- check_output
       new_list_step$"pack_output"    <- ""
-      new_list_step$"button_class"   <- button_class
+      new_list_step$"button_state"   <- button_state
       new_list_step$"error_message"  <- error_message
       
       # Validate the list ------------------------------------------------------
@@ -978,7 +834,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       check_input = FALSE,
       pack_output = "",
       check_output = FALSE,
-      button_class = "initial"
+      button_state = "initial"
     )   
     
 
@@ -1115,7 +971,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         "check_input"  = TRUE,
         "pack_output"  = output_list,
         "check_output" = check_all_fn,
-        "button_class" = "confirmed"))
+        "button_state" = "confirmed"))
       
     })
     
@@ -1220,15 +1076,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     ############################################################################
     
-    output$visual_dataset <- DT::renderDataTable({
-      req(internal_DATASET_SELECTOR)
-      req(internal_DATASET_SELECTOR$"check_output")
-      req(internal_DATASET_SELECTOR$"pack_output"$"database")
-      
-      my_dataset <- internal_DATASET_SELECTOR$"pack_output"$"database"
-      my_dataset
-      
-    })
+   
     
     ############################################################################
     
@@ -1430,7 +1278,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       check_output         = FALSE,
       check_end_modal      = FALSE,
       check_general        = FALSE,
-      button_class         = "initial"
+      button_state         = "initial"
     )
     
     active_R_OBJECTS   <- do.call(reactiveValues, default_R_OBJECTS)
@@ -1528,7 +1376,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
             fn_shiny_apply_changes_reactiveValues(rv = active_R_OBJECTS,  changes_list = list(
               "pack_output" = the_results(),
               "check_output" = TRUE,
-              "button_class" = "confirmed"
+              "button_state" = "confirmed"
             ))
           }
           

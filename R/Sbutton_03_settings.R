@@ -13,11 +13,9 @@ Sbutton_03_settings_ui <- function(id) {
 
 
 #' @export
-Sbutton_03_settings_server <- function(id, 
-                                                 internal_DATASET_SELECTOR, 
-                                                 internal_TOOLS_SELECTOR, 
-                                                 internal_CFG,
-                                                 internal_VARIABLE_SELECTOR) {
+Sbutton_03_settings_server <- function(id,
+                                       step_pos, 
+                                       number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     

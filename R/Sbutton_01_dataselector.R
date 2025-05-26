@@ -10,24 +10,25 @@ Sbutton_01_dataselector_ui <- function(id) {
 }
 
 #' @export
-Sbutton_01_dataselector_server <- function(id, internal_DATASET_SELECTOR) {
+Sbutton_01_dataselector_server <- function(id, step_pos, number_current_step, internal_DATASET_SELECTOR) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
     
     
     # Variable reactiva para almacenar el módulo de importación
-    output_list_database_rv <- reactiveVal(NULL)  
+    # the_output <- reactiveVal(NULL)  
     
     # My button
-    button_state <- reactiveVal("initial")
+    button_state <- reactiveVal(NULL)
     
     observe({
-      button_state(internal_DATASET_SELECTOR$button_class)
+      button_state(internal_DATASET_SELECTOR$"button_state")
     })
     
     output$my_action_button <- renderUI({
-     
+
+      
       btn_class <- fn_R_switch_class_from_button_state(button_state = button_state())
 
       actionButton(
@@ -42,11 +43,12 @@ Sbutton_01_dataselector_server <- function(id, internal_DATASET_SELECTOR) {
       )
     })
     
-    # Iniciamos el server
-    output_list_database_rv(
-      Rscience.import::MASTER_module_import_server(id = "MASTER_import", show_dev = show_dev)
-    )
-    
+    # It a reactive object!
+    my_info_dataset <- Rscience.import::MASTER_module_import_server(id = "MASTER_import", show_dev = show_dev)
+
+    # observeEvent(my_info_dataset(),{
+    #   number_current_step(step_pos)
+    # }, ignoreInit = T)
     
     
     # Cuando el usuario hace clic en el botón para elegir datos
@@ -138,45 +140,36 @@ Sbutton_01_dataselector_server <- function(id, internal_DATASET_SELECTOR) {
       # 2) Asignar nuevos valores a "valores_internos".
       # 3) Cerrar el modal
       # Verificar que se haya seleccionado un dataset primero
-      if (is.null(output_list_database_rv)) {
-        print(output_list_database_rv)
+      if (is.null(my_info_dataset())) {
+        print(my_info_dataset())
         showNotification(
           "Please, select a dataset.",
           type = "warning"
         )
+        the_output(NULL)
         return()  
-      }
+      }  
+
       
-      resultado <- fn_validate_01_dataselector(output_list_database_rv)
-      
-      if (!resultado$status) {
-        showNotification(resultado$message, type = "warning")
-        button_state("error")
-        return()
-      }
-      # 
-       datos <- resultado$datos
-      
-       fn_shiny_apply_changes_reactiveValues(rv = internal_DATASET_SELECTOR, list(
-         "pack_input"   = datos,
-         "check_input"  = resultado$status,
-         "pack_output"  = datos,
-         "check_output" = resultado$status,
-         "button_class" = "confirmed"))
        
 
        
-      # 
-      # button_state("confirmed")
       fn_show_notification_ok(the_message = "Dataset imported successfully.")
       
       
       removeModal()
-      return(resultado)
+
+      
+
+      fn_shiny_apply_changes_reactiveValues(rv = internal_DATASET_SELECTOR,  changes_list = list(
+        "pack_output"  = my_info_dataset(),
+        "check_output" = TRUE,
+        "button_state" = "confirmed")
+        )
+      
+      
     })
     
-    
-    return(NULL)
     
     
   })
