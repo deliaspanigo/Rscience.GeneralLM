@@ -24,7 +24,8 @@ Sbutton_reset2_ui <- function(id) {
 
 #' @export
 Sbutton_reset2_server <- function(id, 
-                                  default_structure, 
+                                  default_structure_internal, 
+                                  number_current_step,
                                   internal_DATASET_SELECTOR,  active_DATASET_SELECTOR,
                                   internal_TOOLS_SELECTOR,    active_TOOLS_SELECTOR,
                                   internal_STR,               active_STR,
@@ -50,22 +51,26 @@ Sbutton_reset2_server <- function(id,
     # Confirmación de reseteo
     observeEvent(input$confirmar_reset, {
       
-      fn_shiny_apply_changes_reactiveValues(rv = internal_DATASET_SELECTOR, default_structure)
-      fn_shiny_apply_changes_reactiveValues(rv = active_DATASET_SELECTOR, default_structure)
+      number_current_step(1)
+      isolate({
+        
+        
+        fn_shiny_apply_changes_reactiveValues(rv = internal_DATASET_SELECTOR, default_structure_internal)
+        fn_shiny_apply_changes_reactiveValues(rv = active_DATASET_SELECTOR, default_structure_internal)
+        
+        fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, default_structure_internal)
+        fn_shiny_apply_changes_reactiveValues(rv = active_TOOLS_SELECTOR, default_structure_internal)
+        
+        fn_shiny_apply_changes_reactiveValues(rv = internal_STR, default_structure_internal)
+        fn_shiny_apply_changes_reactiveValues(rv = active_STR, default_structure_internal)
+        
+        fn_shiny_apply_changes_reactiveValues(rv = internal_VARIABLE_SELECTOR, default_structure_internal)
+        fn_shiny_apply_changes_reactiveValues(rv = active_VARIABLE_SELECTOR, default_structure_internal)
+        
+        fn_shiny_apply_changes_reactiveValues(rv = internal_PLAY_SELECTOR, default_structure_internal)
+        fn_shiny_apply_changes_reactiveValues(rv = active_PLAY_SELECTOR, default_structure_internal)
       
-      fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, default_structure)
-      fn_shiny_apply_changes_reactiveValues(rv = active_TOOLS_SELECTOR, default_structure)
-      
-      fn_shiny_apply_changes_reactiveValues(rv = internal_STR, default_structure)
-      fn_shiny_apply_changes_reactiveValues(rv = active_STR, default_structure)
-      
-      fn_shiny_apply_changes_reactiveValues(rv = internal_VARIABLE_SELECTOR, default_structure)
-      fn_shiny_apply_changes_reactiveValues(rv = active_VARIABLE_SELECTOR, default_structure)
-      
-      fn_shiny_apply_changes_reactiveValues(rv = internal_PLAY_SELECTOR, default_structure)
-      fn_shiny_apply_changes_reactiveValues(rv = active_PLAY_SELECTOR, default_structure)
-      
-     
+      })     
       
       # Mostrar mensaje de éxito
       showNotification(
@@ -76,35 +81,15 @@ Sbutton_reset2_server <- function(id,
       removeModal()
     })
     
-    
-    observeEvent(internal_DATASET_SELECTOR$pack_output,{
-
-        fn_shiny_apply_changes_reactiveValues(rv = active_TOOLS_SELECTOR, default_structure)
-        fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, default_structure)
-        
-        fn_shiny_apply_changes_reactiveValues(rv = internal_STR, default_structure)
-        fn_shiny_apply_changes_reactiveValues(rv = active_STR, default_structure)
-    })
-    
-    # 
-    # 
-    observeEvent(internal_TOOLS_SELECTOR$pack_output,{
-
-        
-        fn_shiny_apply_changes_reactiveValues(rv = active_VARIABLE_SELECTOR, default_structure)
-        fn_shiny_apply_changes_reactiveValues(rv = internal_VARIABLE_SELECTOR, default_structure)
-      
-        
-      
-    })
-    # 
-    observeEvent(internal_VARIABLE_SELECTOR$pack_output,{
-
-        fn_shiny_apply_changes_reactiveValues(rv = active_PLAY_SELECTOR, default_structure)
-        fn_shiny_apply_changes_reactiveValues(rv = internal_PLAY_SELECTOR, default_structure)
-
-      
-    })
+    # observeEvent(internal_DATASET_SELECTOR$pack_output,{
+    #   
+    #   fn_shiny_apply_changes_reactiveValues(rv = active_TOOLS_SELECTOR, default_structure)
+    #   fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, default_structure)
+    #   
+    #   fn_shiny_apply_changes_reactiveValues(rv = internal_STR, default_structure)
+    #   fn_shiny_apply_changes_reactiveValues(rv = active_STR, default_structure)
+    # })
+   
     
   })
 }

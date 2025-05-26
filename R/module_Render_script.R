@@ -45,7 +45,9 @@ module_Render_script_server <- function(id, show_dev,
       req(file_path)
       # the_code   <- GeneralLM_fix_anova1_take_code(str_fn_name="GeneralLM_fix_anova1_RCode")
       # the_code
-      the_code <- fn_R_extract_code_between_markers(file_path = file_path(), 
+      vector_code_lines <- readLines(file_path())
+      
+      the_code <- fn_R_extract_code_between_markers(vector_code_lines = vector_code_lines, 
                                                start_marker = "### INIT CODE ###", 
                                                end_marker   = "### END CODE ###")
 

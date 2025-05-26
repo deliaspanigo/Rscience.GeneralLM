@@ -12,10 +12,9 @@ Sbutton_02_tools_ui <- function(id) {
 
 #' @export
 Sbutton_02_tools_server <- function(id, 
-                                     default_structure, 
+                                    default_structure_internal, 
                                      internal_DATASET_SELECTOR, 
-                                     internal_TOOLS_SELECTOR, 
-                                     internal_PLAY_SELECTOR) {
+                                     internal_TOOLS_SELECTOR) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
@@ -166,7 +165,7 @@ Sbutton_02_tools_server <- function(id,
       # }
       
       
-      fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, default_structure)
+      fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, default_structure_internal)
       
       
       obj_intermedio <- list_user_tool_selection()
