@@ -1,13 +1,14 @@
 #' @export
-module_step02_upload_ui <- function(id) {
+module_step06_settings_ui <- function(id) {
   ns <- NS(id)
   
   
 }
 
 #' @export
-module_step02_upload_server <- function(id, step_pos, number_current_step, 
-                                      STR_STEP_NAME, default_list_step, APP_TOTEM) {
+module_step06_settings_server <- function(id, step_pos, number_current_step, 
+                                     STR_STEP_NAME, default_list_step, 
+                                     APP_TOTEM, internal_SETTINGS) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
@@ -15,12 +16,14 @@ module_step02_upload_server <- function(id, step_pos, number_current_step,
       
       # Requeriments -----------------------------------------------------------
       req(number_current_step() == step_pos)
-      # print(paste0("Adentro del: ", number_current_step()))
+      req(internal_SETTINGS)
+      req(internal_SETTINGS$"check_output")
+      # print(number_current_step())
+      print(reactiveValuesToList(internal_SETTINGS))
       
       # Hardcoded --------------------------------------------------------------
-      current_label <- "Step 02: Up resources"
+      current_label <- "Step 06: Setting Selector"
       current_step <- number_current_step()
-      print(paste0("Adentro del: ", current_label))
       
       # Basics and plague control ----------------------------------------------
       current_step_name <- paste0(STR_STEP_NAME, current_step)
@@ -38,8 +41,8 @@ module_step02_upload_server <- function(id, step_pos, number_current_step,
       }
       
       # Action for this step - Create pack_output!!!!!!!!!! --------------------
-      list_all_config02_tools <- fn_R_load_config02_yaml()
-      pack_output <- list_all_config02_tools
+      pack_output       <- internal_SETTINGS$"pack_output"
+
       
       # Check output and more --------------------------------------------------
       check_output <- !is.null(pack_output)
@@ -57,7 +60,7 @@ module_step02_upload_server <- function(id, step_pos, number_current_step,
       new_list_step <- default_list_step
       new_list_step$"current_step"   <- current_step
       new_list_step$"current_label"  <- current_label
-      new_list_step$"key"            <- "upload_resources"
+      new_list_step$"key"            <- "settings"#sys.function()
       new_list_step$"check_previous" <- check_previous
       new_list_step$"pack_output"    <- pack_output
       new_list_step$"check_output"   <- check_output
@@ -65,7 +68,7 @@ module_step02_upload_server <- function(id, step_pos, number_current_step,
       new_list_step$"the_time"       <- fn_R_the_time_beauty()
       new_list_step$"error_message"  <- ""
       
-
+      
       # Validating the new totem list ------------------------------------------
       check_list_step <- fn_R_validate_new_list(new_list = new_list_step,  
                                                 ref_list = default_list_step)
@@ -85,7 +88,7 @@ module_step02_upload_server <- function(id, step_pos, number_current_step,
         number_current_step(current_step+1)
       })
       
-
+      
     })
     
   })

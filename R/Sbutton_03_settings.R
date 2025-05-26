@@ -15,14 +15,16 @@ Sbutton_03_settings_ui <- function(id) {
 #' @export
 Sbutton_03_settings_server <- function(id,
                                        step_pos, 
-                                       number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM) {
+                                       number_current_step, 
+                                       internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR, 
+                                       internal_CFG, internal_SETTINGS) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
     #---------------------------------------------------------------------------
     # UI BUTTON - state button entails a specific color
     button_state <- reactiveVal(NULL)
-    observe({button_state(internal_VARIABLE_SELECTOR$"button_class")})
+    observe({button_state(internal_SETTINGS$"button_state")})
     
     output$my_action_button <- renderUI({
       
@@ -52,6 +54,8 @@ Sbutton_03_settings_server <- function(id,
     # Local OK
     local_OK <- reactive({
       
+      print(internal_CFG$"check_output")
+      print("FFF")
       vector_all <- c(isTruthy(internal_DATASET_SELECTOR$"check_output"),
                       isTruthy(internal_TOOLS_SELECTOR$"check_output"),
                       isTruthy(internal_CFG$"check_output")
@@ -120,6 +124,11 @@ Sbutton_03_settings_server <- function(id,
       ### Server execution and taking return (the user selections for settings!!!)
       args_server <- list(id = local_id(), my_dataset = my_dataset)
       the_output_server <- do.call(my_str_MM_server(), args_server)
+      
+      print("the output")
+      print(the_output_server)
+      print("the output end")
+      
       output_list_variable_selector_rv(the_output_server)
       
       #
@@ -254,28 +263,26 @@ Sbutton_03_settings_server <- function(id,
       }
       
       
-      # variables_seleccionadas <- output_list_variable_selector_rv()
-      
-      args <- list(output_list_variable_selector_rv = output_list_variable_selector_rv)
-      # print(str_02_FN_validate_vars())
-      resultado <- do.call(my_str_FN(), args)
-      resultado
-        
-      # resultado <- GeneralLM_fix_anova1_FN_validate_vars(output_list_variable_selector_rv = output_list_variable_selector_rv)
-      
-      if (!resultado$status) {
-        showNotification(resultado$message, type = "warning")
-        return()
-      }
+      variables_seleccionadas <- output_list_variable_selector_rv()
+      # print(variables_seleccionadas)
+      # args <- list(output_list_variable_selector_rv = output_list_variable_selector_rv)
+      # # print(str_02_FN_validate_vars())
+      # resultado <- do.call(my_str_FN(), args)
+      # resultado
+      #   
+      # # resultado <- GeneralLM_fix_anova1_FN_validate_vars(output_list_variable_selector_rv = output_list_variable_selector_rv)
+      # 
+      # if (!resultado$status) {
+      #   showNotification(resultado$message, type = "warning")
+      #   return()
+      # }
       
     
       
-      fn_shiny_apply_changes_reactiveValues(rv = internal_VARIABLE_SELECTOR, list(
-        "pack_input"   = resultado$output_list,
-        "check_input"  = resultado$status,
-        "pack_output"  = resultado$output_list,
-        "check_output" = resultado$status,
-        "button_class" = "confirmed"))
+      fn_shiny_apply_changes_reactiveValues(rv = internal_SETTINGS, list(
+        "pack_output"  = variables_seleccionadas(),
+        "check_output" = TRUE,
+        "button_state" = "confirmed"))
       
 
       removeModal()

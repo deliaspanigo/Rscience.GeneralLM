@@ -18,9 +18,8 @@ Sbutton_01_dataselector_server <- function(id, step_pos, number_current_step, in
     
     # Variable reactiva para almacenar el módulo de importación
     # the_output <- reactiveVal(NULL)  
-    
     # My button
-    button_state <- reactiveVal(NULL)
+    button_state <- reactiveVal()
     
     observe({
       button_state(internal_DATASET_SELECTOR$"button_state")

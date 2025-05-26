@@ -220,10 +220,25 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     module_step04_tools_server(id = "step04", step_pos = 4,
                                         number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM, internal_TOOLS_SELECTOR)
     
-    # Step 06) CFG from selected tool ------------------------------------------
+    # Step 05) CFG from selected tool ------------------------------------------
     internal_CFG <- do.call(reactiveValues, default_list_button)
     module_step05_cfg_server(id = "step05", step_pos = 5,
-                           number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM, internal_TOOLS_SELECTOR)
+                           number_current_step, STR_STEP_NAME, default_list_step, 
+                           APP_TOTEM, internal_TOOLS_SELECTOR, internal_CFG)
+    
+    # Step 06) Settings ---------------------------------------------------
+    internal_SETTINGS <- do.call(reactiveValues, default_list_button)
+    Sbutton_03_settings_server(id = "settings", step_pos = 6, number_current_step, 
+                               internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR, 
+                               internal_CFG, internal_SETTINGS)
+    
+    # observe(print(reactiveValuesToList(internal_SETTINGS)))
+    module_step06_settings_server(id = "step06", step_pos = 6,
+                                  number_current_step,
+                                  STR_STEP_NAME, default_list_step,
+                                  APP_TOTEM, internal_SETTINGS)
+    
+   
     # --------------------------------------------------------------------------
     # el detalle "key_obj" es para poder buscar un step en particular aunque
     # se agreguen mas modulos intermedios.
@@ -361,126 +376,13 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     internal_PLAY_SELECTOR <- do.call(reactiveValues, default_structure_internal)
     active_PLAY_SELECTOR   <- do.call(reactiveValues, default_structure_internal)
     
-    Sbutton_reset2_server(id = "reset2", 
-                          default_structure_internal, 
-                          number_current_step,
-                          internal_DATASET_SELECTOR,  active_DATASET_SELECTOR,
-                          internal_TOOLS_SELECTOR,    active_TOOLS_SELECTOR,
-                          internal_STR,               active_STR,
-                          internal_VARIABLE_SELECTOR, active_VARIABLE_SELECTOR,
-                          internal_PLAY_SELECTOR,     active_PLAY_SELECTOR)
     
-   
-    #---------------------------------------------------------------------------    
-    # Step05 - CFG (config from tool selector)
-    #
-    ### ReactiveValues
-    internal_CFG <- do.call(reactiveValues, default_structure_internal)
-    active_CFG   <- do.call(reactiveValues, default_structure_internal)
-    
-    ### Step05 - Observe
-    observe({
-      
-      # Requeriments -----------------------------------------------------------
-      req(number_current_step() == 5)
-      req(internal_CFG, active_CFG)
-      req(MY_SELECTED_TOOL(), list_all_config02_tools)
-      
-      # Basics and plague control ----------------------------------------------
-      current_step <- number_current_step()
-      current_step_name <- paste0(STR_STEP_NAME, current_step)
-      fn_shiny_remove_future_steps(APP_TOTEM, current_step = current_step, STR_STEP_NAME)
-      
-      # New list ---------------------------------------------------------------      
-      new_list_step <- default_list_step
-      error_message <- ""
-      new_list_step$"current_step"   <- current_step
-      new_list_step$"current_label" <- "Step 05: CFG from selected tool"
-      
-      
-      # Check previous ---------------------------------------------------------
-      my_previous_step <- current_step - 1
-      my_previous_step_name <- paste0(STR_STEP_NAME, my_previous_step)
-      check_previous <- APP_TOTEM[[my_previous_step_name]]$"check_output"
-      new_list_step$"check_previous" <- check_previous
-      
-      # Error message for check previous ---------------------------------------
-      if(!check_previous){
-        error_message <- paste0("Step: ", current_step)
-        
-      }
-
-      # Check output -----------------------------------------------------------
-      str_selected_tool <- MY_SELECTED_TOOL()
-      vector_names_all_tools <- names(list_all_config02_tools)
-      check_output <- str_selected_tool %in% vector_names_all_tools
-      pack_output <- list_all_config02_tools[[str_selected_tool]]
-      button_state <- "confirmed"
-      
-      # Error message for check_output -----------------------------------------
-      if (!check_output) {
-        text_error <- "Rscience error: selected tools is not available.\n
-        Selected tool: _the_tool_"
-        text_error <- sub(pattern = "_the_tool_", replacement = str_selected_tool, text_error)
-        shiny::showNotification(
-          text_error,
-          type = "warning"
-        )
-        return()  # Salir del observe
-      }
-      
-      # Filling internal_CFG ---------------------------------------------------
-      fn_shiny_apply_changes_reactiveValues(rv = internal_CFG, list(
-        "pack_input"   = "",
-        "check_input"  = TRUE,
-        "pack_output"  = pack_output,
-        "check_output" = check_output,
-        "button_state" = button_state))
-      
-      # Filling new list -------------------------------------------------------
-      new_list_step$"check_output"   <- check_output
-      new_list_step$"pack_output"    <- ""
-      new_list_step$"button_state"   <- button_state
-      new_list_step$"error_message"  <- error_message
-      
-      # Check new list ---------------------------------------------------------
-      check_list <- fn_R_validate_new_list(new_list = new_list_step, 
-                                           ref_list = default_list_step)
-      
-      # Error message for check new list ---------------------------------------
-      if (!check_list) {
-        fn_shiny_show_error_new_list(step_number = current_step, 
-                                     new_list = new_list_step, 
-                                     ref_list = default_list_step)
-        
-        return()  # Stop further execution
-      }
-      
-      # Add --------------------------------------------------------------------
-      isolate({
-        APP_TOTEM[[current_step_name]] <- new_list_step
-        number_current_step(current_step+1)
-        fn_shiny_remove_future_steps(APP_TOTEM, current_step = current_step, STR_STEP_NAME)
-        
-      })
-      
-    })
-    #
+     #
     #---------------------------------------------------------------------------    
     # 
     # Step06 - Settings Selector
     #
-    ### ReactiveValues
-    internal_VARIABLE_SELECTOR <- do.call(reactiveValues, default_structure_internal)
-    active_VARIABLE_SELECTOR   <- do.call(reactiveValues, default_structure_internal)
-    
-    ### Module server
-    Sbutton_03_settings_server(id = "settings", 
-                               internal_DATASET_SELECTOR, 
-                               internal_TOOLS_SELECTOR,
-                               internal_CFG,
-                               internal_VARIABLE_SELECTOR)
-    
+  
     ### Step06 - Observe
     observe({
       

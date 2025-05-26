@@ -8,7 +8,7 @@ module_step05_cfg_ui <- function(id) {
 #' @export
 module_step05_cfg_server <- function(id, step_pos, number_current_step, 
                                        STR_STEP_NAME, default_list_step, 
-                                       APP_TOTEM, internal_TOOLS_SELECTOR) {
+                                       APP_TOTEM, internal_TOOLS_SELECTOR, internal_CFG) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
@@ -18,11 +18,11 @@ module_step05_cfg_server <- function(id, step_pos, number_current_step,
       req(number_current_step() == step_pos)
       req(internal_TOOLS_SELECTOR)
       req(internal_TOOLS_SELECTOR$"check_output")
-      print(number_current_step())
-      
+
       # Hardcoded --------------------------------------------------------------
       current_label <- "Step 05: CFG from selected tool"
       current_step <- number_current_step()
+      print(paste0("Adentro del: ", current_label))
       
       # Basics and plague control ----------------------------------------------
       current_step_name <- paste0(STR_STEP_NAME, current_step)
@@ -60,6 +60,12 @@ module_step05_cfg_server <- function(id, step_pos, number_current_step,
       }
       
       
+      # Adding informacion to internal_CFG -------------------------------------
+      fn_shiny_apply_changes_reactiveValues(rv = internal_CFG, list(
+        "pack_output"  = pack_output,
+        "check_output" = check_output,
+        "button_state" = button_state))
+      
       # The new list step ------------------------------------------------------
       new_list_step <- default_list_step
       new_list_step$"current_step"   <- current_step
@@ -85,6 +91,8 @@ module_step05_cfg_server <- function(id, step_pos, number_current_step,
         
         return()  # Stop further execution
       }
+      
+
       
       # Add --------------------------------------------------------------------
       isolate({

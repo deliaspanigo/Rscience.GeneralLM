@@ -15,11 +15,11 @@ module_step01_init_server <- function(id, step_pos, number_current_step,
       
       # Requeriments -----------------------------------------------------------
       req(number_current_step() == step_pos)
-      print(number_current_step())
       
       # Hardcoded --------------------------------------------------------------
       current_label <- "Step 01 - Initial"
       current_step <- number_current_step()
+      print(paste0("Adentro del: ", current_label))
       
       # Basic for step and plague control --------------------------------------
       current_step_name <- paste0(STR_STEP_NAME, current_step)

@@ -16,11 +16,7 @@ Sbutton_02_tools_server <- function(id, step_pos, number_current_step, internal_
     ns <- session$ns
     
     
-    # Variable reactiva para almacenar el módulo de importación
-    ### output_list_tools_rv <- reactiveVal(NULL)  # # # POR AHORA INACTIVO
-    
-    # My button
-    button_state <- reactiveVal(NULL)
+    button_state <- reactiveVal()
     
     observe({ 
       button_state(internal_TOOLS_SELECTOR$"button_state")
@@ -179,8 +175,6 @@ Sbutton_02_tools_server <- function(id, step_pos, number_current_step, internal_
       
       
       fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR, list(
-        "pack_input"   = obj_intermedio,
-        "check_input"  = the_check,
         "pack_output"  = obj_intermedio,
         "check_output" = the_check,
         "button_state" = "confirmed"))
