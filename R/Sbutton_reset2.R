@@ -24,7 +24,8 @@ Sbutton_reset2_ui <- function(id) {
 
 #' @export
 Sbutton_reset2_server <- function(id, 
-                                  number_current_step, default_list_button, internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR) {
+                                  number_current_step, default_list_button, internal_DATASET_SELECTOR, 
+                                  internal_TOOLS_SELECTOR, internal_SETTINGS) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
@@ -45,10 +46,12 @@ Sbutton_reset2_server <- function(id,
     # Confirmación de reseteo
     observeEvent(input$confirmar_reset, {
       
-      number_current_step(1)
-      fn_shiny_apply_changes_reactiveValues(rv = internal_DATASET_SELECTOR,  changes_list = default_list_button)
-      fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR,  changes_list = default_list_button)
-      
+      isolate({
+        number_current_step(1)
+        fn_shiny_apply_changes_reactiveValues(rv = internal_DATASET_SELECTOR,  changes_list = default_list_button)
+        fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR,  changes_list = default_list_button)
+        fn_shiny_apply_changes_reactiveValues(rv = internal_SETTINGS,  changes_list = default_list_button)
+      })
       
       # Mostrar mensaje de éxito
       showNotification(
@@ -62,12 +65,26 @@ Sbutton_reset2_server <- function(id,
    
     observeEvent(internal_DATASET_SELECTOR$"pack_output",{
       req(internal_DATASET_SELECTOR$"check_output")
-      fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR,  changes_list = default_list_button)
-      number_current_step(3)
-      # fn_shiny_remove_future_steps(APP_TOTEM, current_step, STR_STEP_NAME)
+      
+      isolate({
+        number_current_step(3)
+        fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR,  changes_list = default_list_button)
+        fn_shiny_apply_changes_reactiveValues(rv = internal_SETTINGS,  changes_list = default_list_button)
+      })
+      
       
     })
    
+    observeEvent(internal_TOOLS_SELECTOR$"pack_output",{
+      req(internal_TOOLS_SELECTOR$"check_output")
+      
+      isolate({
+        number_current_step(4)
+        fn_shiny_apply_changes_reactiveValues(rv = internal_SETTINGS,  changes_list = default_list_button)
+      })
+      
+      
+    })
     
   })
 }

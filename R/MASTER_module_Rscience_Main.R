@@ -43,39 +43,32 @@ MASTER_module_Rscience_Main_ui <- function(id) {
               
               
               height = "100%",  # Especificar altura explícitamente
-              bslib::nav_panel(title = "super",
-                               uiOutput(ns("SUPER_ALL"))
+              bslib::nav_panel(title = "cy_totem",
+                               uiOutput(ns("crystal01_totem_all"))
+              ),
+              bslib::nav_panel(title = "cy_internal",
+                                 uiOutput(ns("crystal02_internal_all"))
               ),
               bslib::nav_panel(title = "user_selection",
                                uiOutput(ns("card02_user_selection"))
               ),
-              bslib::nav_panel(title = "crystal02",
-                               uiOutput(ns("crystal02"))
-              ),
               bslib::nav_panel(title = "dataset",
                                DT::DTOutput(ns("visual_dataset"))
               ),
-              bslib::nav_panel(title = "crystal01_run_code",
+              bslib::nav_panel(title = "script",
+                               uiOutput(ns("card06_script"))
+              ),
+              bslib::nav_panel(title = "cy_output",
                                uiOutput(ns("crystal01_run_code"))
-                               # verbatimTextOutput(ns("crystal01_run_code"))
-              ),
-              bslib::nav_panel(title = "crystal04_ALL",
-                               uiOutput(ns("crystal04_ALL"))
-                               # verbatimTextOutput(ns("crystal01_run_code"))
-              ),
-              bslib::nav_panel(title = "crystal05_ALL",
-                               uiOutput(ns("crystal05_ALL"))
                                # verbatimTextOutput(ns("crystal01_run_code"))
               ),
               bslib::nav_panel(title = "output",
                                uiOutput(ns("card05_output"))
               ),
-              bslib::nav_panel(title = "output22",
+              bslib::nav_panel(title = "theory",
                                uiOutput(ns("card05_output22"))
               ),
-              bslib::nav_panel(title = "script",
-                               uiOutput(ns("card06_script"))
-              ),
+             
               bslib::nav_panel(title = "download",
                                uiOutput(ns("card07_download"))
               )
@@ -181,7 +174,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     # Reset button -------------------------------------------------------------
     Sbutton_reset2_server(id = "reset2", number_current_step, default_list_button, 
-                          internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR)
+                          internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR, internal_SETTINGS)
     
     # List steps
     # Step 01) Initial ---------------------------------------------------------
@@ -238,25 +231,19 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
                                   STR_STEP_NAME, default_list_step,
                                   APP_TOTEM, internal_SETTINGS)
     
+    # Step 07) Script ---------------------------------------------------
+    module_step07_script_server(id = "step07", step_pos = 7,
+                                number_current_step, 
+                                STR_STEP_NAME, default_list_step, 
+                                APP_TOTEM, internal_DATASET_SELECTOR, internal_CFG, internal_SETTINGS)
    
     # --------------------------------------------------------------------------
-    # el detalle "key_obj" es para poder buscar un step en particular aunque
-    # se agreguen mas modulos intermedios.
-    # por ejemplo el modulo de RUN necesita al modulo de Script, y al modulo de
-    # settings, y al modulo de data set, indistintamente de si hay otros modulos
-    # o si se agregan o cambiar los modulos. Solo debe ocurrir que el modulo de script
-    # este despues de los modulos que esta requiriendo.
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     
-    # y en los "crystal" podemos trabajar con o sin los product_output, para poder tener
-    # una vison de lo que está siendo ejecutado sin tener que ver tooodos los resultados
-    # obtendios en cada caso.
-    
-    # all_step_OK <- reactiveVal()
-    # observe({
-    #   print(step01_initial())
-    #   print(step02_upload())
-    # })
-    # Card 01) Botonera "main menu"
+       
+    # 01 - Crystal 01 - TOTEM ALL
     output$"SUPER_A" <- renderPrint({
 
       # "current_step" = NA,
@@ -281,29 +268,6 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       selected_cols <- c("current_step", "current_label", "key", "button_state", "the_time")
       the_df[selected_cols]
     })
-    output$"SUPER_C" <- renderPrint({
-      the_list <- reactiveValuesToList(APP_TOTEM)
-      the_list <- Filter(Negate(is.null), the_list)
-      
-      the_list
-    })
-    output$"SUPER_ALL" <- renderUI({
-      div(
-        h2("Por iniciar"),
-        verbatimTextOutput(ns("SUPER_A")),
-        br(),
-        h2("Finalizados"),
-        verbatimTextOutput(ns("SUPER_B")),
-        br(),
-        h2("AVER"),
-        uiOutput(ns("dynamic_tabs")),
-        br(),
-        h2("Finalizados"),
-        verbatimTextOutput(ns("SUPER_C"))
-      )
-    })
-    ############################################################################
-    # Generar las pestañas y los outputs dinámicamente en un solo renderUI
     output$dynamic_tabs <- renderUI({
       the_list <- reactiveValuesToList(APP_TOTEM)
       the_list <- Filter(Negate(is.null), the_list)
@@ -339,6 +303,57 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         !!!tabs  # Desempaquetar la lista de pestañas
       )
     })
+    output$"SUPER_C" <- renderPrint({
+      the_list <- reactiveValuesToList(APP_TOTEM)
+      the_list <- Filter(Negate(is.null), the_list)
+      
+      the_list
+    })
+    output$"crystal01_totem_all" <- renderUI({
+      div(
+        h2("Por iniciar"),
+        verbatimTextOutput(ns("SUPER_A")),
+        br(),
+        h2("Finalizados"),
+        verbatimTextOutput(ns("SUPER_B")),
+        br(),
+        h2("AVER"),
+        uiOutput(ns("dynamic_tabs")),
+        br(),
+        h2("Finalizados"),
+        verbatimTextOutput(ns("SUPER_C"))
+      )
+    })
+    # --------------------------------------------------------------------------
+    
+    # 02 - Crystal 02 - Internal ALL
+    output$"crystal02_internal_DATASET_SELECTOR" <- renderPrint({
+      the_list <- list(
+        "la1" = reactiveValuesToList(internal_DATASET_SELECTOR)
+      )
+      
+      the_list
+    })
+    output$"crystal02_internal_all" <- renderUI({
+      lista_principal <- list(
+        "internal_DATASET_SELECTOR" = reactiveValuesToList(internal_DATASET_SELECTOR),
+        "internal_TOOLS_SELECTOR" = reactiveValuesToList(internal_TOOLS_SELECTOR),
+        "internal_CFG" = reactiveValuesToList(internal_CFG),
+        "internal_SETTINGS" = reactiveValuesToList(internal_SETTINGS)
+      )
+      lapply(names(lista_principal), function(nom) {
+        tags$div(
+          tags$h4(nom),  # título para identificar cada sección
+          tags$pre(
+            paste(capture.output(str(lista_principal[[nom]])), collapse = "\n")
+          ),
+          hr()  # línea separadora
+        )
+      })
+    })
+    # --------------------------------------------------------------------------
+    # Generar las pestañas y los outputs dinámicamente en un solo renderUI
+
    
     ###################################################
     
@@ -362,563 +377,6 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     })
     
     
-
-    if(FALSE){
-    
-    
-    # Init STR
-    internal_STR <- do.call(reactiveValues, default_structure_internal)
-    active_STR   <- do.call(reactiveValues, default_structure_internal)
-    
-    # Init Variable
-       
-    # Init Play
-    internal_PLAY_SELECTOR <- do.call(reactiveValues, default_structure_internal)
-    active_PLAY_SELECTOR   <- do.call(reactiveValues, default_structure_internal)
-    
-    
-     #
-    #---------------------------------------------------------------------------    
-    # 
-    # Step06 - Settings Selector
-    #
-  
-    ### Step06 - Observe
-    observe({
-      
-      # Requeriments -----------------------------------------------------------
-      req(number_current_step() == 6)
-      req(internal_VARIABLE_SELECTOR, active_VARIABLE_SELECTOR)
-      req(internal_VARIABLE_SELECTOR$"check_output")
-
-      # Bacics and plague control ----------------------------------------------
-      current_step <- number_current_step()
-      current_step_name <- paste0(STR_STEP_NAME, current_step)
-      fn_shiny_remove_future_steps(APP_TOTEM, current_step = current_step, STR_STEP_NAME)
-      
-      # Info for selected step -------------------------------------------------
-      new_list_step <- default_list_step
-      error_message <- ""
-      new_list_step$"current_step"   <- current_step
-      new_list_step$"current_label" <- "Step 06: Setting Selector"
-      
-      
-      # Check Previous Step ----------------------------------------------------
-      my_previous_step <- current_step - 1
-      my_previous_step_name <- paste0(STR_STEP_NAME, my_previous_step)
-      check_previous <- APP_TOTEM[[my_previous_step_name]]$"check_output"
-      new_list_step$"check_previous" <- check_previous
-
-      # Error message for check previous ---------------------------------------
-      if(!check_previous){
-        error_message <- paste0("Step: ", current_step)
-        
-      }
-
-      # Check_out --------------------------------------------------------------
-      check_output <- internal_VARIABLE_SELECTOR$"check_out"
-      if(!check_output){
-        error_message <- paste0("Step: ", current_step)
-        
-      }
-
-      # Filling new_list -------------------------------------------------------
-      new_list_step$"check_output"   <- check_output
-      new_list_step$"pack_output"    <- ""
-      new_list_step$"button_state"   <- "confirmed"
-      new_list_step$"error_message"  <- error_message
-      
-      # Validating new list ----------------------------------------------------
-      check_list <- fn_R_validate_new_list(new_list = new_list_step, 
-                                           ref_list = default_list_step)
-      
-      # Error message for new list ---------------------------------------------
-      if (!check_list) {
-        fn_shiny_show_error_new_list(step_number = current_step, 
-                                     new_list = new_list_step, 
-                                     ref_list = default_list_step)
-        
-        return()  # Stop further execution
-      }
-      
-      # Add --------------------------------------------------------------------
-      isolate({
-        APP_TOTEM[[current_step_name]] <- new_list_step
-        number_current_step(current_step+1)
-        fn_shiny_remove_future_steps(APP_TOTEM, current_step = current_step, STR_STEP_NAME)
-        
-      })
-      
-    })
-    
-    #
-    #---------------------------------------------------------------------------
-    #
-    # Step07 - R Code
-    
-    
-    ### ReactiveValues
-    internal_R_CODE <- do.call(reactiveValues, default_structure_internal)
-    active_R_CODE   <- do.call(reactiveValues, default_structure_internal)
-    
-    ### Observe
-    observe({
-      
-      # Requeriments -----------------------------------------------------------
-      req(number_current_step() == 7)
-      req(internal_R_CODE, active_R_CODE)
-      
-      # Basics and plague control ----------------------------------------------
-      current_step <- number_current_step()
-      fn_shiny_remove_future_steps(APP_TOTEM, current_step = current_step, STR_STEP_NAME)
-      
-      # New list ---------------------------------------------------------------
-      new_list_step <- default_list_step
-      error_message <- ""
-      new_list_step$"current_step"   <- current_step
-      new_list_step$"current_label" <- "Step 07: R Code"
-      
-      
-      # Check previous ---------------------------------------------------------
-      my_previous_step <- current_step - 1
-      my_previous_step_name <- paste0(STR_STEP_NAME, my_previous_step)
-      check_previous <- APP_TOTEM[[my_previous_step_name]]$"check_output"
-      new_list_step$"check_previous" <- check_previous
-      if(!check_previous){
-        error_message <- paste0("Step: ", current_step)
-        
-      }
-      
-      # pack output - The R CODE! ----------------------------------------------
-      the_file_path <- fn_PK_copies_folder_path()
-      vector_code_lines <- readLines(the_file_path)
-      
-      Rcode_original <- fn_R_extract_code_between_markers(vector_code_lines = vector_code_lines, 
-                                                    start_marker = "### INIT CODE ###", 
-                                                    end_marker   = "### END CODE ###")
-      
-
-      # Extraer todas las coincidencias en cada posición del vector
-      base_A <- "_A_"
-      patron_A <- paste0(base_A, ".*?", base_A)
-      vector_pattern_A  <- regmatches(Rcode_original, gregexpr(patron_A, Rcode_original))
-      vector_pattern_A  <- unlist(vector_pattern_A)
-      vector_names_A <- gsub(pattern = base_A, replacement = "", vector_pattern_A)
-      
-      vector_replacement_A_script <- active_DATASET_SELECTOR$"pack_output"$"str_import_external"
-      vector_changes_A_script <- vector_replacement_A_script
-      names(vector_changes_A_script) <- vector_pattern_A
-      
-      vector_replacement_A_quarto <- active_DATASET_SELECTOR$"pack_output"$"str_import_internal"
-      vector_changes_A_quarto <- vector_replacement_A_quarto
-      names(vector_changes_A_quarto) <- vector_pattern_A
-      
-      
-      base_B <- "_B_"
-      patron_B <- paste0(base_B, ".*?", base_B)
-      vector_pattern_B  <- regmatches(Rcode_original, gregexpr(patron_B, Rcode_original))
-      vector_pattern_B  <- unlist(vector_pattern_B)
-      vector_names_B <- gsub(pattern = base_B, replacement = "", vector_pattern_B)
-      vector_replacement_B <- active_VARIABLE_SELECTOR$"pack_output"[vector_names_B]
-      vector_changes_B <- vector_replacement_B
-      names(vector_changes_B) <- vector_pattern_B
-      
-      vector_changes_C <- c("#---" =  "")
-      
-      # Rcode Script (user visual use)
-      list_vector_changes_script <- list(vector_changes_A_script, vector_changes_B, vector_changes_C)
-      Rcode_script <- Rcode_original
-      for (k in 1:length(list_vector_changes_script)){
-        Rcode_script <- stringi::stri_replace_all_fixed(str = Rcode_script, 
-                                                        pattern = names(list_vector_changes_script[[k]]), 
-                                                        replacement = list_vector_changes_script[[k]],
-                                                        vectorize_all = FALSE)
-      }
-      
-      # Rcode Quarto (processing use)
-      list_vector_changes_quarto <- list(vector_changes_A_quarto, vector_changes_B, vector_changes_C)
-      Rcode_quarto <- Rcode_original
-      for (k in 1:length(list_vector_changes_quarto)){
-        Rcode_quarto <- stringi::stri_replace_all_fixed(str = Rcode_quarto, 
-                                                        pattern = names(list_vector_changes_quarto[[k]]), 
-                                                        replacement = list_vector_changes_quarto[[k]],
-                                                        vectorize_all = FALSE)
-      }
-      
-      # Pack output
-      pack_output <- list("Rcode_original" = Rcode_original, 
-                          "Rcode_script" = Rcode_script, 
-                          "Rcode_quarto" = Rcode_quarto)
-
-      # Check output -----------------------------------------------------------
-      check_output <- !is.null(pack_output)
-      button_state <- "confirmed"
-      
-      # Error message for check output -----------------------------------------
-      if(!check_output){
-        error_message <- paste0("Step: ", current_step)
-        
-      }
-      
-      # Filling internal_R_CODE ------------------------------------------------
-      fn_shiny_apply_changes_reactiveValues(rv = internal_R_CODE, list(
-        "pack_input"   = "",
-        "check_input"  = TRUE,
-        "pack_output"  = pack_output,
-        "check_output" = check_output,
-        "button_state" = button_state))
-      
-      # Filling new list -------------------------------------------------------
-      new_list_step$"check_output"   <- check_output
-      new_list_step$"pack_output"    <- ""
-      new_list_step$"button_state"   <- button_state
-      new_list_step$"error_message"  <- error_message
-      
-      # Validate the list ------------------------------------------------------
-      check_list <- fn_R_validate_new_list(new_list = new_list_step, ref_list = default_list_step)
-      
-      # Error message for new list ---------------------------------------------
-      if (!check_list) {
-        fn_shiny_show_error_new_list(step_number = current_step, 
-                                     new_list = new_list_step, 
-                                     ref_list = default_list_step)
-        
-        return()  # Stop further execution
-      }
-      
-      
-      # Add --------------------------------------------------------------------
-      isolate({
-        current_step_name <- paste0(STR_STEP_NAME, current_step)
-        APP_TOTEM[[current_step_name]] <- new_list_step
-        number_current_step(current_step+1)
-        fn_shiny_remove_future_steps(APP_TOTEM, current_step = current_step, STR_STEP_NAME)
-        
-      })
-      
-    })
-    
-    
-    the_RS_UI <- reactiveVal()
-    
-    observe({
-      req(OK_ALL_ACTIVE())
-      # req(my_list_str_rv())
-      
-      req(internal_STR$"check_output")
-      mi_super_lista <- reactiveValuesToList(internal_STR) #print(paste0("AVER: ", internal_STR$"pack_output"$"vector_str"$"str_01_MM_variable_selector"))
-      
-      # ----------------------------------------------------------------------
-      #
-      # Hardcoded master
-      my_pack_name  <- "df_06_script"
-      str_local_id  <- "the_06_script"
-      #
-      # Hardcoded basics
-      my_df <- mi_super_lista$"pack_output"[[my_pack_name]]
-      vector_short_names  <- my_df$"short_name"
-      vector_full_names   <- my_df$"resource_name"
-      str_MM_server <- "MM_server"
-      str_MM_ui     <- "MM_ui"
-      #-----------------------------------------------------------------------
-      #
-      # server and ui
-      ### MM server
-      dt_str_MM_server    <- vector_short_names == str_MM_server
-      full_name_MM_server <- vector_full_names[dt_str_MM_server]
-      my_str_MM_server    <- full_name_MM_server
-      
-      ### MM ui
-      dt_str_MM_ui     <- vector_short_names == str_MM_ui
-      full_name_MM_ui  <- vector_full_names[dt_str_MM_ui]
-      my_str_MM_ui     <- full_name_MM_ui
-      #-----------------------------------------------------------------------
-      #
-      ### ARGs
-      args_server <- list(id = str_local_id, 
-                          show_dev = FALSE,
-                          active_DATASET_SELECTOR, 
-                          active_TOOLS_SELECTOR,
-                          active_VARIABLE_SELECTOR,
-                          active_PLAY_SELECTOR,
-                          active_R_CODE
-      )
-      
-      ### Running server module - 04 - ORRS (Output R Results Shiny)
-      do.call(my_str_MM_server, args_server)
-      
-      ### Running ui module - 04 - ORRS (Output R Results Shiny)
-      args_ui <- list(id = ns("the_06_script"))
-      the_rendered_iu <- do.call(my_str_MM_ui, args_ui)
-      the_RS_UI(the_rendered_iu)
-    })
-    
-    output$card06_script <- renderUI({
-      req(the_RS_UI)
-      
-      div(
-        style = "height: 100%;",  
-        the_RS_UI()
-      )
-    })
-    #---------------------------------------------------------------------------
-    
-    
-    
-
-    #---------------------------------------------------------------------------
-    ### Initialization ---------------------------------------------------------
-    
-    default_structure <- list(
-      pack_input = "",
-      check_input = FALSE,
-      pack_output = "",
-      check_output = FALSE,
-      button_state = "initial"
-    )   
-    
-
-    ### ### ### END Initialization ---------------------------------------------
-    #---------------------------------------------------------------------------
-    
-    
-    
-    # Button Tools - Server
-
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-
-    
-    output[["crystal05_A"]]  <- renderPrint({ MY_SELECTED_TOOL() })
-    output[["crystal05_B1"]] <- renderPrint({ reactiveValuesToList(internal_CFG) })
-    output[["crystal05_B2"]] <- renderPrint({ reactiveValuesToList(active_CFG) })
-    
-    output$"crystal05_ALL" <- renderUI({
-      
-      div(
-        h2("Selected tool"), 
-        verbatimTextOutput(ns("crystal05_A")),
-        hr(),
-        fluidRow(
-          column(6, 
-                 h2("Internal CFG"),
-                 verbatimTextOutput(ns("crystal05_B1"))
-          ),
-          column(6, 
-                 h2("Active CFG"),
-                 verbatimTextOutput(ns("crystal05_B2"))
-          )
-        )
-      )
-      
-    })
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-    
-    # Observe - internal_STR
-    observe({
-         
-      req(MY_SELECTED_TOOL())      
-
-      # Selected tools
-      str_selected_tool <- MY_SELECTED_TOOL()
-
-      # Reemplaza 'nombre_del_paquete' por el nombre del paquete que te interesa
-      package_name <- "Rscience.GeneralLM"
-      vector_pk_fn_vector <- getNamespaceExports(package_name)
-    
-
-      
-
-      # ------------------------------------------------------------------------
-      #
-      # 02) Zocalo selected vars (ZSV)
-      df_02_ZSV <- data.frame(
-        "short_name" = c("FN_zocalo"),
-        "str_end_file" = c("_FN_shiny_zocalo")
-      )
-      df_02_ZSV$"resource_name"   <- paste0(str_selected_tool, df_02_ZSV$"str_end_file")
-      df_02_ZSV$"resource_exists" <- df_02_ZSV$"resource_name" %in% vector_pk_fn_vector
-      check_02_ZSV <- all(df_02_ZSV$"resource_exists")
-      # ------------------------------------------------------------------------
-      #
-      # 03) Run R Code (RRC)
-      df_03_RRC <- data.frame(
-        "short_name" = c("MM_server", "MM_ui"),
-        "str_end_file" = c("_MM_run_code_server",
-                           "_MM_run_code_ui")
-      )
-      df_03_RRC$"resource_name"   <- paste0(str_selected_tool, df_03_RRC$"str_end_file")
-      df_03_RRC$"resource_exists" <- df_03_RRC$"resource_name" %in% vector_pk_fn_vector
-      check_03_RRC <- all(df_03_RRC$"resource_exists")
-      # ------------------------------------------------------------------------
-      #
-      # 04) Output R Results on Shiny (ORRS)
-      df_04_ORRS <- data.frame(
-        "short_name" = c("MM_server", "MM_ui"),
-        "str_end_file" = c("_MM_output_server",
-                           "_MM_output_ui")
-      )
-      df_04_ORRS$"resource_name"   <- paste0(str_selected_tool, df_04_ORRS$"str_end_file")
-      df_04_ORRS$"resource_exists" <- df_04_ORRS$"resource_name" %in% vector_pk_fn_vector
-      check_04_ORRS <- all(df_04_ORRS$"resource_exists")
-      # ------------------------------------------------------------------------
-      #
-      # 05) Theory
-      df_05_theory <- data.frame(
-        "short_name" = c("MM_server", "MM_ui"),
-        "str_end_file" = c("_MM_theory_server",
-                           "_MM_theory_ui")
-      )
-      df_05_theory$"resource_name"   <- paste0(str_selected_tool, df_05_theory$"str_end_file")
-      df_05_theory$"resource_exists" <- df_05_theory$"resource_name" %in% vector_pk_fn_vector
-      check_05_theory <- all(df_05_theory$"resource_exists")
-      # ------------------------------------------------------------------------
-      #
-      # 06) Script
-      df_06_script <- data.frame(
-        "short_name" = c("MM_server", "MM_ui"),
-        "str_end_file" = c("_server",
-                           "_ui")
-      )
-      df_06_script$"resource_name"   <- paste0("module_Render_script", df_06_script$"str_end_file")
-      df_06_script$"resource_exists" <- df_05_theory$"resource_name" %in% vector_pk_fn_vector
-      check_06_script <- all(df_06_script$"resource_exists")
-      # ------------------------------------------------------------------------
-      
-    
-      
-    check_all_fn <- all(check_02_ZSV, 
-                        check_03_RRC, check_04_ORRS, check_05_theory,
-                        check_06_script)
-      
-    output_list <- list(
-      "df_02_ZSV" = df_02_ZSV,
-      "check_02_ZSV" = check_02_ZSV,
-      "df_03_RRC" = df_03_RRC,
-      "check_03_RRC" = check_03_RRC,
-      "df_04_ORRS" = df_04_ORRS,
-      "check_04_ORRS" = check_04_ORRS,
-      "df_05_theory" = df_05_theory,
-      "check_05_theory" = check_05_theory,
-      "df_06_script" = df_06_script,
-      "check_06_script" = check_06_script,
-      
-      "check_all_fn" = check_all_fn
-      
-      )
-    
-    fn_shiny_apply_changes_reactiveValues(rv = internal_STR, list(
-        "pack_input"   = "",
-        "check_input"  = TRUE,
-        "pack_output"  = output_list,
-        "check_output" = check_all_fn,
-        "button_state" = "confirmed"))
-      
-    })
-    
-    output[["crystal04_A"]]  <- renderPrint({ MY_SELECTED_TOOL() })
-    output[["crystal04_B1"]] <- renderPrint({ reactiveValuesToList(internal_STR) })
-    output[["crystal04_B2"]] <- renderPrint({ reactiveValuesToList(active_STR) })
-    
-    output$"crystal04_ALL" <- renderUI({
-      
-      div(
-        h2("Selected tool"), 
-        verbatimTextOutput(ns("crystal04_A")),
-        hr(),
-        fluidRow(
-          column(6, 
-             h2("Internal STR"),
-             verbatimTextOutput(ns("crystal04_B1"))
-             ),
-          column(6, 
-             h2("Active STR"),
-             verbatimTextOutput(ns("crystal04_B2"))
-          )
-        )
-      )
-      
-    })
-    # # # # # # - - - - - - - - - - - - - - - - - -
-    # # # # # # - - - - - - - - - - - - - - - - - -
-    # # # # # # - - - - - - - - - - - - - - - - - -
-    
-
-    
-
-    
-    
-    Sbutton_play2_server(id = "play2", 
-                         default_structure, 
-                         internal_DATASET_SELECTOR,  active_DATASET_SELECTOR,
-                         internal_TOOLS_SELECTOR,    active_TOOLS_SELECTOR,
-                         internal_STR,               active_STR,
-                         internal_CFG,               active_CFG,
-                         internal_VARIABLE_SELECTOR, active_VARIABLE_SELECTOR,
-                         internal_PLAY_SELECTOR,     active_PLAY_SELECTOR)
-    
-    
-  
-    
-    
-    
-    ############################################################################
-    output[["internal_DATASET_SELECTOR"]] <- renderPrint({ reactiveValuesToList(internal_DATASET_SELECTOR) })
-    output[["active_DATASET_SELECTOR"]] <- renderPrint({ reactiveValuesToList(active_DATASET_SELECTOR) })
-    
-    output[["internal_TOOLS_SELECTOR"]] <- renderPrint({ reactiveValuesToList(internal_TOOLS_SELECTOR) })
-    output[["active_TOOLS_SELECTOR"]] <- renderPrint({ reactiveValuesToList(active_TOOLS_SELECTOR) })
-    
-    output[["internal_VARIABLE_SELECTOR"]] <- renderPrint({ reactiveValuesToList(internal_VARIABLE_SELECTOR) })
-    output[["active_VARIABLE_SELECTOR"]] <- renderPrint({ reactiveValuesToList(active_VARIABLE_SELECTOR) })
-    
-    output[["internal_PLAY_SELECTOR"]] <- renderPrint({ reactiveValuesToList(internal_PLAY_SELECTOR) })
-    output[["active_PLAY_SELECTOR"]] <- renderPrint({ reactiveValuesToList(active_PLAY_SELECTOR) })
-    
-    
-    output$"crystal02" <- renderUI({
-    
-      div(
-      fluidRow(
-        column(3, 
-               h2("Internal Dataset"), 
-                  verbatimTextOutput(ns("internal_DATASET_SELECTOR"))),
-        column(3, 
-               h2("Internal Tools"), 
-               verbatimTextOutput(ns("internal_TOOLS_SELECTOR"))),
-        column(3, 
-               h2("Internal Variable"), 
-                  verbatimTextOutput(ns("internal_VARIABLE_SELECTOR"))),
-        column(3, 
-               h2("Internal Play"),
-                  verbatimTextOutput(ns("internal_PLAY_SELECTOR")))
-        
-      ),
-      hr(),
-      fluidRow(
-        column(3, 
-               h2("External Dataset"), 
-               verbatimTextOutput(ns("active_DATASET_SELECTOR"))),
-        column(3, 
-               h2("External Tools"), 
-               verbatimTextOutput(ns("active_TOOLS_SELECTOR"))),
-        column(3, 
-               h2("External Variable"), 
-               verbatimTextOutput(ns("active_VARIABLE_SELECTOR"))),
-        column(3, 
-               h2("External Play"), 
-               verbatimTextOutput(ns("active_PLAY_SELECTOR")))
-        
-      )
-      )
-      
-    })
-    
-    
-    ############################################################################
-    
-   
-    
-    ############################################################################
     
     # Card 02) "user_selection"
     output$card02_user_selection <- renderUI({
@@ -968,25 +426,18 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     })
     
     output$tarjeta03_vars <- renderUI({
-      req(internal_STR$"check_output")
-      mi_super_lista <- reactiveValuesToList(internal_STR) #print(paste0("AVER: ", internal_STR$"pack_output"$"vector_str"$"str_01_MM_variable_selector"))
+      req(internal_SETTINGS$"check_output")
+      mi_super_lista <- reactiveValuesToList(internal_SETTINGS) #print(paste0("AVER: ", internal_STR$"pack_output"$"vector_str"$"str_01_MM_variable_selector"))
       
       # ------------------------------------------------------------------------
       #
       # Hardcoded
-      my_df <- mi_super_lista$"pack_output"$"df_02_ZSV"
-      vector_short_names  <- my_df$"short_name"
-      vector_full_names   <- my_df$"resource_name"
-      str_FN        <- "FN_zocalo"
-      # ------------------------------------------------------------------------
-      #
-      # Funtion name detection
-      dt_str_FN    <- vector_short_names == str_FN
-      full_name_FN <- vector_full_names[dt_str_FN]
+      
+      full_name_FN <- "GeneralLM_fix_anova1_FN_shiny_zocalo"
       # ------------------------------------------------------------------------
       #
       # Running fn for obtain zocalo
-      args <- list(internal_VARIABLE_SELECTOR = internal_VARIABLE_SELECTOR)
+      args <- list(internal_VARIABLE_SELECTOR = internal_SETTINGS)
       the_zocalo <- do.call(full_name_FN, args)
       the_zocalo
       # ------------------------------------------------------------------------
@@ -995,95 +446,129 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
     })
     
-    
-    
-    
     ############################################################################
     
     
-    # # # # CONTROL POINT # # # # 
-    OK_ALL_ACTIVE <- reactive({
-      req(active_DATASET_SELECTOR, active_TOOLS_SELECTOR, active_STR, 
-          active_VARIABLE_SELECTOR, active_PLAY_SELECTOR)
-      
-      vector_check <- c(active_DATASET_SELECTOR$"check_output", 
-                        active_TOOLS_SELECTOR$"check_output",
-                        active_CFG$"check_output",
-                        active_STR$"check_output",
-                        active_VARIABLE_SELECTOR$"check_output",
-                        active_PLAY_SELECTOR$"check_output")
-      
-      the_final_value <- all(vector_check)
-      the_final_value
+    output$el_cartel <- renderUI({
+      my_cartel <- reactiveValuesToList(internal_TOOLS_SELECTOR)$"pack_output"$"selected_cartel"
+      fn_html_cartel(my_text = my_cartel)
     })
-    ############################################################################
+    # style = "height: 100%; width: 100%; max-width: 100%; box-sizing: border-box; overflow-x: hidden;",  # Ajustes para evitar el scroll horizontal
     
-    active_R_CODE   <- do.call(reactiveValues, default_structure)
     
-    if(FALSE){
-    the_RS_UI <- reactiveVal()
     
-    observe({
-      req(OK_ALL_ACTIVE())
-      # req(my_list_str_rv())
+    ##############################################################################
+    # Tab05 - RCode
+    output$shiny_ace_editor_MENU <- renderUI({
       
-      req(internal_STR$"check_output")
-      mi_super_lista <- reactiveValuesToList(internal_STR) #print(paste0("AVER: ", internal_STR$"pack_output"$"vector_str"$"str_01_MM_variable_selector"))
+      # req(Rcode_script())
+      #Rcode_script <- GeneralLM_fix_anova1_take_code(my_fn=GeneralLM_fix_anova1_RCode)
+      # Calcular la altura adecuada para el editor basado en el número de líneas
       
-      # ----------------------------------------------------------------------
-      #
-      # Hardcoded master
-      my_pack_name  <- "df_06_script"
-      str_local_id  <- "the_06_script"
-      #
-      # Hardcoded basics
-      my_df <- mi_super_lista$"pack_output"[[my_pack_name]]
-      vector_short_names  <- my_df$"short_name"
-      vector_full_names   <- my_df$"resource_name"
-      str_MM_server <- "MM_server"
-      str_MM_ui     <- "MM_ui"
-      #-----------------------------------------------------------------------
-      #
-      # server and ui
-      ### MM server
-      dt_str_MM_server    <- vector_short_names == str_MM_server
-      full_name_MM_server <- vector_full_names[dt_str_MM_server]
-      my_str_MM_server    <- full_name_MM_server
       
-      ### MM ui
-      dt_str_MM_ui     <- vector_short_names == str_MM_ui
-      full_name_MM_ui  <- vector_full_names[dt_str_MM_ui]
-      my_str_MM_ui     <- full_name_MM_ui
-      #-----------------------------------------------------------------------
-      #
-      ### ARGs
-      args_server <- list(id = str_local_id, 
-                          show_dev = FALSE,
-                          active_DATASET_SELECTOR, 
-                          active_TOOLS_SELECTOR,
-                          active_VARIABLE_SELECTOR,
-                          active_PLAY_SELECTOR,
-                          active_R_CODE
+      
+      
+      fluidRow(
+        column(3, 
+               selectInput(ns("theme"), "Editor Theme:", 
+                           choices = c("xcode", "monokai", "github", "eclipse", "tomorrow", 
+                                       "solarized_light", "solarized_dark", "textmate", "twilight"),
+                           selected = "solarized_dark")),
+        column(3,
+               sliderInput(ns("fontSize"), "Font Size:", min = 8, max = 40, value = 14, step = 1)
+        ),
+        column(3, downloadButton(ns("download_btn"), "Download", icon = icon("download")))
+        
       )
       
-      ### Running server module - 04 - ORRS (Output R Results Shiny)
-      do.call(my_str_MM_server, args_server)
       
-      ### Running ui module - 04 - ORRS (Output R Results Shiny)
-      args_ui <- list(id = ns("the_06_script"))
-      the_rendered_iu <- do.call(my_str_MM_ui, args_ui)
-      the_RS_UI(the_rendered_iu)
+    })
+    
+    output$shiny_ace_CODE <- renderUI({
+      
+      req( input$"theme", input$"fontSize")
+      
+      Rcode_script <- APP_TOTEM[["step7"]]$"pack_output"$"Rcode_script"
+        
+      line_count <- length(strsplit(Rcode_script, "\n")[[1]])
+      line_count <- line_count + 5
+      # Asignar aproximadamente 20px por línea para el alto del editor
+      editor_height <- paste0(max(300, line_count * 20), "px")
+      
+      shinyAce::aceEditor(
+        outputId = "script_part1",
+        value = Rcode_script,
+        mode = "r",
+        theme = input$"theme", #"chrome",
+        height = editor_height,#"200px",
+        fontSize = input$"fontSize", #14,
+        showLineNumbers = TRUE,
+        readOnly = TRUE,
+        autoScrollEditorIntoView = TRUE,
+        maxLines = 1000,  # Un número grande para evitar scroll
+        minLines = line_count 
+      )
+      
     })
     
     output$card06_script <- renderUI({
-      req(the_RS_UI)
+      # req(mis_valores())
       
       div(
-        style = "height: 100%;",  
-        the_RS_UI()
+        style = "height: 100%;",
+          uiOutput(ns("el_cartel")),
+          card(
+            card_header("Editor Options"),
+            card_body(
+              uiOutput(ns("shiny_ace_editor_MENU")),
+              uiOutput(ns("shiny_ace_CODE"))
+            )
+          )
       )
+      
     })
-    }
+    
+    
+    
+    
+    
+    ############################################################################
+    if(FALSE){
+    
+    # Init Variable
+       
+    # Init Play
+    internal_PLAY_SELECTOR <- do.call(reactiveValues, default_structure_internal)
+    active_PLAY_SELECTOR   <- do.call(reactiveValues, default_structure_internal)
+    
+    
+  
+ 
+  
+    Sbutton_play2_server(id = "play2", 
+                         default_structure, 
+                         internal_DATASET_SELECTOR,  active_DATASET_SELECTOR,
+                         internal_TOOLS_SELECTOR,    active_TOOLS_SELECTOR,
+                         internal_STR,               active_STR,
+                         internal_CFG,               active_CFG,
+                         internal_VARIABLE_SELECTOR, active_VARIABLE_SELECTOR,
+                         internal_PLAY_SELECTOR,     active_PLAY_SELECTOR)
+    
+    
+  
+    
+    
+   
+    
+    ############################################################################
+    
+    
+    ############################################################################
+     
+    if(FALSE){
+    the_RS_UI <- reactiveVal()
+    
+   
     # observe(print(reactiveValuesToList( active_R_CODE)))
     
     

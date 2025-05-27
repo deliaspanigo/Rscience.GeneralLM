@@ -8,6 +8,8 @@ config:
     module_ui: "GeneralLM_fix_anova1_MM_settings_ui"
     module_server: "GeneralLM_fix_anova1_MM_settings_server"
     fn_control: "GeneralLM_fix_anova1_FN_validate_vars"
+  script:
+    copie_file_name: "GeneralLM_fix_anova1_RCode.R"
   version: "1.0.0"
   date_version: "2025-05-24"
   

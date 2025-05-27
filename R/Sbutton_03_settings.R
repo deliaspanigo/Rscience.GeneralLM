@@ -54,8 +54,6 @@ Sbutton_03_settings_server <- function(id,
     # Local OK
     local_OK <- reactive({
       
-      print(internal_CFG$"check_output")
-      print("FFF")
       vector_all <- c(isTruthy(internal_DATASET_SELECTOR$"check_output"),
                       isTruthy(internal_TOOLS_SELECTOR$"check_output"),
                       isTruthy(internal_CFG$"check_output")
@@ -125,10 +123,7 @@ Sbutton_03_settings_server <- function(id,
       args_server <- list(id = local_id(), my_dataset = my_dataset)
       the_output_server <- do.call(my_str_MM_server(), args_server)
       
-      print("the output")
-      print(the_output_server)
-      print("the output end")
-      
+
       output_list_variable_selector_rv(the_output_server)
       
       #
