@@ -49,6 +49,9 @@ MASTER_module_Rscience_Main_ui <- function(id) {
               bslib::nav_panel(title = "cy_internal",
                                  uiOutput(ns("crystal02_internal_all"))
               ),
+              bslib::nav_panel(title = "cy_output",
+                               uiOutput(ns("crystal03_output"))
+              ),
               bslib::nav_panel(title = "user_selection",
                                uiOutput(ns("card02_user_selection"))
               ),
@@ -58,10 +61,7 @@ MASTER_module_Rscience_Main_ui <- function(id) {
               bslib::nav_panel(title = "script",
                                uiOutput(ns("card06_script"))
               ),
-              bslib::nav_panel(title = "cy_output",
-                               uiOutput(ns("crystal01_run_code"))
-                               # verbatimTextOutput(ns("crystal01_run_code"))
-              ),
+
               bslib::nav_panel(title = "output",
                                uiOutput(ns("card05_output"))
               ),
@@ -249,6 +249,11 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     module_step08_play_server(id = "step08", step_pos = 8, number_current_step, 
                               STR_STEP_NAME, default_list_step, 
                               APP_TOTEM, internal_CFG, internal_PLAY)
+    # Step 09) Run ------------------------------------------------------------
+    module_step09_run_Rcode_server(id = "step09", step_pos = 9, number_current_step, 
+                              STR_STEP_NAME, default_list_step, 
+                              APP_TOTEM, internal_DATASET_SELECTOR,
+                              internal_SETTINGS)
     
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -372,6 +377,92 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     # --------------------------------------------------------------------------
     # Generar las pestañas y los outputs dinámicamente en un solo renderUI
 
+    
+    crear_outputs_y_ui33 <- function(prefix, mis_valores_reactive, output, ns) {
+      
+      the_names <- names(mis_valores_reactive())
+      the_names <- na.omit(the_names)
+      # the_names <- the_names[1:10]
+      # Identifico plot y text
+      dt_plots <- grepl("^plot", the_names)
+      dt_text <- !dt_plots
+      
+      vector_render <- rep(NA, length(the_names))
+      vector_render[dt_plots] <- "plotly"
+      vector_render[dt_text] <- "text"
+      
+      
+      # Crea los outputs en bucle, en ámbitos independientes para evitar sobrescrituras
+      for (i in seq_along(the_names)) {
+        id_output <- paste0(prefix, i)
+        obj_name <- the_names[i]
+        el_render <- vector_render[i]
+        
+        # Crear un ámbito local para que cada output sea independiente
+        local({
+          n <- i
+          id <- id_output
+          obj <- obj_name
+          
+          if(el_render == "text"){
+            output[[id]] <- renderPrint({
+              req(mis_valores_reactive())
+              mis_valores_reactive()[obj]
+            })
+          }
+          
+          # if(el_render == "plotly"){
+          #   output[[id]] <- plotly::renderPlotly({
+          #     req(mis_valores_reactive())
+          #     mis_valores_reactive()[[obj]]
+          #   })
+          # }
+          
+        })
+        
+      }
+      
+      # Crear UI dinámicamente
+      ui_list <- lapply(seq_along(the_names), function(i) {
+        id_output <- paste0(prefix, i)
+        el_render <- vector_render[i]
+        obj_name <- the_names[i]
+        
+        if(el_render == "text"){
+          list(
+            fluidRow(
+              #h4(list_objetos[[i]]$"title"),
+              verbatimTextOutput(ns(id_output)),
+              br()
+            )
+          )
+        }
+        # if(el_render == "plotly"){
+        #   list(
+        #     fluidRow(
+        #     HTML(paste0("<b><u>R plot object:</u></b> ", obj_name)),
+        #     #h4(list_objetos[[i]]$"title"),
+        #     plotlyOutput(ns(id_output)),
+        #     br()
+        #     )
+        #   )
+        # }
+        
+      })
+      
+      return(do.call(tagList, ui_list))
+    }
+    output$crystal03_output <- renderUI({
+      
+      the_list <- reactiveValuesToList(APP_TOTEM)
+      the_output <-  the_list[["step9"]]
+      
+      if(the_output$"check_output"){
+        crear_outputs_y_ui33(prefix = "jajja", mis_valores_reactive = reactive(the_output$"pack_output"), output, ns)    
+      } else "NADA"
+      
+    })
+    
    
     ###################################################
     
