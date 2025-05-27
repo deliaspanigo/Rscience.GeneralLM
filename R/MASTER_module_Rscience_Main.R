@@ -66,7 +66,7 @@ MASTER_module_Rscience_Main_ui <- function(id) {
                                uiOutput(ns("card05_output"))
               ),
               bslib::nav_panel(title = "theory",
-                               uiOutput(ns("card05_output22"))
+                               module_extra_theory_ui(id = ns("extra_theory"))
               ),
              
               bslib::nav_panel(title = "download",
@@ -144,7 +144,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     # 9) Download
     # -----------------------------------------
     # Reset
-    
+    module_extra_theory_server(id = "extra_theory")
 
     number_current_step  <- reactiveVal(1)
     APP_TOTEM <- reactiveValues()
@@ -644,39 +644,12 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     ############################################################################
     if(FALSE){
     
-    # Init Variable
-       
-    # Init Play
-    internal_PLAY_SELECTOR <- do.call(reactiveValues, default_structure_internal)
-    active_PLAY_SELECTOR   <- do.call(reactiveValues, default_structure_internal)
     
-    
-  
  
-  
-    Sbutton_play2_server(id = "play2", 
-                         default_structure, 
-                         internal_DATASET_SELECTOR,  active_DATASET_SELECTOR,
-                         internal_TOOLS_SELECTOR,    active_TOOLS_SELECTOR,
-                         internal_STR,               active_STR,
-                         internal_CFG,               active_CFG,
-                         internal_VARIABLE_SELECTOR, active_VARIABLE_SELECTOR,
-                         internal_PLAY_SELECTOR,     active_PLAY_SELECTOR)
-    
-    
   
     
     
    
-    
-    ############################################################################
-    
-    
-
-    ############################################################################
-    
-  
-    
  
     ############################################################################
     
@@ -697,25 +670,9 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
     })
     
-    ############################################################################
-    # Crystal01 - the_R_objects
-    # AQUI ESTAN LAS SALIDAS ESTADISTICAS!!!!
-    default_R_OBJECTS <- list(
-      check_previous_items = FALSE,
-      check_init_modal     = FALSE,
-      check_init_proc      = FALSE,
-      check_end_proc       = FALSE,
-      output               = "",
-      check_output         = FALSE,
-      check_end_modal      = FALSE,
-      check_general        = FALSE,
-      button_state         = "initial"
-    )
+   
     
-    active_R_OBJECTS   <- do.call(reactiveValues, default_R_OBJECTS)
-    
-
-    
+   
     
     observe({
       
@@ -991,59 +948,6 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
  
     ############################################################################
     
-    # # Render 05 - Theory (output R Results Shiny)
-    # Rendedir server and ui modules inside of renderUI!!!!!!
-    output$card05_output22 <- renderUI({
-      req(OK_ALL_ACTIVE())
-      # req(my_list_str_rv())
-      
-      req(internal_STR$"check_output")
-      mi_super_lista <- reactiveValuesToList(internal_STR) #print(paste0("AVER: ", internal_STR$"pack_output"$"vector_str"$"str_01_MM_variable_selector"))
-      
-      # ----------------------------------------------------------------------
-      #
-      # Hardcoded master
-      my_pack_name  <- "df_05_theory"
-      str_local_id  <- "the_05_theory"
-      #
-      # Hardcoded basics
-      my_df <- mi_super_lista$"pack_output"[[my_pack_name]]
-      vector_short_names  <- my_df$"short_name"
-      vector_full_names   <- my_df$"resource_name"
-      str_MM_server <- "MM_server"
-      str_MM_ui     <- "MM_ui"
-      #-----------------------------------------------------------------------
-      #
-      # server and ui
-      ### MM server
-      dt_str_MM_server    <- vector_short_names == str_MM_server
-      full_name_MM_server <- vector_full_names[dt_str_MM_server]
-      my_str_MM_server    <- full_name_MM_server
-      
-      ### MM ui
-      dt_str_MM_ui     <- vector_short_names == str_MM_ui
-      full_name_MM_ui  <- vector_full_names[dt_str_MM_ui]
-      my_str_MM_ui     <- full_name_MM_ui
-      #-----------------------------------------------------------------------
-      #
-      ### ARGs
-      args_server <- list(id = str_local_id, 
-                   show_dev = FALSE,
-                   mis_valores = reactive(active_R_OBJECTS$"pack_output")
-      )
-      
-      ### Running server module - 04 - ORRS (Output R Results Shiny)
-      do.call(my_str_MM_server, args_server)
-      
-      ### Running ui module - 04 - ORRS (Output R Results Shiny)
-      args_ui <- list(id = ns(str_local_id))
-      the_rendered_iu <- do.call(my_str_MM_ui, args_ui)
-      
-      div(
-        style = "height: 100%;",  
-        the_rendered_iu  
-      )
-    })
     
     ############################################################################
     
