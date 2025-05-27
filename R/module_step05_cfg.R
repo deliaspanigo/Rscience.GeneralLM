@@ -22,7 +22,7 @@ module_step05_cfg_server <- function(id, step_pos, number_current_step,
       # Hardcoded --------------------------------------------------------------
       current_label <- "Step 05: CFG from selected tool"
       current_step <- number_current_step()
-      print(paste0("Adentro del: ", current_label))
+      # print(paste0("Adentro del: ", current_label))
       
       # Basics and plague control ----------------------------------------------
       current_step_name <- paste0(STR_STEP_NAME, current_step)

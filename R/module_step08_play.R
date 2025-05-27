@@ -1,13 +1,14 @@
 #' @export
-module_step02_upload_ui <- function(id) {
+module_step08_play_ui <- function(id) {
   ns <- NS(id)
   
   
 }
 
 #' @export
-module_step02_upload_server <- function(id, step_pos, number_current_step, 
-                                      STR_STEP_NAME, default_list_step, APP_TOTEM) {
+module_step08_play_server <- function(id, step_pos, number_current_step, 
+                                        STR_STEP_NAME, default_list_step, 
+                                        APP_TOTEM, internal_CFG, internal_PLAY) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
@@ -15,10 +16,11 @@ module_step02_upload_server <- function(id, step_pos, number_current_step,
       
       # Requeriments -----------------------------------------------------------
       req(number_current_step() == step_pos)
-      # print(paste0("Adentro del: ", number_current_step()))
+      req(internal_PLAY)
+      req(internal_PLAY$"check_output")
       
       # Hardcoded --------------------------------------------------------------
-      current_label <- "Step 02: Up resources"
+      current_label <- "Step 08: Play"
       current_step <- number_current_step()
       # print(paste0("Adentro del: ", current_label))
       
@@ -38,11 +40,11 @@ module_step02_upload_server <- function(id, step_pos, number_current_step,
       }
       
       # Action for this step - Create pack_output!!!!!!!!!! --------------------
-      list_all_config02_tools <- fn_R_load_config02_yaml()
-      pack_output <- list_all_config02_tools
+      pack_output       <- internal_PLAY$"pack_output"
+      
       
       # Check output and more --------------------------------------------------
-      check_output <- !is.null(pack_output)
+      check_output <- internal_PLAY$"check_output"
       button_state <- "confirmed"
       
       
@@ -57,7 +59,7 @@ module_step02_upload_server <- function(id, step_pos, number_current_step,
       new_list_step <- default_list_step
       new_list_step$"current_step"   <- current_step
       new_list_step$"current_label"  <- current_label
-      new_list_step$"key"            <- "upload_resources"
+      new_list_step$"key"            <- "play"#sys.function()
       new_list_step$"check_previous" <- check_previous
       new_list_step$"pack_output"    <- pack_output
       new_list_step$"check_output"   <- check_output
@@ -65,7 +67,7 @@ module_step02_upload_server <- function(id, step_pos, number_current_step,
       new_list_step$"the_time"       <- fn_R_the_time_beauty()
       new_list_step$"error_message"  <- ""
       
-
+      
       # Validating the new totem list ------------------------------------------
       check_list_step <- fn_R_validate_new_list(new_list = new_list_step,  
                                                 ref_list = default_list_step)
@@ -79,13 +81,15 @@ module_step02_upload_server <- function(id, step_pos, number_current_step,
         return()  # Stop further execution
       }
       
+      
+      
       # Add --------------------------------------------------------------------
       isolate({
         APP_TOTEM[[current_step_name]] <- new_list_step
         number_current_step(current_step+1)
       })
       
-
+      
     })
     
   })

@@ -19,7 +19,7 @@ module_step06_settings_server <- function(id, step_pos, number_current_step,
       req(internal_SETTINGS)
       req(internal_SETTINGS$"check_output")
       # print(number_current_step())
-      print(reactiveValuesToList(internal_SETTINGS))
+      # print(reactiveValuesToList(internal_SETTINGS))
       
       # Hardcoded --------------------------------------------------------------
       current_label <- "Step 06: Setting Selector"

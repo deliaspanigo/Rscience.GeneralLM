@@ -75,7 +75,8 @@ Sbutton_03_settings_server <- function(id,
     output_list_variable_selector_rv <- reactiveVal(NULL)
     module_uiOutput_settings <- reactiveVal(NULL)
     
-    ### Finding modules
+    ### Finding modules server and ui, and fn for settings...
+    # Note: I canceled fn. It was a control fn.
     observe({
       req(local_OK())
 

@@ -25,7 +25,7 @@ Sbutton_reset2_ui <- function(id) {
 #' @export
 Sbutton_reset2_server <- function(id, 
                                   number_current_step, default_list_button, internal_DATASET_SELECTOR, 
-                                  internal_TOOLS_SELECTOR, internal_SETTINGS) {
+                                  internal_TOOLS_SELECTOR, internal_CFG, internal_SETTINGS, internal_PLAY) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
@@ -50,7 +50,10 @@ Sbutton_reset2_server <- function(id,
         number_current_step(1)
         fn_shiny_apply_changes_reactiveValues(rv = internal_DATASET_SELECTOR,  changes_list = default_list_button)
         fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR,  changes_list = default_list_button)
+        fn_shiny_apply_changes_reactiveValues(rv = internal_CFG,  changes_list = default_list_button)
         fn_shiny_apply_changes_reactiveValues(rv = internal_SETTINGS,  changes_list = default_list_button)
+        fn_shiny_apply_changes_reactiveValues(rv = internal_PLAY,  changes_list = default_list_button)
+        
       })
       
       # Mostrar mensaje de éxito
@@ -69,7 +72,9 @@ Sbutton_reset2_server <- function(id,
       isolate({
         number_current_step(3)
         fn_shiny_apply_changes_reactiveValues(rv = internal_TOOLS_SELECTOR,  changes_list = default_list_button)
+        fn_shiny_apply_changes_reactiveValues(rv = internal_CFG,  changes_list = default_list_button)
         fn_shiny_apply_changes_reactiveValues(rv = internal_SETTINGS,  changes_list = default_list_button)
+        fn_shiny_apply_changes_reactiveValues(rv = internal_PLAY,  changes_list = default_list_button)
       })
       
       
@@ -81,10 +86,24 @@ Sbutton_reset2_server <- function(id,
       isolate({
         number_current_step(4)
         fn_shiny_apply_changes_reactiveValues(rv = internal_SETTINGS,  changes_list = default_list_button)
+        fn_shiny_apply_changes_reactiveValues(rv = internal_PLAY,  changes_list = default_list_button)
+        
       })
       
       
     })
     
+    
+    observeEvent(internal_SETTINGS$"pack_output",{
+      req(internal_SETTINGS$"check_output")
+      
+      isolate({
+        number_current_step(6)
+        fn_shiny_apply_changes_reactiveValues(rv = internal_PLAY,  changes_list = default_list_button)
+        
+      })
+      
+      
+    })
   })
 }

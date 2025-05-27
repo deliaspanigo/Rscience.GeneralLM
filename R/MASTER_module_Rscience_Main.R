@@ -123,7 +123,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
               Sbutton_02_tools_ui(id = ns("tools_selector2")),
               Sbutton_03_settings_ui(id = ns("settings")),
               Sbutton_reset2_ui(id = ns("reset2")),
-              Sbutton_play2_ui(id = ns("play2"))
+              Sbutton_04_play_ui(id = ns("play2"))
             )
           )
         )
@@ -174,7 +174,9 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     # Reset button -------------------------------------------------------------
     Sbutton_reset2_server(id = "reset2", number_current_step, default_list_button, 
-                          internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR, internal_SETTINGS)
+                          internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR, internal_CFG,
+                          internal_SETTINGS,
+                          internal_PLAY)
     
     # List steps
     # Step 01) Initial ---------------------------------------------------------
@@ -219,7 +221,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
                            number_current_step, STR_STEP_NAME, default_list_step, 
                            APP_TOTEM, internal_TOOLS_SELECTOR, internal_CFG)
     
-    # Step 06) Settings ---------------------------------------------------
+    # Step 06) Settings --------------------------------------------------------
     internal_SETTINGS <- do.call(reactiveValues, default_list_button)
     Sbutton_03_settings_server(id = "settings", step_pos = 6, number_current_step, 
                                internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR, 
@@ -231,13 +233,28 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
                                   STR_STEP_NAME, default_list_step,
                                   APP_TOTEM, internal_SETTINGS)
     
-    # Step 07) Script ---------------------------------------------------
+    # Step 07) Script ----------------------------------------------------------
     module_step07_script_server(id = "step07", step_pos = 7,
                                 number_current_step, 
                                 STR_STEP_NAME, default_list_step, 
                                 APP_TOTEM, internal_DATASET_SELECTOR, internal_CFG, internal_SETTINGS)
    
+    
+    # Step 08) Play ------------------------------------------------------------
+    internal_PLAY <- do.call(reactiveValues, default_list_button)
+    Sbutton_04_play_server(id = "play2", internal_DATASET_SELECTOR, 
+                           internal_TOOLS_SELECTOR, internal_CFG,
+                           internal_SETTINGS,
+                           internal_PLAY, APP_TOTEM, number_current_step)
+    module_step08_play_server(id = "step08", step_pos = 8, number_current_step, 
+                              STR_STEP_NAME, default_list_step, 
+                              APP_TOTEM, internal_CFG, internal_PLAY)
+    
     # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -339,7 +356,8 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         "internal_DATASET_SELECTOR" = reactiveValuesToList(internal_DATASET_SELECTOR),
         "internal_TOOLS_SELECTOR" = reactiveValuesToList(internal_TOOLS_SELECTOR),
         "internal_CFG" = reactiveValuesToList(internal_CFG),
-        "internal_SETTINGS" = reactiveValuesToList(internal_SETTINGS)
+        "internal_SETTINGS" = reactiveValuesToList(internal_SETTINGS),
+        "internal_PLAY" = reactiveValuesToList(internal_PLAY)
       )
       lapply(names(lista_principal), function(nom) {
         tags$div(
@@ -563,15 +581,12 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     ############################################################################
     
     
+
     ############################################################################
-     
-    if(FALSE){
-    the_RS_UI <- reactiveVal()
     
-   
-    # observe(print(reactiveValuesToList( active_R_CODE)))
+  
     
-    
+ 
     ############################################################################
     
     THE_MODAL <- reactiveVal(NULL)

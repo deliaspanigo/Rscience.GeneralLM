@@ -21,7 +21,7 @@ module_step03_import_dataset_server <- function(id, step_pos, number_current_ste
       # Hardcoded --------------------------------------------------------------
       current_label <- "Step 03: Import dataset"
       current_step <- number_current_step()
-      print(paste0("Adentro del: ", current_label))
+      # print(paste0("Adentro del: ", current_label))
       
       
       # Basics and plague control ----------------------------------------------
