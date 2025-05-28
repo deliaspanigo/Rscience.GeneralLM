@@ -43,14 +43,14 @@ MASTER_module_Rscience_Main_ui <- function(id) {
               
               
               height = "100%",  # Especificar altura explícitamente
-              bslib::nav_panel(title = "cy_totem",
-                               uiOutput(ns("crystal01_totem_all"))
+              bslib::nav_panel(title = "cy_01_totem",
+                               uiOutput(ns("cy_01_totem"))
               ),
-              bslib::nav_panel(title = "cy_internal",
-                                 uiOutput(ns("crystal02_internal_all"))
+              bslib::nav_panel(title = "cy_02_internal",
+                                 uiOutput(ns("cy_02_internal"))
               ),
-              bslib::nav_panel(title = "cy_output",
-                               uiOutput(ns("crystal03_output"))
+              bslib::nav_panel(title = "cy_04_output",
+                               uiOutput(ns("cy_04_output"))
               ),
               bslib::nav_panel(title = "user_selection",
                                uiOutput(ns("card02_user_selection"))
@@ -58,17 +58,15 @@ MASTER_module_Rscience_Main_ui <- function(id) {
               bslib::nav_panel(title = "dataset",
                                DT::DTOutput(ns("visual_dataset"))
               ),
-              bslib::nav_panel(title = "script",
-                               uiOutput(ns("card06_script"))
-              ),
-
               bslib::nav_panel(title = "output",
                                uiOutput(ns("card05_output"))
               ),
               bslib::nav_panel(title = "theory",
                                module_extra_theory_ui(id = ns("extra_theory"))
               ),
-             
+              bslib::nav_panel(title = "script",
+                               uiOutput(ns("card06_script"))
+              ),
               bslib::nav_panel(title = "download",
                                uiOutput(ns("card07_download"))
               )
@@ -134,15 +132,17 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     # List steps
     # 1) Initial OK!
     # 2) Import tool options OK!
-    # 2) Import dataset    
-    # 3) Tool selection
-    # 4) Choosing settings...
-    # 5) Make script for user and quarto
-    # 6) Press PLAY and pass internal to active
-    # 7) Create temporal folder
-    # 8) Execute fn to obtain R objets
-    # 9) Download
+    # 3) Import dataset    
+    # 4) Tool selection
+    # 5) Config
+    # 6) Choosing settings...
+    # 8) Press PLAY and pass internal to active
+    # 9) Create temporal folder
+    # 7) Make script for user and quarto
+    # 10) Execute fn to obtain R objets
+    # 11) Download
     # -----------------------------------------
+    # Theory
     # Reset
     module_extra_theory_server(id = "extra_theory")
 
@@ -331,7 +331,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
       the_list
     })
-    output$"crystal01_totem_all" <- renderUI({
+    output$"cy_01_totem" <- renderUI({
       div(
         h2("Por iniciar"),
         verbatimTextOutput(ns("SUPER_A")),
@@ -356,7 +356,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
       the_list
     })
-    output$"crystal02_internal_all" <- renderUI({
+    output$"cy_02_internal" <- renderUI({
       lista_principal <- list(
         "internal_DATASET_SELECTOR" = reactiveValuesToList(internal_DATASET_SELECTOR),
         "internal_TOOLS_SELECTOR" = reactiveValuesToList(internal_TOOLS_SELECTOR),
@@ -452,7 +452,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
       return(do.call(tagList, ui_list))
     }
-    output$crystal03_output <- renderUI({
+    output$cy_04_output <- renderUI({
       
       the_list <- reactiveValuesToList(APP_TOTEM)
       the_output <-  the_list[["step9"]]
@@ -462,9 +462,32 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       } else "NADA"
       
     })
-    
+    ############################################################################ 
    
-    ###################################################
+    # $step8$pack_output
+    # $step8$pack_output$current_time_pritty
+    # [1] "2025-05-28 01:55 40.575"
+    # 
+    # $step8$pack_output$str_current_time
+    # [1] "2025_05_28_01_55_40_575"
+    # 
+    # $step8$pack_output$path_folder_work
+    # [1] "/tmp/RtmpwUPpfD/Rscience/GeneralLM_fix_anova1_2025_05_28_01_55_40_575/folder_work"
+    # 
+    # $step8$pack_output$check_folder_work
+    # [1] TRUE
+    # 
+    # $step8$pack_output$path_folder_output
+    # [1] "/tmp/RtmpwUPpfD/Rscience/GeneralLM_fix_anova1_2025_05_28_01_55_40_575/folder_output"
+    # 
+    # $step8$pack_output$check_folder_output
+    # [1] TRUE
+    # 
+    # 
+    # $step8$check_output
+    # [1] TRUE
+    
+    ############################################################################
     
     # UI - Dataset
     output$visual_dataset <- DT::renderDataTable({

@@ -161,9 +161,75 @@ module_step08_play_server <- function(id, step_pos, number_current_step,
       
     })
     
-    # Sub_step 04 - Add to TOTEM
+    # Sub_step 04 - Copy files from pk to folder_work
     observe({
       req(sub_step() == 4)
+      
+      # PK details
+      quarto_folder_path <- fn_PK_quarto_folder_path()
+      check_ok01 <- dir.exists(quarto_folder_path)
+      if(!check_ok01){
+        showNotification("No encuentra o no existe la carpeta del package.", type = "error")
+        return(NULL)
+      }
+      
+      # Tool PK details
+      selected_tool <- internal_CFG$"pack_output"$"id"
+      pk_quarto_tool_path <- file.path(quarto_folder_path, selected_tool)
+      check_ok02 <- dir.exists(pk_quarto_tool_path)
+      if(!check_ok02){
+        showNotification("No encuentra o no existe la carpeta de la herramienta en el package.", type = "error")
+        return(NULL)
+      }
+      
+      pk_quarto_tool_list_files <- list.files(pk_quarto_tool_path, full.names = TRUE, recursive = TRUE)
+      vector_check_file_names <- sapply(pk_quarto_tool_list_files, function(x){file.exists(x)})
+      check_ok03 <- all(vector_check_file_names)
+      if(!check_ok03){
+        showNotification("No se encuentran archivos de qurto - selected tool.", type = "error")
+        return(NULL)
+      }
+      
+      
+      # Temporal Work folder path
+      new_list_step <-  THE_CAPSULE$"new_list_step"
+      path_folder_work <- new_list_step$"pack_output"$"path_folder_work"
+      check_ok04 <- dir.exists(path_folder_work)
+      if(!check_ok04){
+        showNotification("No encuentra o no existe la carpeta temporal de WORK.", type = "error")
+        return(NULL)
+      }
+      
+     
+      # Copiar cada archivo a la carpeta destino
+      # print(vector_check_file_names)
+      # print(basename(vector_check_file_names[1]))
+      for (archivo in pk_quarto_tool_list_files) {
+        # print(archivo)
+        # Crear la ruta de destino manteniendo la estructura de subcarpetas
+        ruta_destino <- file.path(path_folder_work, basename(archivo))
+        
+        # Copiar el archivo
+        file.copy(archivo, ruta_destino)
+      }
+      
+      
+      temporal_work_list_files <- list.files(path_folder_work, full.names = TRUE, recursive = TRUE)
+      vector_check_temporal_work_file_names <- sapply(temporal_work_list_files, function(x){file.exists(x)})
+      check_ok04 <- all(vector_check_temporal_work_file_names)
+      if(!check_ok04){
+        showNotification("No se encuentran archivos de temporal work.", type = "error")
+        return(NULL)
+      }
+      
+      
+      sub_step(sub_step()+1)
+      
+    })
+    
+    # Sub_step 05 - Add to TOTEM
+    observe({
+      req(sub_step() == 5)
       
       current_step <- THE_CAPSULE$"current_step" 
       current_step_name <- THE_CAPSULE$"current_step_name"

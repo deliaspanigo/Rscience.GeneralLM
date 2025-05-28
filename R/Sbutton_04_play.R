@@ -92,7 +92,7 @@ Sbutton_04_play_server <- function(id,
       vector_check <- unlist( vector_check)
       vector_check <- vector_check[1:(number_current_step()-1)]
       
-      print(vector_check)
+      
       all_previous_ok <- all(vector_check)
 
       if (!all_previous_ok) {

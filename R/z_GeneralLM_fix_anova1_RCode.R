@@ -880,6 +880,7 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   
   #######----
   
+  ####### DESDE ACAAAAAAAAAAAAAAAAAAAA
   # # # Create a new plot...
   plot001_residuals <- plotly::plot_ly()
   

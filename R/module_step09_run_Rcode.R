@@ -70,7 +70,7 @@ module_step09_run_Rcode_server <- function(id, step_pos, number_current_step,
       new_list_step <- default_list_step
       new_list_step$"current_step"   <- current_step
       new_list_step$"current_label"  <- current_label
-      new_list_step$"key"            <- "play"#sys.function()
+      new_list_step$"key"            <- "run"#sys.function()
       new_list_step$"check_previous" <- check_previous
       new_list_step$"pack_output"    <- pack_output
       new_list_step$"check_output"   <- check_output
