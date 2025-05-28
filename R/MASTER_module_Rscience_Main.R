@@ -49,6 +49,9 @@ MASTER_module_Rscience_Main_ui <- function(id) {
               bslib::nav_panel(title = "cy_02_internal",
                                  uiOutput(ns("cy_02_internal"))
               ),
+              bslib::nav_panel(title = "cy_03_temp",
+                               uiOutput(ns("cy_03_temp"))
+              ),
               bslib::nav_panel(title = "cy_04_output",
                                uiOutput(ns("cy_04_output"))
               ),
@@ -254,6 +257,11 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
                               STR_STEP_NAME, default_list_step, 
                               APP_TOTEM, internal_DATASET_SELECTOR,
                               internal_SETTINGS)
+    # Step 10) Run ------------------------------------------------------------
+    module_step10_download_server(id = "step10", step_pos = 10, number_current_step, 
+                                  STR_STEP_NAME, default_list_step, 
+                                  APP_TOTEM, internal_TOOLS_SELECTOR,
+                                  internal_CFG, internal_PLAY)
     
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -375,9 +383,48 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       })
     })
     # --------------------------------------------------------------------------
-    # Generar las pestañas y los outputs dinámicamente en un solo renderUI
-
-    
+    output$"crystal03_01_work" <- renderPrint({
+      the_list <- reactiveValuesToList(APP_TOTEM)
+      the_output <-  the_list[["step8"]]$"pack_output"
+      
+      path_folder_work <- the_output$"path_folder_work"
+      check_folder_work <- the_output$"check_folder_work" 
+      vector_list_files <- list.files(path = path_folder_work, all.files = T, full.names = T, recursive = T)
+      
+      list_show <- list(path_folder_work = path_folder_work,
+                        check_folder_work = check_folder_work,
+                        vector_list_files = vector_list_files)
+      list_show
+    })
+    output$"crystal03_02_output" <- renderPrint({
+      the_list <- reactiveValuesToList(APP_TOTEM)
+      the_output <-  the_list[["step8"]]$"pack_output"
+      
+      path_folder_output <- the_output$"path_folder_output"
+      check_folder_output <- the_output$"check_folder_output" 
+      vector_list_files <- list.files(path = path_folder_output, all.files = T, full.names = T, recursive = T)
+      
+      list_show <- list(path_folder_work = path_folder_output,
+                        check_folder_work = check_folder_output,
+                        vector_list_files = vector_list_files)
+      list_show
+    })
+    output$cy_03_temp <- renderUI({
+      
+      div(
+        fluidPage(
+          h2("Work folder"),
+          verbatimTextOutput(ns("crystal03_01_work"))
+        ),
+        fluidPage(
+          h2("Output folder"),
+          verbatimTextOutput(ns("crystal03_02_output"))
+        )
+      )
+        
+      
+    })
+    # --------------------------------------------------------------------------
     crear_outputs_y_ui33 <- function(prefix, mis_valores_reactive, output, ns) {
       
       the_names <- names(mis_valores_reactive())
@@ -498,7 +545,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       my_dataset <- NULL
       if (!is.null(the_list[[3]]$"pack_output"$"database")) {
         my_dataset <- the_list[[3]]$"pack_output"$"database"
-        print(my_dataset)
+        # print(my_dataset)
       }
 
       # Solo continuar si my_dataset existe y es válido
@@ -659,7 +706,13 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       )
       
     })
+    ############################################################################
     
+    output$card07_download <- renderUI({
+    
+      # req(my_list_str_rv())
+      module_step10_download_ui(id=ns("step10"))
+    })
     
     
     

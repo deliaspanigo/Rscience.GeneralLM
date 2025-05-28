@@ -10,6 +10,11 @@ config:
     fn_control: "GeneralLM_fix_anova1_FN_validate_vars"
   script:
     copie_file_name: "GeneralLM_fix_anova1_RCode.R"
+  download:
+    output:
+      Rcode_script_file_name: "GeneralLM_fix_anova1_RCode.R"
+    input:
+      file_01_qmd: "aver.qmd"
   version: "1.0.0"
   date_version: "2025-05-24"
   
