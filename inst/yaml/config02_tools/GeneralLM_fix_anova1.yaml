@@ -11,10 +11,11 @@ config:
   script:
     copie_file_name: "GeneralLM_fix_anova1_RCode.R"
   download:
-    output:
-      Rcode_script_file_name: "GeneralLM_fix_anova1_RCode.R"
-    input:
-      file_01_qmd: "aver.qmd"
+    file01:
+      id: "file01_Rscript_GeneralLM_fix_anova1.R"
+      on_work_folder: TRUE
+      show_render: TRUE
+      fn_render: "GeneralLM_fix_anova1.R"
   version: "1.0.0"
   date_version: "2025-05-24"
   

@@ -13,14 +13,14 @@ module_step10_download_ui <- function(id) {
           column(10,
                  uiOutput(ns("set01_RCode")),
                  hr(),
-                 uiOutput(ns("set02_RLong")),
-                 hr()#,
+                 # uiOutput(ns("set02_RLong")),
+                 # hr()#,
                  #uiOutput(ns("set03_RReport"))
           )#,
           # column(6, actionButton(ns("download_ALL"), "Download ALL", class = "btn-primary", icon = icon("download"))),
         ),
-        br(),
-        uiOutput(ns("visual_para_archivos")),
+        br()
+        # uiOutput(ns("visual_para_archivos")),
         # br(),
         # actionButton(ns("renderizar"), "Render VIEJO", class = "btn-primary"),
         
@@ -78,22 +78,28 @@ module_step10_download_server <- function(id, step_pos, number_current_step,
     })  
     
     ###-------------------------------------------------------------------------
-    default_structure_file_download <- list(
+    # Default File Download state
+    list_DFDS <- list(
+      "check_clic_render" = FALSE,
       "current_time_pritty"     = "",
       "str_current_time" = "",
-      "check_render" = FALSE,
+      "MY_SCRIPT" = "",
+      "folder_path_work" = "",
+      "file_name_work" = "",
+      "file_path_work" = "",
+      "check_work" = FALSE,
+      "folder_path_delivery" = "", 
+      "file_name_delivery" = "", 
+      "file_path_delivery" = "", 
+      "check_delivery" = FALSE,
+      "check_output" = FALSE,
       "button_state_render" = "initial",
-      "delivery_file_path" = "",
-      "delivery_file_name" ="",
-      "check_exist_delivery_file" = FALSE,
-      "check_clic_render" = FALSE,
-      "button_state_render" = "initial",
-      "check_file_in_delivery" = FALSE,
       "check_clic_download" = FALSE,
       "button_state_download" = "initial"
     )
-    internal_01_FILE_RCODE <- do.call(reactiveValues, default_structure_file_download)
-    internal_02_RLONG  <- do.call(reactiveValues, default_structure_file_download)
+    
+    internal_01_FILE_RCODE <- do.call(reactiveValues, list_DFDS)
+    internal_02_RLONG  <- do.call(reactiveValues, list_DFDS)
     
     output$el_cartel <- renderUI({
       my_cartel <- reactiveValuesToList(internal_TOOLS_SELECTOR)$"pack_output"$"selected_cartel"
@@ -118,25 +124,7 @@ module_step10_download_server <- function(id, step_pos, number_current_step,
       )
     })
     
-    output$"set02_RLong" <- renderUI({
-      the_class_render   <- internal_02_RLONG$"button_class"
-      #      the_class_download <- internal_01_FILE_RCODE$"button_class"
-      
-      btn_class_render <- switch(the_class_render,
-                                 "initial"   = "btn-outline-primary",    # Azul inicial
-                                 "confirmed" = "btn-success",    # Verde después de confirmar
-                                 "modified"  = "btn-outline-primary") 
-      
-      fluidRow(
-        column(3, "R code and Outputs"),
-        column(2, actionButton(ns("render_RLong"), "Render", class = btn_class_render)),
-        # column(2, "Status"),
-        column(2, downloadButton(ns("download_RLong"), "Download", class = "btn-primary", icon = icon("download"))),
-      )
-    })
-      
-   ###--------------------------------------------------------------------------
-    
+     
     # Sub_step 01 - Enviroment and THE_CAPSULE
     observe({
       # Requeriments -----------------------------------------------------------
@@ -145,16 +133,19 @@ module_step10_download_server <- function(id, step_pos, number_current_step,
       req(number_current_step() == step_pos)
       req(internal_PLAY, internal_TOOLS_SELECTOR, internal_CFG)
       req(internal_PLAY$"check_output", internal_TOOLS_SELECTOR$"check_output", internal_CFG$"check_output")
-      
+
+      # THE_CAPSULE$"file_name_work" = APP_TOTEM[["step8"]]$"pack_output"$"download"$"file01_Rcode"$"work_file_name"
+      # THE_CAPSULE$"file_name_delivery" = APP_TOTEM[["step8"]]$"pack_output"$"download"$"file01_Rcode"$"delivery_file_name"
+      # 
       isolate({
         THE_CAPSULE$"current_step" = number_current_step()
         THE_CAPSULE$"current_step_name" = paste0(STR_STEP_NAME, step_pos)
         THE_CAPSULE$"current_label" ="Step 10: Download"
         THE_CAPSULE$"new_list_step" = NA # Not necesary at download???
         THE_CAPSULE$"selected_tool" = internal_CFG$"pack_output"$"id"
-        THE_CAPSULE$"Rcode_script"  = APP_TOTEM[["step7"]]$"pack_output"$"Rcode_script"
         THE_CAPSULE$"folder_path_work" = APP_TOTEM[["step8"]]$"pack_output"$"path_folder_work"
         THE_CAPSULE$"folder_path_delivery" = APP_TOTEM[["step8"]]$"pack_output"$"path_folder_output"
+        THE_CAPSULE$"Rcode_script"  = APP_TOTEM[["step7"]]$"pack_output"$"Rcode_script"
       })
       
       
@@ -185,31 +176,7 @@ module_step10_download_server <- function(id, step_pos, number_current_step,
     
 
     
-    internal_01_FILE_RCODE <- do.call(reactiveValues, default_structure_file_download)
-    THE_MODAL_RCODE <- reactiveVal(NULL)
-    observeEvent(THE_MODAL_RCODE(),{
-      
-      if(THE_MODAL_RCODE()){
-        # Mostrar el modal de carga
-        # Mostrar el modal de carga con un spinner
-        
-      }
-      
-      if(!THE_MODAL_RCODE()){
-        shinyjs::delay(2000, {
-          removeModal()
-        })
-        THE_MODAL_RCODE(NULL)
-      }
-      
-    })
-    observeEvent(input$"render_RCode", {
-      
-      req(sub_step() == 2)
-      fn_shiny_apply_changes_reactiveValues(rv = internal_01_FILE_RCODE,  
-                                            changes_list = default_structure_file_download
-      )
-      
+    fn_shiny_ACTIVE_SHOW_MODAL <- function(){
       showModal(
         modalDialog(
           id = "miModalEspecifico2",  # Asignar un ID al modal
@@ -235,96 +202,147 @@ module_step10_download_server <- function(id, step_pos, number_current_step,
           easyClose = FALSE  # Evitar que el usuario cierre el modal manualmente
         )
       )
+    }
+    
+    THE_MODAL_RCODE <- reactiveVal(NULL)
+    observeEvent(THE_MODAL_RCODE(),{
       
-      # Stage 1 - Time and str_search
-      current_time_pritty   <-  fn_R_the_time_beauty()
-      str_current_time      <-  gsub("[^0-9]", "_", current_time_pritty)
-      
-      # State 2 - Folder path
-      folder_path_delivery <- THE_CAPSULE$"folder_path_delivery"
-      if(!dir.exists(folder_path_delivery)){
-        print(paste0("Work path: ", folder_path_delivery))
-        print("No existe la carpeta en la que se quiere hacer el delivery.")  
+      if(THE_MODAL_RCODE()){
+        # Mostrar el modal de carga
+        # Mostrar el modal de carga con un spinner
+        
       }
       
-      # Stage 3 - File name
-      ### Standard file name
-      output_file_name_standard <- "my_codigo.R"  # Esto debe venir del yaml. Cambiar luego!
-      spected_end <- ".R" # Esto no se si setearlo aqui o en yaml o que.
-      if(!endsWith(output_file_name_standard, spected_end)){
-        print(paste0("File name:  ", output_file_name_standard))
-        print(paste0("Spected end:  ", spected_end))
-        print("Puede estar mal referenciado el yaml o el spected end.")
+      if(!THE_MODAL_RCODE()){
+        shinyjs::delay(2000, {
+          removeModal()
+        })
+        THE_MODAL_RCODE(NULL)
       }
-      
-      ### Modificated file name
-      output_file_name_mod <- tools::file_path_sans_ext(output_file_name_standard)
-      output_file_name_mod <- paste0(output_file_name_mod, "_", str_current_time, spected_end)
-      if(!endsWith( output_file_name_mod, spected_end)){
-        print(paste0("File name:  ",output_file_name_mod))
-        print(paste0("Spected end:  ", spected_end))
-        print("Puede estar mal referenciado el yaml o el spected end.")
-      }
-
-      
-      # Stage 04 - Output file paths
-      delivery_file_path <- file.path(folder_path_delivery, output_file_name_mod)
-      if(file.exists(delivery_file_path)){
-        print("El archivo ya existe!")
-        print("El archivo no deberia existir ya en la carpeta delivery")
-      }
-     
-      MY_SCRIPT <- THE_CAPSULE$"Rcode_script"
-      
-
-      #################################################################
-      
-      message(green("Starting process..."))
-      message(green("Please, wait..."))
-      writeLines(MY_SCRIPT, delivery_file_path)
-      message(green("Process completed!"))
-      message("")
-      
-      
-      
-      #################################################################
-      if(!file.exists(delivery_file_path)){
-        print("OCurrio un problema.")
-        print("El archivo ya fue procesado, y guardado, pero no se encuentra
-              en la carpeta delivery.")
-      }
-      
-      
-      fn_shiny_apply_changes_reactiveValues(rv = internal_01_FILE_RCODE, changes_list = list(
-        "current_time_pritty"     = current_time_pritty,
-        "str_current_time" = str_current_time,
-        "check_render" = TRUE,
-        "button_state_render" = "confirmed",
-        "delivery_file_path" = delivery_file_path,
-        "delivery_file_name" = output_file_name_mod,
-        "check_exist_delivery_file" = TRUE,
-        "check_clic_render" = TRUE,
-        "button_state_render" = "confirmed",
-        "check_file_in_delivery" = TRUE,
-        "check_clic_download" = FALSE,
-        "button_state_download" = "initial"
-        )
-      )
-      
-      THE_MODAL_RCODE(FALSE)
-      
       
     })
     
     
-    output$visual_RCode <- renderText({
-      req(internal_01_FILE_RCODE)
-      mi_lista <- reactiveValuesToList(internal_01_FILE_RCODE)
+    observeEvent(input$"render_RCode", {
       
-      req(mi_lista$"check_path_output_file")
-      # print(mi_lista)
+      req(sub_step() == 2)
       
-      paste(readLines(mi_lista$"path_output_file"), collapse = "\n")
+      # Abrir show modal
+      fn_shiny_ACTIVE_SHOW_MODAL()
+      
+ 
+        
+        # Reset por las dudas
+        fn_shiny_apply_changes_reactiveValues(rv = internal_01_FILE_RCODE,  
+                                              changes_list = list_DFDS
+        )
+        
+
+        # From Capsule
+        MY_SCRIPT <- THE_CAPSULE$"Rcode_script"
+        folder_path_work <- THE_CAPSULE$"folder_path_work"
+        folder_path_delivery <- THE_CAPSULE$"folder_path_delivery"
+        
+        # From yaml config
+        file_name_work   <- "file01_Rscript_GeneralLM_fix_anova1.R"
+        file_name_delivery   <- "file01_Rscript_GeneralLM_fix_anova1.R"
+        
+          
+        if(internal_01_FILE_RCODE[["check_clic_render"]] == list_DFDS[["check_clic_render"]]){
+          internal_01_FILE_RCODE[["check_clic_render"]] <- TRUE
+        }
+        
+        if(internal_01_FILE_RCODE[["current_time_pritty"]] == list_DFDS[["current_time_pritty"]]){
+          internal_01_FILE_RCODE[["current_time_pritty"]] <- fn_R_the_time_beauty()
+        }
+        
+        if(internal_01_FILE_RCODE[["str_current_time"]] == list_DFDS[["str_current_time"]]){
+          current_time_pritty   <-   internal_01_FILE_RCODE[["current_time_pritty"]]
+          str_current_time      <-  gsub("[^0-9]", "_", current_time_pritty)
+          internal_01_FILE_RCODE[["str_current_time"]] <- str_current_time
+        }
+        
+        if(internal_01_FILE_RCODE[["MY_SCRIPT"]] == list_DFDS[["MY_SCRIPT"]]){
+          internal_01_FILE_RCODE[["MY_SCRIPT"]] <- MY_SCRIPT
+        }
+        
+        if(internal_01_FILE_RCODE[["folder_path_work"]] == list_DFDS[["folder_path_work"]]){
+          
+          internal_01_FILE_RCODE[["folder_path_work"]] <- folder_path_work
+        }
+        
+        if(internal_01_FILE_RCODE[["file_name_work"]] == list_DFDS[["file_name_work"]]){
+          
+          internal_01_FILE_RCODE[["file_name_work"]] <- file_name_work
+        }
+        
+        if(internal_01_FILE_RCODE[["file_path_work"]] == list_DFDS[["file_path_work"]]){
+          file_path_work <-file.path(folder_path_work, file_name_work)
+          
+          internal_01_FILE_RCODE[["file_path_work"]] <- file_path_work
+        }
+        
+        if(internal_01_FILE_RCODE[["check_work"]] == list_DFDS[["check_work"]]){
+          file_path_work <- internal_01_FILE_RCODE[["file_path_work"]]
+          
+          check_work <- file.exists(file_path_work)
+          internal_01_FILE_RCODE[["check_work"]] <- check_work
+        }
+        
+        if(internal_01_FILE_RCODE[["folder_path_delivery"]] == list_DFDS[["folder_path_delivery"]]){
+          
+          internal_01_FILE_RCODE[["folder_path_delivery"]] <- folder_path_delivery
+        }
+        
+        if(internal_01_FILE_RCODE[["file_name_delivery"]] == list_DFDS[["file_name_delivery"]]){
+          # new file name for delivery
+          file_ext <- tools::file_ext(file_name_delivery)
+          file_name_no_ext <- tools::file_path_sans_ext(file_name_delivery)
+          file_name_mod <- paste0(file_name_no_ext, "_", str_current_time, file_ext)
+          internal_01_FILE_RCODE[["file_name_delivery"]] <- file_name_delivery
+        }
+        
+        if(internal_01_FILE_RCODE[["file_path_delivery"]] == list_DFDS[["file_path_delivery"]]){
+          file_path_delivery <-file.path(folder_path_delivery, file_name_delivery)
+          
+          internal_01_FILE_RCODE[["file_path_delivery"]] <- file_path_delivery
+        }
+        
+        if(internal_01_FILE_RCODE[["check_delivery"]] == list_DFDS[["check_delivery"]]){
+          file_path_delivery <- internal_01_FILE_RCODE[["file_path_delivery"]]
+          
+          check_delivery <- !file.exists(file_path_delivery)
+          internal_01_FILE_RCODE[["check_delivery"]] <- check_delivery
+        }
+        
+        message(green("Starting process..."))
+        message(green("Please, wait..."))
+        file_path_delivery <- internal_01_FILE_RCODE[["file_path_delivery"]]
+        writeLines(MY_SCRIPT, file_path_delivery)
+        message(green("Process completed!"))
+        message("")
+        
+        if(internal_01_FILE_RCODE[["check_output"]] == list_DFDS[["check_output"]]){
+          file_path_delivery <- internal_01_FILE_RCODE[["file_path_delivery"]]
+          
+          check_output <- file.exists(file_path_delivery)
+          internal_01_FILE_RCODE[["check_output"]] <- check_output
+        }
+        
+        if(internal_01_FILE_RCODE[["button_state_render"]] == list_DFDS[["button_state_render"]]){
+          check_output <- internal_01_FILE_RCODE[["check_output"]]
+          
+          if(check_output){
+            button_state_render <- "confirmed"
+            internal_01_FILE_RCODE[["button_state_render"]] <- button_state_render
+          }
+
+        }
+        
+     print(reactiveValuesToList(THE_CAPSULE))
+     print(reactiveValuesToList(internal_01_FILE_RCODE))
+      
+      THE_MODAL_RCODE(FALSE)
       
     })
     
@@ -332,11 +350,11 @@ module_step10_download_server <- function(id, step_pos, number_current_step,
     
     output$download_RCode <- downloadHandler(
       filename = function() {
-        internal_01_FILE_RCODE$"delivery_file_name"
+        internal_01_FILE_RCODE$"file_name_delivery"
       },
       content = function(file) {
-        req(internal_01_FILE_RCODE$"check_file_in_delivery")
-        file.copy(internal_01_FILE_RCODE$"delivery_file_path", file)
+        req(internal_01_FILE_RCODE$"check_output")
+        file.copy(internal_01_FILE_RCODE$"file_path_delivery", file)
       }
     )
     
