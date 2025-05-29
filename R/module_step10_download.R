@@ -3,6 +3,15 @@ module_step10_download_ui <- function(id) {
   ns <- NS(id)
   
   div(
+    # Agregar el código JavaScript
+    tags$head(
+      tags$script(HTML(paste0("
+        $(document).on('click', '#", ns("download_RCode"), "', function() {
+          Shiny.setInputValue('", ns("clic_descarga"), "', true);
+        });
+      ")))
+    ),
+    
     uiOutput(ns("el_cartel")),
     card(
       card_header(
@@ -12,33 +21,17 @@ module_step10_download_ui <- function(id) {
         fluidRow(
           column(10,
                  uiOutput(ns("set01_RCode")),
-                 hr(),
-                 # uiOutput(ns("set02_RLong")),
-                 # hr()#,
-                 #uiOutput(ns("set03_RReport"))
-          )#,
-          # column(6, actionButton(ns("download_ALL"), "Download ALL", class = "btn-primary", icon = icon("download"))),
+                 hr()
+          )
         ),
         br()
-        # uiOutput(ns("visual_para_archivos")),
-        # br(),
-        # actionButton(ns("renderizar"), "Render VIEJO", class = "btn-primary"),
-        
-        # uiOutput(ns("render_status")),
-        
-        # Aquí se mostrará el HTML renderizado
-        # div(
-        #   id = ns("contenedor_html"),
-        #   #style = "display: none; border: 1px solid #ddd; border-radius: 5px; padding: 15px; margin-top: 20px; overflow: visible; max-height: none;",
-        #   htmlOutput(ns("quarto_iframe"))
-        # )
-        
       ),
       # Permitir que el card crezca según sea necesario
       height = "auto"
     )
   )
 }
+
 
 #' @export
 module_step10_download_server <- function(id, step_pos, number_current_step, 
@@ -116,11 +109,16 @@ module_step10_download_server <- function(id, step_pos, number_current_step,
                                  "confirmed" = "btn-success",    # Verde después de confirmar
                                  "modified"  = "btn-outline-primary") 
       
+      the_state_download <-  internal_01_FILE_RCODE$"button_state_download"
+      btn_class_download <- switch(the_state_download,
+                                 "initial"   = "btn-outline-primary",    # Azul inicial
+                                 "confirmed" = "btn-success",    # Verde después de confirmar
+                                 "modified"  = "btn-outline-primary") 
       fluidRow(
         column(3, "R code"),
         column(2, actionButton(ns("render_RCode"), "Render", class = btn_class_render)),
         # column(2, "Status"),
-        column(2, downloadButton(ns("download_RCode"), "Download", class = "btn-primary", icon = icon("download"))),
+        column(2, downloadButton(outputId = ns("download_RCode"), "Download", class = btn_class_download, icon = icon("download"))),
       )
     })
     
@@ -247,73 +245,75 @@ module_step10_download_server <- function(id, step_pos, number_current_step,
         file_name_work   <- "file01_Rscript_GeneralLM_fix_anova1.R"
         file_name_delivery   <- "file01_Rscript_GeneralLM_fix_anova1.R"
         
-          
-        if(internal_01_FILE_RCODE[["check_clic_render"]] == list_DFDS[["check_clic_render"]]){
+        
+        if(internal_01_FILE_RCODE[["check_clic_render"]] == list_DFDS[["check_clic_render"]]) local({
           internal_01_FILE_RCODE[["check_clic_render"]] <- TRUE
-        }
+        })
         
-        if(internal_01_FILE_RCODE[["current_time_pritty"]] == list_DFDS[["current_time_pritty"]]){
+        if(internal_01_FILE_RCODE[["current_time_pritty"]] == list_DFDS[["current_time_pritty"]]) local({
           internal_01_FILE_RCODE[["current_time_pritty"]] <- fn_R_the_time_beauty()
-        }
+        })
         
-        if(internal_01_FILE_RCODE[["str_current_time"]] == list_DFDS[["str_current_time"]]){
+        if(internal_01_FILE_RCODE[["str_current_time"]] == list_DFDS[["str_current_time"]])local({
           current_time_pritty   <-   internal_01_FILE_RCODE[["current_time_pritty"]]
           str_current_time      <-  gsub("[^0-9]", "_", current_time_pritty)
           internal_01_FILE_RCODE[["str_current_time"]] <- str_current_time
-        }
+        })
         
-        if(internal_01_FILE_RCODE[["MY_SCRIPT"]] == list_DFDS[["MY_SCRIPT"]]){
+        if(internal_01_FILE_RCODE[["MY_SCRIPT"]] == list_DFDS[["MY_SCRIPT"]])local({
           internal_01_FILE_RCODE[["MY_SCRIPT"]] <- MY_SCRIPT
-        }
+        })
         
-        if(internal_01_FILE_RCODE[["folder_path_work"]] == list_DFDS[["folder_path_work"]]){
+        if(internal_01_FILE_RCODE[["folder_path_work"]] == list_DFDS[["folder_path_work"]])local({
           
           internal_01_FILE_RCODE[["folder_path_work"]] <- folder_path_work
-        }
+        })
         
-        if(internal_01_FILE_RCODE[["file_name_work"]] == list_DFDS[["file_name_work"]]){
+        if(internal_01_FILE_RCODE[["file_name_work"]] == list_DFDS[["file_name_work"]])local({
           
           internal_01_FILE_RCODE[["file_name_work"]] <- file_name_work
-        }
+        })
         
-        if(internal_01_FILE_RCODE[["file_path_work"]] == list_DFDS[["file_path_work"]]){
+        if(internal_01_FILE_RCODE[["file_path_work"]] == list_DFDS[["file_path_work"]])local({
           file_path_work <-file.path(folder_path_work, file_name_work)
           
           internal_01_FILE_RCODE[["file_path_work"]] <- file_path_work
-        }
+        })
         
-        if(internal_01_FILE_RCODE[["check_work"]] == list_DFDS[["check_work"]]){
+        if(internal_01_FILE_RCODE[["check_work"]] == list_DFDS[["check_work"]])local({
           file_path_work <- internal_01_FILE_RCODE[["file_path_work"]]
           
           check_work <- file.exists(file_path_work)
           internal_01_FILE_RCODE[["check_work"]] <- check_work
-        }
+        })
         
-        if(internal_01_FILE_RCODE[["folder_path_delivery"]] == list_DFDS[["folder_path_delivery"]]){
+        if(internal_01_FILE_RCODE[["folder_path_delivery"]] == list_DFDS[["folder_path_delivery"]])local({
           
           internal_01_FILE_RCODE[["folder_path_delivery"]] <- folder_path_delivery
-        }
+        })
         
-        if(internal_01_FILE_RCODE[["file_name_delivery"]] == list_DFDS[["file_name_delivery"]]){
+        if(internal_01_FILE_RCODE[["file_name_delivery"]] == list_DFDS[["file_name_delivery"]])local({
           # new file name for delivery
-          file_ext <- tools::file_ext(file_name_delivery)
+          str_current_time <- internal_01_FILE_RCODE[["str_current_time"]]
+          file_ext <- paste0(".", tools::file_ext(file_name_delivery))
           file_name_no_ext <- tools::file_path_sans_ext(file_name_delivery)
           file_name_mod <- paste0(file_name_no_ext, "_", str_current_time, file_ext)
+          file_name_delivery <- file_name_mod
           internal_01_FILE_RCODE[["file_name_delivery"]] <- file_name_delivery
-        }
+        })
         
-        if(internal_01_FILE_RCODE[["file_path_delivery"]] == list_DFDS[["file_path_delivery"]]){
+        if(internal_01_FILE_RCODE[["file_path_delivery"]] == list_DFDS[["file_path_delivery"]])local({
           file_path_delivery <-file.path(folder_path_delivery, file_name_delivery)
           
           internal_01_FILE_RCODE[["file_path_delivery"]] <- file_path_delivery
-        }
+        })
         
-        if(internal_01_FILE_RCODE[["check_delivery"]] == list_DFDS[["check_delivery"]]){
+        if(internal_01_FILE_RCODE[["check_delivery"]] == list_DFDS[["check_delivery"]])local({
           file_path_delivery <- internal_01_FILE_RCODE[["file_path_delivery"]]
           
           check_delivery <- !file.exists(file_path_delivery)
           internal_01_FILE_RCODE[["check_delivery"]] <- check_delivery
-        }
+        })
         
         message(green("Starting process..."))
         message(green("Please, wait..."))
@@ -322,14 +322,14 @@ module_step10_download_server <- function(id, step_pos, number_current_step,
         message(green("Process completed!"))
         message("")
         
-        if(internal_01_FILE_RCODE[["check_output"]] == list_DFDS[["check_output"]]){
+        if(internal_01_FILE_RCODE[["check_output"]] == list_DFDS[["check_output"]])local({
           file_path_delivery <- internal_01_FILE_RCODE[["file_path_delivery"]]
           
           check_output <- file.exists(file_path_delivery)
           internal_01_FILE_RCODE[["check_output"]] <- check_output
-        }
+        })
         
-        if(internal_01_FILE_RCODE[["button_state_render"]] == list_DFDS[["button_state_render"]]){
+        if(internal_01_FILE_RCODE[["button_state_render"]] == list_DFDS[["button_state_render"]])local({
           check_output <- internal_01_FILE_RCODE[["check_output"]]
           
           if(check_output){
@@ -337,16 +337,31 @@ module_step10_download_server <- function(id, step_pos, number_current_step,
             internal_01_FILE_RCODE[["button_state_render"]] <- button_state_render
           }
 
-        }
+        })
         
-     print(reactiveValuesToList(THE_CAPSULE))
-     print(reactiveValuesToList(internal_01_FILE_RCODE))
       
       THE_MODAL_RCODE(FALSE)
       
     })
     
+    observeEvent(input$"download_RCode", {
+      print("HOLA")
+    })
     
+    
+    # Crear un reactiveValues para almacenar el contador de clics
+    contador <- reactiveValues(clics = 0)
+    
+    # Observar cuando se hace clic en el botón de descarga
+    observeEvent(input$clic_descarga, {
+      # Incrementar el contador de clics
+      req(internal_01_FILE_RCODE$"check_output")
+      contador$clics <- contador$clics + 1
+      
+      internal_01_FILE_RCODE$"check_clic_download" <- TRUE
+      internal_01_FILE_RCODE$"button_state_download" <- "confirmed"
+
+    })
     
     output$download_RCode <- downloadHandler(
       filename = function() {
