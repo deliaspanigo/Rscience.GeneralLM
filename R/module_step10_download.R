@@ -115,10 +115,25 @@ module_step10_download_server <- function(id, step_pos, number_current_step,
                                  "confirmed" = "btn-success",    # Verde después de confirmar
                                  "modified"  = "btn-outline-primary") 
       fluidRow(
+        style = "display: flex; align-items: center; justify-content: space-between;",
         column(3, "R code"),
-        column(2, actionButton(ns("render_RCode"), "Render", class = btn_class_render)),
-        # column(2, "Status"),
-        column(2, downloadButton(outputId = ns("download_RCode"), "Download", class = btn_class_download, icon = icon("download"))),
+        column(4, 
+               actionButton(inputId = ns("render_RCode"), 
+                               label = NULL, 
+                               icon = icon("play", class = "fa-2x"),
+                               class = btn_class_render),
+              actionButton(ns("show_RCode"), 
+                label = NULL,
+                icon = icon("binoculars", class = "fa-2x"),  # Cambiado a un ojo grande
+                class = "btn-info",
+                title = "Mostrar Visualización"
+              ),
+            downloadButton(outputId = ns("download_RCode"), 
+                                 label = NULL, 
+                                 icon = icon("download", class = "fa-2x"), 
+                                 class = btn_class_download)
+      ),
+      column(5)
       )
     })
     
@@ -153,24 +168,9 @@ module_step10_download_server <- function(id, step_pos, number_current_step,
     ok_show <- reactive({
       sub_step() >= 2
     })
-##################################################################################
-    # Verificacion de existencia de la carpeta work y delivery.
-    # Cuando da clic en renderizar el archivo, toma la hora.
-    # Armado del nombre del nuevo archivo con lo detallado en yaml y la hora del paso anterior.
-    # Armar el path a la carpeta delivery
-    # Verificar que no existe en la carpeta delivery, si existe borrarlo o dar error, no se.
-    # Guardar el script en delivery.
-    # Dar al downloader el path del archivo en la carpeta delivery
+
     
-    # Crear un "internal" para cada archivo, y luego un new_list_step que contiene a todos los
-    # internal de cada archivo. 
-    
-    # Crear un modulo visor de archivos. Servira para mostrar los archivos .R, pero tambien
-    # para mostrar archivos txt, yaml o cualquier otra cos de texto. 
-    # En descargas debe haber si o si la posibilidades de descargar un txt que da detalles
-    # de la version de R, Rscience, las librerias, etc.
-    # ---- EN Script, debe estar el script completo de R, pero tambien las sentencias
-    # de la libreria Rscience para ejecutar eso mismo completo.
+
     
 
     
@@ -372,7 +372,131 @@ module_step10_download_server <- function(id, step_pos, number_current_step,
         file.copy(internal_01_FILE_RCODE$"file_path_delivery", file)
       }
     )
+    ############################################################################
     
+    output$el_cartel2 <- renderUI({
+      my_cartel <- reactiveValuesToList(internal_TOOLS_SELECTOR)$"pack_output"$"selected_cartel"
+      fn_html_cartel(my_text = my_cartel)
+    })
+    # style = "height: 100%; width: 100%; max-width: 100%; box-sizing: border-box; overflow-x: hidden;",  # Ajustes para evitar el scroll horizontal
+    
+    
+    
+    ##############################################################################
+    # Tab05 - RCode
+    # Botón para mostrar modal con visualización
+    observeEvent(input$show_RCode, {
+      
+      showModal(
+        tagList(
+          # CSS personalizado para este modal específico
+          tags$div(
+            tags$style(HTML("
+            .modal-dialog.modal-xl {
+              margin: 30px 60px; /* Ajusta el margen superior/inferior y izquierda/derecha */
+              width: calc(100% - 120px); /* Ancho ajustado para respetar los márgenes */
+              max-width: none; /* Sobrescribe el max-width predeterminado */
+            }
+            
+            .modal-body {
+              max-height: calc(100vh - 300px); /* Altura máxima con espacio para header y footer */
+              overflow-y: auto; /* Agrega scroll vertical cuando sea necesario */
+              padding: 20px; /* Ajusta el padding interno */
+            }
+          "))
+          ),
+          modalDialog(
+            title = "Visualización",
+            div(
+              uiOutput(ns("card06_script"))
+            ),
+            size = "xl",
+            easyClose = TRUE,
+            footer = modalButton("Close")
+          )
+        )
+      )
+      
+
+      
+    
+    })
+    
+    output$shiny_ace_editor_MENU <- renderUI({
+      
+      # req(Rcode_script())
+      #Rcode_script <- GeneralLM_fix_anova1_take_code(my_fn=GeneralLM_fix_anova1_RCode)
+      # Calcular la altura adecuada para el editor basado en el número de líneas
+      
+      
+      
+      
+      fluidRow(
+        column(3, 
+               selectInput(ns("theme"), "Editor Theme:", 
+                           choices = c("xcode", "monokai", "github", "eclipse", "tomorrow", 
+                                       "solarized_light", "solarized_dark", "textmate", "twilight"),
+                           selected = "solarized_dark")),
+        column(3,
+               sliderInput(ns("fontSize"), "Font Size:", min = 8, max = 40, value = 14, step = 1)
+        )
+        
+      )
+      
+      
+    })
+    
+    output$shiny_ace_CODE <- renderUI({
+      
+      req(input$"theme", input$"fontSize", internal_01_FILE_RCODE)
+      req(internal_01_FILE_RCODE$"check_output")
+      
+      file_path_delivery <- internal_01_FILE_RCODE$"file_path_delivery"
+      Rcode_script <- readLines(file_path_delivery)
+      
+      # Rcode_script <- APP_TOTEM[["step7"]]$"pack_output"$"Rcode_script"
+      # print(THE_CAPSULE)
+      # Rcode_Script <- THE_CAPSULE$"MY_SCRIPT"
+      
+      line_count <- length(strsplit(Rcode_script, "\n")[[1]])
+      line_count <- line_count + 5
+      # Asignar aproximadamente 20px por línea para el alto del editor
+      editor_height <- paste0(max(300, line_count * 20), "px")
+      
+      shinyAce::aceEditor(
+        outputId = "script_part1",
+        value = Rcode_script,
+        mode = "r",
+        theme = input$"theme", #"chrome",
+        height = editor_height,#"200px",
+        fontSize = input$"fontSize", #14,
+        showLineNumbers = TRUE,
+        readOnly = TRUE,
+        autoScrollEditorIntoView = TRUE,
+        maxLines = 10000,  # Un número grande para evitar scroll
+        minLines = line_count 
+      )
+      
+    })
+    
+    output$card06_script <- renderUI({
+      # req(mis_valores())
+      
+      div(
+        style = "height: 100%;",
+        uiOutput(ns("el_cartel2")),
+        card(
+          card_header("Editor Options"),
+          card_body(
+            uiOutput(ns("shiny_ace_editor_MENU")),
+            uiOutput(ns("shiny_ace_CODE"))
+          )
+        )
+      )
+      
+      
+     
+    })
 ################################################################################
     
     
