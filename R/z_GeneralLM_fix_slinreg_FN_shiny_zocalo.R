@@ -4,7 +4,7 @@ GeneralLM_fix_slinreg_FN_shiny_zocalo <- function(internal_VARIABLE_SELECTOR){
   info_VS <- valores_list_variable_selector$"pack_output"
   req(info_VS)
   
-  # print(info_output)
+
   
   value_factor <- info_VS$"factor"
   value_rv <-     info_VS$"respuesta"

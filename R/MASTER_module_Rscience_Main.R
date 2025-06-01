@@ -15,77 +15,50 @@ MASTER_module_Rscience_Main_ui <- function(id) {
     "))
   ),
     # Usamos card() para envolver todo el contenido
+  
+  div(
+    style = "height: 100vh; display: flex; flex-direction: column;",
     card(
-      # Añadimos un card_header explícito
+      style = "flex: 1; display: flex; flex-direction: column;",
       card_header(
         h4("Rscience", class = "btn-sidebar")
       ),
       layout_sidebar(
         sidebar = sidebar(
+          id = "sidebar_izquierdo",
+          title = "Main menu",
+          open = "open",
           div(
-            class = "d-flex",  # Contenedor flexible
-            style = "height: 80vh;",  # Altura del contenedor principal (80% de la ventana)
-            # Primer bloque - 3/12
+            style = "height: 80vh; overflow-y: auto; padding-right: 10px;",  # Aquí le das altura y scroll independiente
             div(
-              # style = "flex: 0 0 12.5%; max-width: 12.5%; padding: 10px; height: 100%;",  # Ancho del 25%, alto del 100%
-              uiOutput(ns("main_menu"))
+              uiOutput(ns("the_toggle")),
+              conditionalPanel(
+                condition = "input.toggle == false", ns = ns,
+                uiOutput(ns("main_menu_input"))
+              ),
+              conditionalPanel(
+                condition = "input.toggle == true", ns = ns,
+                uiOutput(ns("main_menu_output"))
+              )
             )
-            ),
-          open = "open"
+          )
         ),
-        # Encabezado con botones en una fila
+        # El resto del layout puede seguir igual
         div(
-          class = "d-flex",  # Contenedor flexible
-          style = "height: 80vh;",  # Altura del contenedor principal (80% de la ventana)
-          # Primer bloque - 3/12
-          # div(
-          #   style = "flex: 0 0 12.5%; max-width: 12.5%; padding: 10px; height: 100%;",  # Ancho del 25%, alto del 100%
-          #   uiOutput(ns("main_menu"))
-          # ),
-          div(
-            style = "flex: 0 0 100%; max-width: 100%; padding: 10px; height: 100%;",# overflow-y: auto;",  # Altura del 100%
-            bslib::navset_card_tab(
-              title = "R for Science",
-              id = ns("mynav"),
-              
-              
-              
-              height = "100%",  # Especificar altura explícitamente
-              bslib::nav_panel(title = "cy_01_totem",
-                               uiOutput(ns("cy_01_totem"))
-              ),
-              bslib::nav_panel(title = "cy_02_internal",
-                                 uiOutput(ns("cy_02_internal"))
-              ),
-              bslib::nav_panel(title = "cy_03_temp",
-                               uiOutput(ns("cy_03_temp"))
-              ),
-              bslib::nav_panel(title = "cy_04_output",
-                               uiOutput(ns("cy_04_output"))
-              ),
-              bslib::nav_panel(title = "user_selection",
-                               uiOutput(ns("card01_user_selection"))
-              ),
-              bslib::nav_panel(title = "dataset",
-                               uiOutput(ns("card02_dataset"))
-              ),
-              bslib::nav_panel(title = "output",
-                               module_step10_04_report_download_ui(id = ns("f04_report"))#uiOutput(ns("card03_output"))
-              ),
-              bslib::nav_panel(title = "theory",
-                               module_extra_theory_ui(id = ns("extra_theory"))
-              ),
-              bslib::nav_panel(title = "download",
-                               uiOutput(ns("card04_download"))
-              ),
-              bslib::nav_panel(title = "experiment",
-                               uiOutput(ns("experiment"))
-              ),
-            )
+          style = "margin-top: 20px;",
+          conditionalPanel(
+            condition = "input.toggle == false", ns = ns,
+            uiOutput(ns("soft_visual_input"))
+          ),
+          conditionalPanel(
+            condition = "input.toggle == true", ns = ns,
+            uiOutput(ns("soft_visual_output"))
           )
         )
       )
     )
+  )
+  
   )
 }
 
@@ -117,14 +90,78 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     cat(mensaje, "\n")
     ############################################################################
     
+    output$the_toggle <- renderUI({
+      # Toggle estilo R/Python
+      # Agregar CSS personalizado para los colores del toggle
+      div(
+      tags$head(
+        tags$style(HTML("
+      /* Estilo para el toggle */
+      .form-check-input {
+        background-color: #4c78dd !important; /* Color azul para R (por defecto) */
+        border-color: #4c78dd !important;
+        width: 3.5em !important; /* Aumentar el ancho del toggle */
+        height: 1.8em !important; /* Aumentar la altura proporcionalmente */
+      }
+      
+      /* Estilo cuando está activado (Python) */
+      .form-check-input:checked {
+        background-color: #4CAF50 !important; /* Color verde para Python */
+        border-color: #4CAF50 !important;
+      }
+      
+      /* Asegurar que la transición sea suave */
+      .form-check-input {
+        transition: background-color 0.3s, border-color 0.3s;
+      }
+      
+      /* Ajustar el círculo indicador dentro del toggle */
+      .form-switch .form-check-input:after {
+        height: calc(1.8em - 4px) !important;
+        width: calc(1.8em - 4px) !important;
+      }
+      
+      /* Ajustar el espacio del contenedor */
+      .form-switch {
+        padding-left: 0 !important;
+      }
+    "))
+      ),
+      div(
+        class = "d-flex align-items-center justify-content-between gap-2 mb-3",
+        span("   ", class = "fw-bold"),
+        tags$div(
+          class = "form-check form-switch",
+          tags$input(
+            id = ns("toggle"),
+            type = "checkbox",
+            class = "form-check-input",
+            role = "switch"
+          )
+        ),
+        # span("Python", class = "fw-bold"),
+        uiOutput(ns("toggle_state"), inline = TRUE)
+      )
+      )
+    })
+    
+    # Muestra "input" o "output" según el estado del toggle
+    output$toggle_state <- renderUI({
+      the_selection <- ifelse(test = input$toggle, yes = "output", no = "input")
+      span(the_selection, class = "fw-bold")
+    })
+    
     # Main menu
-    output$main_menu <- renderUI({
+    output$main_menu_input <- renderUI({
+      
+      # req(isFALSE(input$toggle))
+      
       div(
         style = "height: 100%;",  # Altura del contenedor (100% del contenedor padre)
         card(
           style = "height: 100%;",  # Altura de la card (100% del contenedor padre)
-          card_header("Main menu"),
-          card_body(
+          # card_header("Main menu"),
+          # card_body(
             div(
               class = "d-flex flex-column align-items-center",  # Para centrar horizontalmente
               style = "gap: 20px; height: 100%;",  # Altura del cuerpo de la card (100%)
@@ -134,8 +171,89 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
               Sbutton_reset2_ui(id = ns("reset2")),
               Sbutton_04_play_ui(id = ns("play2"))
             )
-          )
+          # )
         )
+      )
+    })
+    
+
+    
+    output$main_menu_output <- renderUI({
+      
+
+      
+      div(
+        style = "height: 100%;",  # Altura del contenedor (100% del contenedor padre)
+        card(
+          style = "height: 100%;",  # Altura de la card (100% del contenedor padre)
+          # card_header("Main menu"),
+          # card_body(
+          div(
+            class = "d-flex flex-column align-items-center",  # Para centrar horizontalmente
+            style = "gap: 20px; height: 100%;",  # Altura del cuerpo de la card (100%)
+            actionButton(
+              ns("btn_dataset33"),
+              tagList(
+                icon("database", style = "font-size: 75px; display: block; margin-bottom: 8px;"),
+                span()
+              ),
+              # class = btn_class, 
+              style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
+              title = "Import dataset"
+            )
+          )
+          # )
+        )
+      )
+    })
+    
+    output$"soft_visual_input" <- renderUI({
+      bslib::navset_card_tab(
+        title = "R for Science",
+        id = ns("mynav"),
+        
+        bslib::nav_panel(title = "cy_01_totem",
+                         uiOutput(ns("cy_01_totem"))
+        ),
+        bslib::nav_panel(title = "cy_02_internal",
+                         uiOutput(ns("cy_02_internal"))
+        ),
+        bslib::nav_panel(title = "cy_03_temp",
+                         uiOutput(ns("cy_03_temp"))
+        ),
+
+        bslib::nav_panel(title = "user_selection",
+                         uiOutput(ns("card01_user_selection"))
+        ),
+        bslib::nav_panel(title = "dataset",
+                         uiOutput(ns("card02_dataset"))
+        ),
+        
+        bslib::nav_panel(title = "experiment",
+                         uiOutput(ns("experiment"))
+        ),
+      )
+    })
+    
+    output$"soft_visual_output" <- renderUI({
+      bslib::navset_card_tab(
+        title = "R for Science",
+        id = ns("mynav"),
+        
+        
+        bslib::nav_panel(title = "cy_04_output",
+                         uiOutput(ns("cy_04_output"))
+        ),
+        bslib::nav_panel(title = "output",
+                         module_step10_04_report_download_ui(id = ns("f04_report"))#uiOutput(ns("card03_output"))
+        ),
+        bslib::nav_panel(title = "theory",
+                         module_extra_theory_ui(id = ns("extra_theory"))
+        ),
+        bslib::nav_panel(title = "download",
+                         uiOutput(ns("card04_download"))
+        )
+        
       )
     })
     ############################################################################
