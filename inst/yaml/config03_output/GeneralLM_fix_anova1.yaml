@@ -1,0 +1,34 @@
+config:
+  id: "GeneralLM_fix_anova1"
+  tab01:
+    label: "Analysis"
+      items:
+        item01:
+          title: "1) Summary ANOVA"
+        objects: 
+          - name: "df_summary_anova"
+          - name: "phrase_shapiro_selected"
+          - name: "phrase_bartlett_selected"
+          - name: "phrase_requeriments_selected"
+          - name: "phrase_anova_selected"
+    tab02:
+      label: "Requirements"
+      content01:
+        content_reader_shiny: "agregar luego"
+	content_reader_quarto: "agregar luego"
+        title: "1) Normality Test - Residuals"
+        objects: 
+          - name: "test_residuals_normality"
+      content02:
+	content_reader_shiny: "agregar luego"
+        content_reader_quarto: "agregar luego"
+        title: "2) Homogeneity Test - Residuals"
+        objects: 
+          - name: "test_residuals_homogeneity"
+      content03:
+        content_reader_shiny: "agregar luego"
+        content_reader_quarto: "agregar luego"
+        title: "3) Estimated Variances - Residuals"
+        objects: 
+          - name: "df_residuals_variance_levels"
+

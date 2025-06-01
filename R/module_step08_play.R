@@ -202,10 +202,8 @@ module_step08_play_server <- function(id, step_pos, number_current_step,
       
      
       # Copiar cada archivo a la carpeta destino
-      # print(vector_check_file_names)
-      # print(basename(vector_check_file_names[1]))
       for (archivo in pk_quarto_tool_list_files) {
-        # print(archivo)
+
         # Crear la ruta de destino manteniendo la estructura de subcarpetas
         ruta_destino <- file.path(path_folder_work, basename(archivo))
         

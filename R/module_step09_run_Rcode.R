@@ -23,8 +23,7 @@ module_step09_run_Rcode_server <- function(id, step_pos, number_current_step,
       # Hardcoded --------------------------------------------------------------
       current_label <- "Step 09: Run Rcode"
       current_step <- number_current_step()
-      # print(paste0("Adentro del: ", current_label))
-      
+
       # Basics and plague control ----------------------------------------------
       current_step_name <- paste0(STR_STEP_NAME, current_step)
       fn_shiny_remove_future_steps(APP_TOTEM, current_step, STR_STEP_NAME)
@@ -48,9 +47,6 @@ module_step09_run_Rcode_server <- function(id, step_pos, number_current_step,
       
       
       the_results        <- GeneralLM_fix_anova1_RCode(database, var_name_factor, var_name_rv, alpha_value)
-      # vector_order_names <- GeneralLM_fix_anova1_objects_in_order(fn = GeneralLM_fix_anova1_RCode)
-      # the_results        <- the_results[vector_order_names]
-
       pack_output        <- the_results
       
       

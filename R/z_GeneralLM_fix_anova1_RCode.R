@@ -21,19 +21,27 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   #---var_name_factor <- "_B_var_name_factor_B_"
   #---alpha_value     <- _B_alpha_value_B_
 
-  # # # # # Section 04 - Settings ----------------------------------------------
+  # # # # # Section 04 - Standard actions --------------------------------------
+  # The factor must be factor data type on R.
   database[,var_name_factor] <- as.factor(as.character(database[,var_name_factor]))
+  
+  # # # # # Section 05 - Alpha and confidence value ----------------------------
   confidence_value <- 1 - alpha_value
+  
+  df_alpha_confidence <- data.frame(
+    "order" = 1:2,
+    "detail" = c("alpha value", "confidence value"),
+    "probability" = c(alpha_value, confidence_value),
+    "percentaje" =  paste0(c(alpha_value, confidence_value)*100, "%")
+  )
+  df_alpha_confidence
+
+  # # # # # Section 06 - Selected variables and roles  -------------------------
   vector_all_var_names <- colnames(database)
   vector_name_selected_vars <- c(var_name_rv, var_name_factor)
   vector_rol_vars <- c("VR", "FACTOR")
   
-  
-  
-  
-  
-  
-  # # # Selected vars info as dataframe
+
   df_selected_vars <- data.frame(
     "order" = 1:length(vector_name_selected_vars),
     "var_name" = vector_name_selected_vars,
@@ -45,30 +53,24 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   df_selected_vars
   
   # # # # # Section 05 - minibase ------------------------------------------------
-  # Only selected vars. Only completed rows. Factor columns as factor object in R.
+  # Only selected variabless. 
+  # Only completed rows. 
+  # Factor columns as factor object in R.
   minibase <- na.omit(database[vector_name_selected_vars])
   colnames(minibase) <- vector_rol_vars
-  minibase[,2] <- as.factor(minibase[,2])
+  minibase[,"FACTOR"] <- as.factor(minibase[,"FACTOR"])
+  head(x = minibase, n = 5)
   
-  
-  
-  
-  # # # # # Section 05 - minibase ------------------------------------------------
-  # Only selected vars. Only completed rows. Factor columns as factor object in R.
-  minibase <- na.omit(database[vector_name_selected_vars])
-  colnames(minibase) <- vector_rol_vars
-  minibase[,2] <- as.factor(minibase[,2])
-  
-  
+
   
   # # # Anova control
   # 'VR' must be numeric and 'FACTOR must be factor.
   df_control_minibase <- data.frame(
     "order" = 1:nrow(df_selected_vars),
-    "var_name" = df_selected_vars$var_name,
-    "var_role" = df_selected_vars$var_role,
+    "var_name" = df_selected_vars$"var_name",
+    "var_role" = df_selected_vars$"var_role",
     "control" = c("is.numeric()", "is.factor()"),
-    "verify" = c(is.numeric(minibase[,1]), is.factor(minibase[,2]))
+    "verify" = c(is.numeric(minibase[,"VR"]), is.factor(minibase[,"FACTOR"]))
   )
   df_control_minibase
   
@@ -94,6 +96,7 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
     "mean" = tapply(minibase[,1], minibase[,2], mean),
     "color" = rainbow(nlevels(minibase[,2]))
   )
+  rownames(df_factor_info) <- 1:nrow(df_factor_info)
   df_factor_info
   
   
@@ -107,11 +110,11 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   
   phrase_yes_unbalanced <- "The design is unbalanced in repetitions. A correction is applied to the Tukey test."
   phrase_no_unbalanced  <- "The design is unbalanced in replicates. A correction should be applied to the Tukey test."
-  phrase_selected_unbalanced <- ifelse(test = check_unbalanced_reps, 
+  phrase_selected_check_unbalanced <- ifelse(test = check_unbalanced_reps, 
                                   yes = phrase_yes_unbalanced,
                                   no  = phrase_no_unbalanced)
   
-  phrase_selected_unbalanced
+  phrase_selected_check_unbalanced
   
   # # # # # Section 06 - Anova Test ----------------------------------------------
   # # # Anova test
@@ -123,14 +126,14 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   
   
   # # # Standard error from model for each level
-  model_error_var <- df_table_anova$`Mean Sq`[2]
-  model_error_sd <- sqrt(model_error_var)
+  model_error_var_MSE <- df_table_anova$`Mean Sq`[2]
+  model_error_sd <- sqrt(model_error_var_MSE)
   
   df_model_error <- data.frame(
     "order" = df_factor_info$order,
     "level" = df_factor_info$level,
     "n" = df_factor_info$n,
-    "model_error_var" = model_error_var,
+    "model_error_var_MSE" = model_error_var_MSE,
     "model_error_sd" = model_error_sd
   )
   df_model_error["model_error_se"] <- df_model_error["model_error_sd"]/sqrt(df_model_error$n)
@@ -175,16 +178,21 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   
   
   # # # Residuals variance from levels from original residuals
-  df_residuals_variance_levels <- data.frame(
+  df_raw_error <- data.frame(
     "order" = 1:nlevels(minibase_mod[,2]),
     "level" = levels(minibase_mod[,2]),
-    "variance" = tapply(minibase_mod$residuals, minibase_mod[,2], var),
-    "n" = tapply(minibase_mod$residuals, minibase_mod[,2], length)
+    "n" = tapply(minibase_mod$residuals, minibase_mod[,2], length),
+    "raw_error_var" = tapply(minibase_mod$residuals, minibase_mod[,2], var),
+    "raw_error_sd" = tapply(minibase_mod$residuals, minibase_mod[,2], sd)
   )
-  df_residuals_variance_levels
+  df_model_error["raw_error_se"] <- df_model_error["model_error_sd"]/sqrt(df_model_error$"n")
+  rownames(df_raw_error) <- 1:nrow(df_raw_error)
+  df_raw_error
   
-  
-  
+  phrase_info_errors <- c("Anova and Tukey use MSE from model.", 
+                          "Bartlett use variance from raw error on each level.",
+                          "Only if there is homogeneity from raw error variances then is a good idea take desition from MSE.")
+  phrase_info_errors
   # # # Sum for residuals
   sum_residuals <- sum(minibase_mod$residuals)
   sum_residuals
@@ -227,7 +235,7 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   
   
   check_bartlett_rejected      <- p_value_bartlett < alpha_value
-  phrase_bartlett_yes_rejected <- "The hypothesis of homogeneity of variances (heteroscedasticity) is rejected."
+  phrase_bartlett_yes_rejected <- "The hypothesis of homogeneity of variances (homoscedasticity) is rejected."
   phrase_bartlett_no_rejected  <- "The hypothesis of homogeneity of variances (homoscedasticity) is not rejected."
   phrase_bartlett_selected     <- ifelse(test = check_bartlett_rejected, 
                                          yes = phrase_bartlett_yes_rejected, 
@@ -547,9 +555,11 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
     "max" = max(minibase_mod$residuals),
     "var" = var(minibase_mod$residuals),
     "sd" = sd(minibase_mod$residuals),
-    "model_error_var" = model_error_var,
+    "model_error_var_MSE" = model_error_var_MSE,
     "model_error_sd" = model_error_sd
   )
+  
+  phrase_coment_errors <- "Model Error (MSE) "
   
   # # # Table for plot006
   df_table_residuals_plot005  <- df_table_residuals_plot004
@@ -1294,10 +1304,15 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   
   #._ Filtrar para excluir los parámetros de la función
   ._obj_to_keep <- setdiff(._obj_names, names(formals(sys.function())))
-  
-  #._ Crear una lista con los objetos (excluyendo parámetros)
   ._result_list <- mget(._obj_to_keep)
-  
+
+  # #._ Intentar ordenamiento por aparicion
+  # ._vector_orden <- fn_R_obj_name_in_order_from_fn(sys.function())
+  # check_all <- identical(sort(._vector_orden), sort(._obj_to_keep))
+  # print(check_all)
+  # 
+  # print(table(c(._vector_orden, ._obj_to_keep)))
+  # if(check_all) ._result_list <- ._result_list[._vector_orden]
   #._ Devolver la lista ordenada según su definición
   return(._result_list)
   

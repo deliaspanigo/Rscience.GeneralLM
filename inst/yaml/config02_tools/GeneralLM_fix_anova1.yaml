@@ -10,12 +10,32 @@ config:
     fn_control: "GeneralLM_fix_anova1_FN_validate_vars"
   script:
     copie_file_name: "GeneralLM_fix_anova1_RCode.R"
+  output:
+    type: "module"
+    module_ui: "GeneralLM_fix_anova1_MM_output_ui"
+    module_server: "GeneralLM_fix_anova1_MM_output_server"
   download:
     file01:
-      id: "file01_Rscript_GeneralLM_fix_anova1.R"
       on_work_folder: TRUE
       show_render: TRUE
-      fn_render: "GeneralLM_fix_anova1.R"
+      file_name_work: "file01_Rscript_GeneralLM_fix_anova1.R"
+      file_name_delivery: "file01_Rscript_GeneralLM_fix_anova1.R"
+    file02:
+      on_work_folder: TRUE
+      show_render: TRUE
+      file_name_work: "file02_RLong_GeneralLM_fix_anova1.qmd"
+      file_name_delivery: "file02_RLong_GeneralLM_fix_anova1.html"
+    file03:
+      on_work_folder: TRUE
+      show_render: TRUE
+      file_name_work: "file03_report_GeneralLM_fix_anova1.qmd"
+      file_name_delivery: "file03_report_GeneralLM_fix_anova1.html"
+    file04:
+      on_work_folder: TRUE
+      show_render: TRUE
+      file_name_work: "file04_report_GeneralLM_fix_anova1.qmd"
+      file_name_delivery: "file04_report_GeneralLM_fix_anova1.html"
   version: "1.0.0"
   date_version: "2025-05-24"
+    
   

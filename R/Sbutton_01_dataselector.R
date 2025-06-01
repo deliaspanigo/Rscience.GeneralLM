@@ -45,6 +45,8 @@ Sbutton_01_dataselector_server <- function(id, step_pos, number_current_step, in
     # It a reactive object!
     my_info_dataset <- Rscience.import::MASTER_module_import_server(id = "MASTER_import", show_dev = show_dev)
 
+    # observe(print(my_info_dataset()))
+    
     # observeEvent(my_info_dataset(),{
     #   number_current_step(step_pos)
     # }, ignoreInit = T)
@@ -134,18 +136,25 @@ Sbutton_01_dataselector_server <- function(id, step_pos, number_current_step, in
     # Al confirmar selección, actualizar los valores_internos
     observeEvent(input$confirm_action, {
       
+      # # # Hace falta modificar la funcion de importacion
+      # para que tenga un objeto como "check_output" con T o F, y que ese
+      # valor se resetee cada vez que hay un cambio de selecion de datos.
+      # Creo que debo crear como sif uera un "internal_DATA".
+      
+      req(my_info_dataset())
       # 1) Hacer validaciones sobre la importacion realizada.
       #    Si todo esta bien...
       # 2) Asignar nuevos valores a "valores_internos".
       # 3) Cerrar el modal
       # Verificar que se haya seleccionado un dataset primero
-      if (is.null(my_info_dataset())) {
-        print(my_info_dataset())
+      # print(my_info_dataset())
+      if (is.null(my_info_dataset()$"database")) {
+        # print(my_info_dataset())
         showNotification(
           "Please, select a dataset.",
           type = "warning"
         )
-        the_output(NULL)
+
         return()  
       }  
 

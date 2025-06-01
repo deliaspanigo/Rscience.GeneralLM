@@ -9,8 +9,7 @@ GeneralLM_fix_anova1_MM_output_ui <- function(id) {
 }
 
 #' @export
-GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev, 
-                                                  mis_valores, active_TOOLS_SELECTOR) {
+GeneralLM_fix_anova1_MM_output_server <- function(id, mis_valores, active_TOOLS_SELECTOR) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
@@ -91,20 +90,23 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
         id_output_table <- paste0(prefix, i, "_table")
         id_output_plot <- paste0(prefix, i, "_plot")
         list(
-          h4(list_objetos[[i]]$"title"),
-          HTML(paste0("<b><u>R plot object:</u></b> ", obj_name_plot)),
-          fluidRow(
-            column(6, shinycssloaders::withSpinner(plotlyOutput(ns(id_output_plot)))),
-            column(6, shinycssloaders::withSpinner(verbatimTextOutput(ns(id_output_table))))
-          ),
-          hr(),
-          br(), br(), br()
+          # h4(list_objetos[[i]]$"title"),
+          # HTML(paste0("<b><u>R plot object:</u></b> ", obj_name_plot, collapse ="")),
+          div(
+            HTML(paste0("<b><u>R plot object:</u></b> ", obj_name_plot)),
+            fluidRow(
+              column(6, shinycssloaders::withSpinner(plotlyOutput(ns(id_output_plot)))),
+              column(6, shinycssloaders::withSpinner(verbatimTextOutput(ns(id_output_table))))
+            ),
+            hr()
+          )
         )
       })
       
       return(do.call(tagList, ui_list))
     }
     
+
     ############################################################################
     
     output$df_summary_anova <- DT::renderDataTable({
@@ -186,185 +188,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
     
     ############################################################################
     
-    # Define la información de los botones con grupo y orden
-    botones_info <- list( 
-      list(id = "boton_1",  label = "Summary",                class = "btn-outline-primary",         grupo = 1, orden = 1, content = "mini_resumen", show_always = TRUE),
-      # list(id = "boton_2",  label = "Full Analysis",          class = "btn-outline-primary",       grupo = 1, orden = 2, content = "mega_tabs", show_always = TRUE),
-      list(id = "boton_3",  label = "Descriptive Statistics", class = "btn-outline-primary",         grupo = 1, orden = 3, content = "3", show_always = TRUE),
-      # list(id = "boton_4",  label = "Script",                 class = "btn-outline-primary",          grupo = 1, orden = 4, content = "shiny_ace_editor_OUTPUT", show_always = TRUE),
-      # list(id = "boton_5",  label = "Download",               class = "btn-warning",         grupo = 1, orden = 5, content = "dynamic_download_quarto", show_always = TRUE),
-      list(id = "boton_6",  label = "Hypotheses",             class = "btn-info",            grupo = 2, orden = 1, content = "6", show_always = TRUE),
-      list(id = "boton_7",  label = "Theoretical Framework",  class = "btn-light",           grupo = 2, orden = 2, content = "7", show_always = TRUE),
-      list(id = "boton_8",  label = "Bibliography",           class = "btn-dark",            grupo = 2, orden = 3, content = "8", show_always = TRUE),
-      list(id = "boton_9",  label = "Stock",                  class = NULL,                  grupo = 2, orden = 4, content = "9", show_always = TRUE),
-      list(id = "boton_10", label = "Catastrophic Errors",    class = "btn-outline-primary", grupo = 2, orden = 5, content = "10", show_always = TRUE),
-      list(id = "boton_11", label = "Possible Cases",         class = "btn-outline-primary", grupo = 2, orden = 6, content = "11", show_always = TRUE),
-      list(id = "boton_12", label = "Analysis Structure",     class = "btn-outline-primary", grupo = 2, orden = 7, content = "12", show_always = TRUE)
-    )
     
-    # En cuanto a renderUI, primero filtramos por grupo
-    # Dentro de tu server, después de definir botones_info y el renderUI
-    
-    # Crear los botones con grupos y orden, y ponerlos en UI
-    output$botones_dinamicos <- renderUI({
-      
-      # valores_internos_list <- reactiveValuesToList(valores_activos)
-      # if(is.null(valores_internos_list)) play_ok <- FALSE else  play_ok <- valores_internos_list$check_play
-      play_ok <- TRUE
-      
-      grupos <- c(1, 2)
-      ui_list <- lapply(grupos, function(g) {
-        botones_grupo <- Filter(function(b) b$grupo == g, botones_info)
-        botones_grupo <- botones_grupo[order(sapply(botones_grupo, function(b) b$orden))]
-        
-        
-        lista_botones <- lapply(botones_grupo, function(boton) {
-          
-          is_disabled <- !boton$show_always
-          if(!is_disabled) if(g == 1) is_disabled <- !play_ok
-          # is_disabled <- FALSE
-          
-          if (!is.null(boton$class)) {
-            actionButton(
-              inputId = ns(boton$id),
-              label = boton$label,
-              class = boton$class,
-              disabled = is_disabled
-            )
-          } else {
-            actionButton(
-              inputId = ns(boton$id),
-              label = boton$label
-            )
-          }
-        })
-        
-        div(
-          style = "
-        border: 1px solid #ccc; 
-        border-radius: 4px; 
-        padding: 10px; 
-        margin-bottom: 15px; 
-        background-color: #f9f9f9;",
-          # Título del grupo
-          tags$h3(paste("Grupo", g)),
-          div(
-            style = "display: flex; flex-wrap: wrap; gap: 10px;",
-            lista_botones
-          )
-        )
-      })
-      
-      do.call(tagList, ui_list)
-    })
-    
-    boton_seleccionado <- reactiveVal(NULL)
-    
-    # Para cada botón, actualizamos la variable
-    lapply(botones_info, function(boton) {
-      observeEvent(input[[boton$id]], {
-        boton_seleccionado(boton)
-      })
-    })
-    
-    observeEvent(boton_seleccionado(), {
-      output$resultado <- renderText({
-        boton <- boton_seleccionado()
-        paste(
-          "Se ha pulsado el botón:", boton$label,
-          "(ID interno:", boton$id, ")",
-          "- Clase:", ifelse(is.null(boton$class), "ninguna", boton$class),
-          "- Número de clics:", input[[boton$id]]
-        )
-      })
-    })
-    
-    observeEvent(boton_seleccionado(), {
-      
-      output$resultado2 <- renderUI({
-        boton <- boton_seleccionado()
-        aver <- paste(
-          "Se ha pulsado el botón:", boton$label,
-          "(ID interno:", boton$id, ")",
-          "- Clase:", ifelse(is.null(boton$class), "ninguna", boton$class),
-          "- Número de clics:", input[[boton$id]]
-        )
-        
-        
-        showModal(
-          modalDialog(
-            title = boton$label,
-            size = "xl",
-            # Aplicamos estilos personalizados para hacer el modal más grande y posicionarlo más arriba
-            tags$div(
-              tags$style(HTML("
-        /* Hacer que el modal sea más grande que xl - ancho y alto */
-        .modal-xl {
-          max-width: 95% !important; /* Aumentamos el ancho al 95% */
-          width: 95%;
-        }
-        
-        /* Aumentar la altura del modal y posicionarlo más cerca del borde superior */
-        .modal-dialog {
-          height: 90vh !important; /* 90% de la altura de la ventana */
-          max-height: 90vh !important;
-          margin-bottom: 20px !important; /* margen inferior */
-          margin-top: 20px !important; /* margen superior */
-        }
-        
-        /* Hacer que el contenido del modal ocupe más espacio verticalmente */
-        .modal-content {
-          height: 100% !important;
-          display: flex;
-          flex-direction: column;
-        }
-        
-        /* Ajustar el cuerpo del modal para que permita scroll y ocupe espacio disponible */
-        .modal-body {
-          flex: 1;
-          overflow-y: auto; /* scroll vertical cuando sea necesario */
-          padding: 15px; /* ajuste de padding si prefieres */
-        }
-        
-        /* Asegura que en pantallas muy grandes se mantenga un tamaño razonable */
-        @media (min-width: 1400px) {
-          .modal-xl {
-            max-width: 1800px !important; /* tamaño máximo en pantallas muy grandes */
-          }
-        }
-        "))
-              ,
-            ),
-            
-            # Contenedor para el módulo de importación - ahora ocupa todo el espacio disponible
-            div(
-              # class = "d-flex",  # Contenedor flexible
-              style = "overflow-y: auto; padding: 15px; height: 95%", 
-              # style = "height: 100%; overflow-y: auto; padding: 15px;",
-              fluidRow(
-                column(10, fn_html_cartel(my_text = "Anova 1 way - Fixed Effects - General Linear Model")),
-                column(2, aver)
-                ),
-              uiOutput(ns(boton$content)),
-              botones_info[[boton$id]]
-            ),
-            
-            easyClose = TRUE,
-            footer = modalButton("Cerrar")#,
-            
-            #style = "color: #721c24; background-color: #f8d7da; border-color: #f5c6cb;"
-          )
-        )
-        
-      })
-    })
-    
-   
-    
-    button_info <- reactive({
-      # Aquí puedes devolver información sobre botones presionados si lo necesitas
-      lapply(botones_info, function(id) input[[id]])
-    })
     
     
     output$el_cartel <- renderUI({
@@ -396,8 +220,37 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
     })
     ############################################################################
     
+    output$"mega_tabs" <- renderUI({
+      
+      bslib::navset_card_tab(
+        title = "output",
+        id = ns("mynav2"),
+        height = "100%",  # Especificar altura explícitamente
+          bslib::nav_panel(title = "Analysis",
+                           uiOutput(ns("dynamic_tab01_ui"))
+          ),
+          bslib::nav_panel(title = "Requeriments",
+                           uiOutput(ns("dynamic_tab02_ui"))
+          ),
+          bslib::nav_panel(title = "Plots - Raw Data",
+                           uiOutput(ns("dynamic_tab03_ui"))
+          ),
+          bslib::nav_panel(title = "Plots - Residuals",
+                           uiOutput(ns("dynamic_tab04_ui"))
+          ),
+          bslib::nav_panel(title = "Summary",
+                           uiOutput(ns("dynamic_tab05_ui"))
+          ),
+          bslib::nav_panel(title = "Full Results",
+                           uiOutput(ns("dynamic_tab06_ui"))
+          )
+      )
+      
+    })
+    
+    ############################################################################
     list_vec01 <- list()
-    list_vec01[[1]] <- list("title" = "1) References", "objects" = c("df_selected_vars"))
+    list_vec01[[1]] <- list("title" = "1) References", "objects" = c("df_selected_vars", "alpha_value"))
     list_vec01[[2]] <- list("title" = "2) Factor resumen", "objects" = c("df_factor_info", "check_unbalanced_reps", "phrase_selected_unbalanced"))
     list_vec01[[3]] <- list("title" = "3) Anova 1 way - Table", "objects" = c("df_table_anova"))
     list_vec01[[4]] <- list("title" = "4) Multiple comparation test (Tukey)", "objects" = c("df_tukey_table"))
@@ -523,7 +376,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
                                           "phrase_anova_selected"))
     
 
-    output$dynamic_ESPECIAL_ui <- renderUI({
+    output$dynamic_tab05_ui <- renderUI({
       req(mis_valores())
       crear_outputs_y_ui(list_vec05, "render_tab05_", mis_valores, output, ns)
     })
@@ -532,7 +385,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
     
     
 
-    output$dynamic_FULL_results_ui <- renderUI({
+    output$dynamic_tab06_ui <- renderUI({
       req(mis_valores())
       
       # Tab05 - Summary Special
@@ -544,124 +397,53 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, show_dev,
       dt_text <- !dt_plots
       the_names <- the_names[dt_text]
 
-      list_vec06 <- list()
-      list_vec06[[1]] <- list("title" = "1) Summary Anova", 
-                              "objects" = the_names)
+      resultados <- mis_valores()
       
+      # Asignar salidas dinámicas
+      for (nombre in names(resultados)) {
+        if (startsWith(nombre, "plot")) {
+          local({
+            nm <- nombre
+            output[[nm]] <- renderPlotly({ resultados[[nm]]} )  # Corrección de cierre
+          })
+        } else {
+          local({
+            nm <- nombre
+            output[[nm]] <- renderPrint({ resultados[nm]} )
+          })
+        }
+      }
       
-      crear_outputs_y_ui(list_vec06, "render_tab06_", mis_valores, output, ns)
+      ui_list <- list()
+      for (nombre in names(resultados)) {
+        new_ui <- c()
+        if (startsWith(nombre, "plot")) {
+          new_ui <- div(
+            HTML(paste0("<b><u>R plot object:</u></b> ", nombre)),
+            shinycssloaders::withSpinner(plotlyOutput(ns(nombre)))
+          )
+        } else {
+          new_ui <- div(
+            shinycssloaders::withSpinner(verbatimTextOutput(ns(nombre)))
+          )
+        }
+        
+        new_ui<- div(new_ui, hr())
+        
+        ui_list[[length(ui_list) + 1]] <- new_ui
+      }
+      
+      div(
+        h2("All results"),
+        do.call(tagList, ui_list)
+      )
+
     })
     
     ##############################################################################
     # Tab05 - RCode
-    
-    output$shiny_ace_editor_MENU <- renderUI({
-      req(mis_valores())
-      
-      #Rcode_script <- GeneralLM_fix_anova1_take_code(my_fn=GeneralLM_fix_anova1_RCode)
-      # Calcular la altura adecuada para el editor basado en el número de líneas
-
-      
-      card(
-        card_header("Editor Options"),
-        card_body(
-          
-          fluidRow(
-            column(3, 
-                   selectInput(ns("theme"), "Editor Theme:", 
-                               choices = c("xcode", "monokai", "github", "eclipse", "tomorrow", 
-                                           "solarized_light", "solarized_dark", "textmate", "twilight"),
-                               selected = "solarized_dark")),
-            column(3,
-                   sliderInput(ns("fontSize"), "Font Size:", min = 8, max = 40, value = 14, step = 1)
-            ),
-            column(3, downloadButton(ns("download_btn"), "Descargar como .R", icon = icon("download")))
-            
-          )
-        )
-      )
-      
-    })
-    
-    output$shiny_ace_CODE <- renderUI({
-      req(mis_valores(), Rcode_script(), input$"theme", input$"fontSize")
-      
-      
-      line_count <- length(strsplit(Rcode_script(), "\n")[[1]])
-      line_count <- line_count + 5
-      # Asignar aproximadamente 20px por línea para el alto del editor
-      editor_height <- paste0(max(300, line_count * 20), "px")
-      
-            shinyAce::aceEditor(
-              outputId = "script_part1",
-              value = Rcode_script(),
-              mode = "r",
-              theme = input$"theme", #"chrome",
-              height = editor_height,#"200px",
-              fontSize = input$"fontSize", #14,
-              showLineNumbers = TRUE,
-              readOnly = TRUE,
-              autoScrollEditorIntoView = TRUE,
-              maxLines = 1000,  # Un número grande para evitar scroll
-              minLines = line_count 
-            )
-      
-    })
-    
-    output$shiny_ace_editor_OUTPUT <- renderUI({
-      req(mis_valores())
-      
-     div(uiOutput(ns("shiny_ace_editor_MENU")),
-         uiOutput(ns("shiny_ace_CODE")))
-      
-    })
-    
-    # Función para descargar el código como archivo .R
-    output$download_btn <- downloadHandler(
-      filename = function() {
-        "code_generalLM_fixed_anova_1way.R"
-      },
-      content = function(file) {
-        writeLines(Rcode_script(), file)
-      }
-    )
-    
-    
-   
-    
-    ############################################################################
-    
-    # Tab06 - Quarto
-    the_quarto_file_path <- reactive({
-      req(mis_valores())
-      GeneralLM_fix_anova1_quarto_file_path()
-    })
-    
-    module_quartoRenderer_server(id="quarto_doc", documento = the_quarto_file_path(), 
-                                 Rcode_script = Rcode_script)
-    
-    output$dynamic_download_quarto <- renderUI({
-      req(mis_valores())
-      module_quartoRenderer_ui(id=ns("quarto_doc"))
-    })
-    
-    ############################################################################
-    output$mega_tabs <- renderUI({
-      req(mis_valores())
-      
-      tabsetPanel(
-        tabPanel(title = "Analysis",          uiOutput(ns("dynamic_tab01_ui"))),
-        tabPanel(title = "Requeriments",      uiOutput(ns("dynamic_tab02_ui"))),
-        tabPanel(title = "Plots - Raw Data",  uiOutput(ns("dynamic_tab03_ui"))),
-        tabPanel(title = "Plots - Residuals", uiOutput(ns("dynamic_tab04_ui"))),
-        tabPanel(title = "Summary",           uiOutput(ns("dynamic_ESPECIAL_ui"))),
-        tabPanel(title = "Full Results",      uiOutput(ns("dynamic_FULL_results_ui")))
-      )
-      
-    })
-    ############################################################################
-
-    
+ 
+     
     
 
   })

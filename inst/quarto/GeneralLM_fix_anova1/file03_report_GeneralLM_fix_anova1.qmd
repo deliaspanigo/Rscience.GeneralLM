@@ -1,0 +1,633 @@
+---
+title: "Anova 1 Way - Fixed Model - General Linear Models"
+format: 
+  html:
+    page-layout: custom
+    margin-left: 5%
+    margin-right: 5%
+    theme: cosmo
+    toc: false
+    embed-resources: true
+    standalone: true
+    code-tools: true  # Añade un botón global para mostrar/ocultar código
+    code-fold: false   # Código plegado por defecto
+    code-summary: "Options"  # Texto para el botón de despliegue
+    css: style.css
+---
+
+```{r}
+#| label: code
+#| warning: false
+#| echo: false  # Oculta el código
+
+# library("Rscience.GeneralLM")
+database <- mtcars
+var_name_factor <- "cyl"
+var_name_rv <- "mpg"
+alpha_value <- 0.05
+my_super_list <- Rscience.GeneralLM::GeneralLM_fix_anova1_RCode(database = database, 
+                           var_name_factor = var_name_factor, 
+                           var_name_rv = var_name_rv, alpha_value = alpha_value)
+```
+
+
+
+<!-- Inicio TabPanel -->
+::: {.panel-tabset}
+
+
+<!-- Inicio Tab01 -->
+### Summary
+::: {.columns}
+::: {.column width="48%"}
+# 1) Anova test
+```{r}
+#| warning: false
+#| echo: false
+vector_obj <- c("df_summary_anova")
+
+
+my_df <- my_super_list[[vector_obj]]
+library(knitr)
+library(kableExtra)
+# Mostrar con kable para mejor estética
+kable(my_df, format = "html", caption = "") %>%
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+
+```
+
+
+```{r}
+#| warning: false
+#| echo: false
+vector_obj <- c("plot007_factor")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="4%"}
+:::
+
+::: {.column width="48%"}
+# Rscience - AI Report (Auto Report)
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("phrase_shapiro_selected", 
+                "phrase_bartlett_selected",
+                "phrase_requeriments_selected",
+                "phrase_anova_selected")
+
+my_text <- my_super_list[vector_obj]
+my_text <- unlist(my_text)
+
+# Unir cada elemento en una línea separada
+# my_text <- paste(my_text, collapse = "  ")
+
+# Mostrar en Quarto
+# knitr::asis_output(my_text)
+```
+`r my_text[1]`  
+`r my_text[2]`  
+`r my_text[3]`  
+`r my_text[4]`
+:::
+:::
+
+### Analysis
+
+# 1) References
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_selected_vars")
+my_super_list[vector_obj]
+```
+
+# 2) Summary Factor
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_factor_info", 
+                "check_unbalanced_reps", 
+                "phrase_selected_check_unbalanced")
+my_super_list[vector_obj]
+```
+
+# 3) Anova 1 way - Table
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_anova")
+my_super_list[vector_obj]
+```
+
+# 4) Multiple comparation test (Tukey)
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_tukey_table")
+my_super_list[vector_obj]
+```
+
+
+# 5) Model Error
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_model_error")
+my_super_list[vector_obj]
+```
+
+
+<!-- End Tab01 -->
+
+
+<!-- Begining Tab02 -->
+
+### Requeriments
+
+# 1) Requeriment - Normaility test - Residuals
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("test_residuals_normality")
+my_super_list[vector_obj]
+```
+
+# 2) Requeriment - Homogeneity test - Residuals
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("test_residuals_homogeneity")
+my_super_list[vector_obj]
+```
+
+# 3) Estimated variances - Residuals
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_model_error", "df_raw_error", "phrase_info_errors")
+my_super_list[vector_obj]
+```
+
+<!-- End Tab02 -->
+
+
+<!-- Begining Tab03 -->
+
+### Plots - Raw Data
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot001_factor")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_factor_plot001")
+my_super_list[vector_obj]
+```
+:::
+:::
+
+<hr style="border: 2px solid black; margin: 20px 0;">
+
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot002_factor")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_factor_plot002")
+my_super_list[vector_obj]
+```
+:::
+:::
+
+<hr style="border: 2px solid black; margin: 20px 0;">
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot003_factor")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_factor_plot003")
+my_super_list[vector_obj]
+```
+:::
+:::
+<hr style="border: 2px solid black; margin: 20px 0;">
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot004_factor")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_factor_plot004")
+my_super_list[vector_obj]
+```
+:::
+:::
+
+<hr style="border: 2px solid black; margin: 20px 0;">
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot005_factor")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_factor_plot005")
+my_super_list[vector_obj]
+```
+:::
+:::
+
+<hr style="border: 2px solid black; margin: 20px 0;">
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot006_factor")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_factor_plot006")
+my_super_list[vector_obj]
+```
+:::
+:::
+
+<hr style="border: 2px solid black; margin: 20px 0;">
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot007_factor")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_factor_plot007")
+my_super_list[vector_obj]
+```
+:::
+:::
+<!-- End Tab03 -->
+
+
+
+<!-- Begining Tab04 -->
+
+### Plots - Residuals
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot001_residuals")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_residuals_plot001")
+my_super_list[vector_obj]
+```
+:::
+:::
+
+<hr style="border: 2px solid black; margin: 20px 0;">
+
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot002_residuals")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_residuals_plot002")
+my_super_list[vector_obj]
+```
+:::
+:::
+
+<hr style="border: 2px solid black; margin: 20px 0;">
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot003_residuals")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_residuals_plot003")
+my_super_list[vector_obj]
+```
+:::
+:::
+<hr style="border: 2px solid black; margin: 20px 0;">
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot004_residuals")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_residuals_plot004")
+my_super_list[vector_obj]
+```
+:::
+:::
+<hr style="border: 2px solid black; margin: 20px 0;">
+
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot005_residuals")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_residuals_plot005")
+my_super_list[vector_obj]
+```
+:::
+:::
+<hr style="border: 2px solid black; margin: 20px 0;">
+
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot006_residuals")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_residuals_plot006")
+my_super_list[vector_obj]
+```
+:::
+:::
+
+<hr style="border: 2px solid black; margin: 20px 0;">
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot007_residuals")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_residuals_plot007")
+my_super_list[vector_obj]
+```
+:::
+:::
+<hr style="border: 2px solid black; margin: 20px 0;">
+
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot008_residuals")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_residuals_plot008")
+my_super_list[vector_obj]
+```
+:::
+:::
+
+<hr style="border: 2px solid black; margin: 20px 0;">
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot009_residuals")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_residuals_plot009")
+my_super_list[vector_obj]
+```
+:::
+:::
+<hr style="border: 2px solid black; margin: 20px 0;">
+
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot010_residuals")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_residuals_plot010")
+my_super_list[vector_obj]
+```
+:::
+:::
+<!-- End Tab05 -->
+
+
+### R Summary
+# 1) Summary Anova 1 way
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_summary_anova", 
+                "phrase_shapiro_selected", 
+                "phrase_bartlett_selected",
+                "phrase_requeriments_selected",
+                "phrase_anova_selected")
+
+my_super_list[vector_obj]
+```
+
+# 2) Tukey
+```{r}
+#| warning: false
+#| echo: false
+vector_obj <- c("plot007_factor")
+my_super_list[[vector_obj]]
+```
+:::
+
+```{r}
+#| warning: false
+#| echo: false
+
+# Forzar una línea en blanco final para evitar el warning de readLines()
+cat("\n")
+```
