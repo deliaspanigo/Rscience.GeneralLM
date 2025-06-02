@@ -4,9 +4,9 @@ MASTER_module_Rscience_Main_ui <- function(id) {
   ns <- NS(id)
   # Contenido principal organizado en columnas para mantener los cards separados
   div(
-    tags$head(
+  tags$head(
     tags$style(HTML("
-       /* Establecer altura y centrado para todos los card headers */
+      /* Establecer altura y centrado para todos los card headers */
       .card-header {
         height: 60px !important;
         display: flex !important;
@@ -14,12 +14,12 @@ MASTER_module_Rscience_Main_ui <- function(id) {
       }
     "))
   ),
-    # Usamos card() para envolver todo el contenido
-  
+  # Contenedor que ocupa toda la ventana
   div(
     style = "height: 100vh; display: flex; flex-direction: column;",
+    # La tarjeta ocupa todo el espacio disponible
     card(
-      style = "height: 100vh, flex: 1; display: flex; flex-direction: column;",
+      style = "flex: 1; display: flex; flex-direction: column; height: 100%;",
       card_header(
         h4("Rscience", class = "btn-sidebar")
       ),
@@ -29,38 +29,46 @@ MASTER_module_Rscience_Main_ui <- function(id) {
           title = "Main menu",
           open = "open",
           div(
-            style = "overflow-y: auto; padding-right: 10px; margin-top: 0px;",  # Aquí le das altura y scroll independiente
+            style = "overflow-y: auto; padding-right: 10px; height: 100%;",
             div(
               uiOutput(ns("the_toggle")),
               conditionalPanel(
-                condition = "input.toggle == false", ns = ns,
+                condition = "input.toggle == false",
+                ns = ns,
                 uiOutput(ns("main_menu_input"))
               ),
               conditionalPanel(
-                condition = "input.toggle == true", ns = ns,
+                condition = "input.toggle == true",
+                ns = ns,
                 uiOutput(ns("main_menu_output"))
               )
             )
           )
         ),
-        # El resto del layout puede seguir igual
+        # Resto del layout. Para que ocupe todo el espacio, también usa flex y height
         div(
-          style = "height: 100vh, margin-top: 0px;",
-          conditionalPanel(
-            condition = "input.toggle == false", ns = ns,
-            uiOutput(ns("soft_visual_input"))
-          ),
-          conditionalPanel(
-            condition = "input.toggle == true", ns = ns,
-            uiOutput(ns("soft_visual_output")),
-            uiOutput(ns("soft_visual_output22"))
+          style = "margin-top: 5px; flex: 1; display: flex; flex-direction: column;",
+          div(
+            style = "flex: 1; display: flex; flex-direction: column;",
+            # Estos contenidos ahora llenan el espacio restante
+            conditionalPanel(
+              condition = "input.toggle == false",
+              ns = ns,
+              uiOutput(ns("soft_visual_input"))
+            ),
+            conditionalPanel(
+              condition = "input.toggle == true",
+              ns = ns,
+              uiOutput(ns("soft_visual_output")),
+              uiOutput(ns("soft_visual_output22"))
+            )
           )
         )
       )
     )
   )
-  
-  )
+)
+
 }
 
 
@@ -237,9 +245,12 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     })
     
     output$"soft_visual_input" <- renderUI({
+      
+
       bslib::navset_card_tab(
         title = "R for Science",
         id = "mynav",  # Con ns() porque estás en un módulo
+        height = "100%",  # Especificar altura explícitamente
         
         # bslib::nav_panel(title = "cy_01_totem",
         #                  uiOutput(ns("cy_01_totem"))
@@ -276,40 +287,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
  
     
-    # button_output <- reactiveVal()
-    # observeEvent(input$"btn_output_report", {
-    #   button_output("output_report")
-    # })
-    # output$"soft_visual_output" <- renderUI({
-    #   
-    #   if(button_output() == "output_report"){
-    #   module_step10_04_report_download_ui(id = ns("f04_report"))
-    #   } else NULL
-    #   
-    # })
-    # 
-    # 
-    # output$"soft_visual_output22" <- renderUI({
-    #   bslib::navset_card_tab(
-    #     title = "R for Science",
-    #     id = ns("mynav"),
-    #     
-    #     
-    #     bslib::nav_panel(title = "cy_04_output",
-    #                      uiOutput(ns("cy_04_output"))
-    #     ),
-    #     bslib::nav_panel(title = "output",
-    #                      module_step10_04_report_download_ui(id = ns("f04_report"))#uiOutput(ns("card03_output"))
-    #     ),
-    #     bslib::nav_panel(title = "theory",
-    #                      module_extra_theory_ui(id = ns("extra_theory"))
-    #     ),
-    #     bslib::nav_panel(title = "download",
-    #                      uiOutput(ns("card04_download"))
-    #     )
-    #     
-    #   )
-    # })
+    
     ############################################################################
     
     # List steps
