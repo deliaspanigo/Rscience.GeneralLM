@@ -603,7 +603,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
           if (startsWith(nombre, "plot")) {
             local({
               nm <- nombre
-              output[[nm]] <- plotly::renderPlotly({ resultados[[nm]]} )  # Corrección de cierre
+              output[[nm]] <- plotly::plotly::renderPlotly({ resultados[[nm]]} )  # Corrección de cierre
             })
           } else {
             local({
@@ -769,7 +769,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
           }
           
           # if(el_render == "plotly"){
-          #   output[[id]] <- plotly::plotly::renderPlotly({
+          #   output[[id]] <- plotly::plotly::plotly::renderPlotly({
           #     req(mis_valores_reactive())
           #     mis_valores_reactive()[[obj]]
           #   })
@@ -827,7 +827,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
           if (startsWith(nombre, "plot")) {
             local({
               nm <- nombre
-              output[[nm]] <- plotly::renderPlotly({ resultados[[nm]]} )  # Corrección de cierre
+              output[[nm]] <- plotly::plotly::renderPlotly({ resultados[[nm]]} )  # Corrección de cierre
             })
           } else {
             local({
