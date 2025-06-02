@@ -274,7 +274,11 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         ),
         bslib::nav_panel(title = "script",
                          uiOutput(ns("card04_script"))
+        ),
+        bslib::nav_panel(title = "full_output",
+                         uiOutput(ns("card05_full_output"))
         )
+        
       )
     })
     
@@ -858,6 +862,26 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
                                                                show_internal_modal = reactive(show_internal_modal02()),
                                                                run_render = reactive(run_render02()))
     #---------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
+    
+    id_report03 <- "f03_report"
+    output$"card05_full_output" <- renderUI({
+
+      module_render_03_full_output_download_ui(id = ns(id_report03))
+
+    })
+
+    run_render03 <- reactiveVal(FALSE)
+    show_internal_modal03 <- reactive({TRUE})
+    ALL_DONE_report03 <- module_render_03_full_output_download_server(id = id_report03, step_pos = 9, number_current_step,
+                                                                 STR_STEP_NAME, default_list_step,
+                                                                 APP_TOTEM, internal_TOOLS_SELECTOR,
+                                                                 internal_CFG, internal_PLAY,
+                                                                 show_internal_modal = reactive(show_internal_modal03()),
+                                                                 run_render = reactive(run_render03()))
 
 
     

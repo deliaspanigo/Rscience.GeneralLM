@@ -211,6 +211,7 @@ module_render_02_script_download_server <- function(id, step_pos, number_current
     })
     
     observeEvent(run_render(), {
+      req(run_render())
       render_activation(TRUE)
     })
     ###-------------------------------------------------------------------------
@@ -241,8 +242,8 @@ module_render_02_script_download_server <- function(id, step_pos, number_current
       folder_path_delivery <- THE_CAPSULE$"folder_path_delivery"
       
       # From yaml config
-      file_name_work       <- APP_TOTEM[["step5"]]$"pack_output"$"download"$"file01"$"file_name_work" #file01_Rscript_GeneralLM_fix_anova1.R"
-      file_name_delivery   <- APP_TOTEM[["step5"]]$"pack_output"$"download"$"file01"$"file_name_delivery"
+      file_name_work       <- APP_TOTEM[["step5"]]$"pack_output"$"download"$"file02"$"file_name_work" #file01_Rscript_GeneralLM_fix_anova1.R"
+      file_name_delivery   <- APP_TOTEM[["step5"]]$"pack_output"$"download"$"file02"$"file_name_delivery"
       
       
       
@@ -345,8 +346,7 @@ module_render_02_script_download_server <- function(id, step_pos, number_current
         file_path_delivery <- internal_01_FILE_RCODE[["file_path_delivery"]]
         
         check_output <- file.exists(file_path_delivery)
-        # print(reactiveValuesToList(internal_01_FILE_RCODE))
-        # print(check_output)
+
         internal_01_FILE_RCODE[["check_output"]] <- check_output
       })
       
@@ -453,7 +453,7 @@ module_render_02_script_download_server <- function(id, step_pos, number_current
       Rcode_script <- readLines(file_path_delivery)
       
       # Rcode_script <- APP_TOTEM[["step7"]]$"pack_output"$"Rcode_script"
-      # print(THE_CAPSULE)
+
       # Rcode_Script <- THE_CAPSULE$"MY_SCRIPT"
       
       line_count <- length(strsplit(Rcode_script, "\n")[[1]])
@@ -479,6 +479,7 @@ module_render_02_script_download_server <- function(id, step_pos, number_current
     
     output$show_script <- renderUI({
       # req(mis_valores())
+      req(internal_01_FILE_RCODE$"check_output")
       
       div(
         style = "height: 100%;",
@@ -496,38 +497,7 @@ module_render_02_script_download_server <- function(id, step_pos, number_current
       
     })
     
-    if(FALSE){
-    output$"visual_RLong" <- renderText({
-      req(internal_01_FILE_RCODE$"check_output")
-      
-      the_list <- reactiveValuesToList(internal_01_FILE_RCODE)
-      # print(the_list)
-      
-      file_path_delivery <- internal_01_FILE_RCODE[["file_path_delivery"]]
-      
-      # print(file.exists(file_path_delivery))
-      
-      file_name_html <- basename(file_path_delivery)
-      dir_temp <- dirname(file_path_delivery)
-      # print(dir_temp)
-      
-      # check_file_RReport()
-      addResourcePath(prefix = "super_delivery_folder", directoryPath = dir_temp)
-      my_local_file <- file.path("super_delivery_folder", file_name_html)
-      
-      
-      # tags$iframe(
-      #   src = my_local_file,
-      #   width = "100%",
-      #   height = "800px",
-      #   frameborder = 0
-      # )
-      armado_v <- paste('<div style="height: 100%; width: 100%; overflow: hidden;"><iframe style="height: 5000vh; width:100%; border: none;" src="', my_local_file, '"></iframe></div>', sep = "")
-      
-      return(armado_v)
-    })
-    ################################################################################
-    }
+
     
     return(reactive(ALL_DONE()))
   })

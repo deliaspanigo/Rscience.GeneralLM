@@ -211,6 +211,7 @@ module_render_01_report_download_server <- function(id, step_pos, number_current
     })
     
     observeEvent(run_render(), {
+      req(run_render())
       render_activation(TRUE)
     })
     ###-------------------------------------------------------------------------
@@ -222,7 +223,7 @@ module_render_01_report_download_server <- function(id, step_pos, number_current
       req(render_activation())
       req(!ALL_DONE())
       
-      print("ADENTRO 02")
+
       
       # Abrir show modal interno
       if(show_internal_modal()){
@@ -242,8 +243,8 @@ module_render_01_report_download_server <- function(id, step_pos, number_current
       folder_path_delivery <- THE_CAPSULE$"folder_path_delivery"
       
       # From yaml config
-      file_name_work       <- APP_TOTEM[["step5"]]$"pack_output"$"download"$"file04"$"file_name_work" #file01_Rscript_GeneralLM_fix_anova1.R"
-      file_name_delivery   <- APP_TOTEM[["step5"]]$"pack_output"$"download"$"file04"$"file_name_delivery"
+      file_name_work       <- APP_TOTEM[["step5"]]$"pack_output"$"download"$"file01"$"file_name_work" #file01_Rscript_GeneralLM_fix_anova1.R"
+      file_name_delivery   <- APP_TOTEM[["step5"]]$"pack_output"$"download"$"file01"$"file_name_delivery"
       
       
       
@@ -346,8 +347,7 @@ module_render_01_report_download_server <- function(id, step_pos, number_current
         file_path_delivery <- internal_01_FILE_RCODE[["file_path_delivery"]]
         
         check_output <- file.exists(file_path_delivery)
-        # print(reactiveValuesToList(internal_01_FILE_RCODE))
-        # print(check_output)
+
         internal_01_FILE_RCODE[["check_output"]] <- check_output
       })
       
@@ -426,15 +426,15 @@ module_render_01_report_download_server <- function(id, step_pos, number_current
       req(internal_01_FILE_RCODE$"check_output")
       
       the_list <- reactiveValuesToList(internal_01_FILE_RCODE)
-      # print(the_list)
+
       
       file_path_delivery <- internal_01_FILE_RCODE[["file_path_delivery"]]
       
-      # print(file.exists(file_path_delivery))
+
       
       file_name_html <- basename(file_path_delivery)
       dir_temp <- dirname(file_path_delivery)
-      # print(dir_temp)
+
       
       # check_file_RReport()
       addResourcePath(prefix = "super_delivery_folder", directoryPath = dir_temp)

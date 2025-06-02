@@ -11,7 +11,8 @@ module_render_03_full_output_download_ui <- function(id) {
         });
       ")))
     ),
-    uiOutput(ns("set01_RCode"))
+    uiOutput(ns("set01_RCode")),
+    htmlOutput(ns("visual_RLong"))
     
     
   )
@@ -22,17 +23,20 @@ module_render_03_full_output_download_ui <- function(id) {
 module_render_03_full_output_download_server <- function(id, step_pos, number_current_step, 
                                                     STR_STEP_NAME, default_list_step, 
                                                     APP_TOTEM, internal_TOOLS_SELECTOR,
-                                                    internal_CFG, internal_PLAY) {
+                                                    internal_CFG, internal_PLAY, show_internal_modal, run_render) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
-    # Valores por defecto
-    THE_CAPSULE <- reactiveValues()
-    sub_step <- reactiveVal(1)
+    # Item 01 - Valores default
+    THE_CAPSULE <- reactiveValues()      # Objetos que intenvienen
+    sub_step <- reactiveVal(1)           # Sub step
+    render_activation <- reactiveVal(FALSE)
     ALL_DONE <- reactiveVal(FALSE)
     local_reset <- reactiveVal(FALSE)
     
-    # Determinar el reset local
+    ###-------------------------------------------------------------------------
+    
+    # Item 02 - Condiciones para realizar un reset local
     observe({
       
       check_there_is_content <- sub_step()>1 
@@ -42,7 +46,9 @@ module_render_03_full_output_download_server <- function(id, step_pos, number_cu
       local_reset(super_check)
     })
     
-    # Aplicar reset local
+    ###-------------------------------------------------------------------------
+    
+    # Item 03 - Definicion del reset local
     observeEvent(local_reset(), {
       req(local_reset())
       
@@ -50,13 +56,14 @@ module_render_03_full_output_download_server <- function(id, step_pos, number_cu
         THE_CAPSULE[[name]] <- NULL
       }
       sub_step(1)
+      render_activation(FALSE)
       ALL_DONE(FALSE)
       local_reset(FALSE)
       
     })  
     
     ###-------------------------------------------------------------------------
-    # Default File Download state
+    # Item 04 - Default File Download state
     list_DFDS <- list(
       "check_clic_render" = FALSE,
       "current_time_pritty"     = "",
@@ -77,31 +84,59 @@ module_render_03_full_output_download_server <- function(id, step_pos, number_cu
     )
     
     internal_01_FILE_RCODE <- do.call(reactiveValues, list_DFDS)
+    ###-------------------------------------------------------------------------
     
+    # Item 05 - sub_step 01 - Requisitos de contexto
+    observe({
+      # Requeriments -----------------------------------------------------------
+      req(sub_step() == 1)
+      req(!ALL_DONE())
+      req(number_current_step() == step_pos)
+      req(internal_PLAY, internal_TOOLS_SELECTOR, internal_CFG)
+      req(internal_PLAY$"check_output", internal_TOOLS_SELECTOR$"check_output", internal_CFG$"check_output")
+      
+      isolate({
+        THE_CAPSULE$"current_step" = number_current_step()
+        THE_CAPSULE$"current_step_name" = paste0(STR_STEP_NAME, step_pos)
+        THE_CAPSULE$"current_label" ="Render 01: Report"
+        THE_CAPSULE$"new_list_step" = NA # Not necesary at download???
+        THE_CAPSULE$"selected_tool" = internal_CFG$"pack_output"$"id"
+        THE_CAPSULE$"folder_path_work" = APP_TOTEM[["step8"]]$"pack_output"$"path_folder_work"
+        THE_CAPSULE$"folder_path_delivery" = APP_TOTEM[["step8"]]$"pack_output"$"path_folder_output"
+        THE_CAPSULE$"Rcode_quarto"  = APP_TOTEM[["step7"]]$"pack_output"$"Rcode_quarto"
+        THE_CAPSULE$"Rcode_script"  = APP_TOTEM[["step7"]]$"pack_output"$"Rcode_script"
+      })
+      
+      
+      sub_step(sub_step()+1)
+    })
     
+    # Si todos los requisitos estan bien...
+    REQ_OK <- reactive({
+      sub_step() >= 2
+    })
+    
+    ###-------------------------------------------------------------------------
+    # Item 06 - Elementos de UI
     output$el_cartel <- renderUI({
+      req(REQ_OK())
       my_cartel <- reactiveValuesToList(internal_TOOLS_SELECTOR)$"pack_output"$"selected_cartel"
       fn_html_cartel(my_text = my_cartel)
     })
     
     output$"set01_RCode" <- renderUI({
+      req(REQ_OK())
       
       the_state_render   <- internal_01_FILE_RCODE$"button_state_render"
-      #      the_class_download <- internal_01_FILE_RCODE$"button_class"
+      btn_class_render <- fn_R_switch_class_from_button_state(button_state = the_state_render)
       
-      btn_class_render <- switch(the_state_render,
-                                 "initial"   = "btn-outline-primary",    # Azul inicial
-                                 "confirmed" = "btn-success",    # Verde después de confirmar
-                                 "modified"  = "btn-outline-primary") 
       
       the_state_download <-  internal_01_FILE_RCODE$"button_state_download"
-      btn_class_download <- switch(the_state_download,
-                                   "initial"   = "btn-outline-primary",    # Azul inicial
-                                   "confirmed" = "btn-success",    # Verde después de confirmar
-                                   "modified"  = "btn-outline-primary") 
+      btn_class_download <- fn_R_switch_class_from_button_state(button_state = the_state_download)
+      
       fluidRow(
         style = "display: flex; align-items: center; justify-content: space-between;",
-        column(3, "R code + All outputs"),
+        column(3, "Rscience Report"),
         column(4, 
                actionButton(inputId = ns("render_RCode"), 
                             label = NULL, 
@@ -122,43 +157,8 @@ module_render_03_full_output_download_server <- function(id, step_pos, number_cu
       )
     })
     
-    
-    # Sub_step 01 - Enviroment and THE_CAPSULE
-    observe({
-      # Requeriments -----------------------------------------------------------
-      req(sub_step() == 1)
-      req(!ALL_DONE())
-      req(number_current_step() == step_pos)
-      req(internal_PLAY, internal_TOOLS_SELECTOR, internal_CFG)
-      req(internal_PLAY$"check_output", internal_TOOLS_SELECTOR$"check_output", internal_CFG$"check_output")
-      
-      # THE_CAPSULE$"file_name_work" = APP_TOTEM[["step8"]]$"pack_output"$"download"$"file01_Rcode"$"work_file_name"
-      # THE_CAPSULE$"file_name_delivery" = APP_TOTEM[["step8"]]$"pack_output"$"download"$"file01_Rcode"$"delivery_file_name"
-      # 
-      isolate({
-        THE_CAPSULE$"current_step" = number_current_step()
-        THE_CAPSULE$"current_step_name" = paste0(STR_STEP_NAME, step_pos)
-        THE_CAPSULE$"current_label" ="Step 10: Download"
-        THE_CAPSULE$"new_list_step" = NA # Not necesary at download???
-        THE_CAPSULE$"selected_tool" = internal_CFG$"pack_output"$"id"
-        THE_CAPSULE$"folder_path_work" = APP_TOTEM[["step8"]]$"pack_output"$"path_folder_work"
-        THE_CAPSULE$"folder_path_delivery" = APP_TOTEM[["step8"]]$"pack_output"$"path_folder_output"
-        THE_CAPSULE$"Rcode_quarto"  = APP_TOTEM[["step7"]]$"pack_output"$"Rcode_quarto"
-      })
-      
-      
-      sub_step(sub_step()+1)
-    })
-    
-    ok_show <- reactive({
-      sub_step() >= 2
-    })
-    
-    
-    
-    
-    
-    
+    ###-------------------------------------------------------------------------
+    # Item 07 - Preparacion del MODAL interno
     fn_shiny_ACTIVE_SHOW_MODAL <- function(){
       showModal(
         modalDialog(
@@ -203,18 +203,35 @@ module_render_03_full_output_download_server <- function(id, step_pos, number_cu
       }
       
     })
-    
-    
+    ###-------------------------------------------------------------------------
+    # Item 08 - Caminos de activacion del render
+    # Todos los caminos llevan a Roma...
     observeEvent(input$"render_RCode", {
+      render_activation(TRUE)
+    })
+    
+    observeEvent(run_render(), {
+      req(run_render())
+      render_activation(TRUE)
+    })
+    ###-------------------------------------------------------------------------
+    
+    # Item 09 - sub_step 02 - Renderizado!
+    observe({
       
       req(sub_step() == 2)
+      req(render_activation())
+      req(!ALL_DONE())
       
-      # Abrir show modal
-      fn_shiny_ACTIVE_SHOW_MODAL()
+  
+      
+      # Abrir show modal interno
+      if(show_internal_modal()){
+        fn_shiny_ACTIVE_SHOW_MODAL()
+      }
       
       
-      
-      # Reset por las dudas
+      # Reset por las dudas del objeto interno.
       fn_shiny_apply_changes_reactiveValues(rv = internal_01_FILE_RCODE,  
                                             changes_list = list_DFDS
       )
@@ -226,8 +243,8 @@ module_render_03_full_output_download_server <- function(id, step_pos, number_cu
       folder_path_delivery <- THE_CAPSULE$"folder_path_delivery"
       
       # From yaml config
-      file_name_work       <- APP_TOTEM[["step5"]]$"pack_output"$"download"$"file02"$"file_name_work" #file01_Rscript_GeneralLM_fix_anova1.R"
-      file_name_delivery   <- APP_TOTEM[["step5"]]$"pack_output"$"download"$"file02"$"file_name_delivery"
+      file_name_work       <- APP_TOTEM[["step5"]]$"pack_output"$"download"$"file03"$"file_name_work" #file01_Rscript_GeneralLM_fix_anova1.R"
+      file_name_delivery   <- APP_TOTEM[["step5"]]$"pack_output"$"download"$"file03"$"file_name_delivery"
       
       
       
@@ -308,12 +325,11 @@ module_render_03_full_output_download_server <- function(id, step_pos, number_cu
       
       message(crayon::green("Starting process..."))
       message(crayon::green("Please, wait..."))
-
+      
       dir_actual <- getwd()
       my_temporal_folder <- folder_path_work
       setwd(my_temporal_folder)
       
-
       
       codigo_extra <- paste(paste(MY_SCRIPT, collapse = "\n"))
       lineas <- readLines(file_name_work)
@@ -336,8 +352,7 @@ module_render_03_full_output_download_server <- function(id, step_pos, number_cu
         file_path_delivery <- internal_01_FILE_RCODE[["file_path_delivery"]]
         
         check_output <- file.exists(file_path_delivery)
-        # print(reactiveValuesToList(internal_01_FILE_RCODE))
-        # print(check_output)
+
         internal_01_FILE_RCODE[["check_output"]] <- check_output
       })
       
@@ -347,18 +362,30 @@ module_render_03_full_output_download_server <- function(id, step_pos, number_cu
         if(check_output){
           button_state_render <- "confirmed"
           internal_01_FILE_RCODE[["button_state_render"]] <- button_state_render
+          
+          ALL_DONE(TRUE)
+          
         }
         
       })
       
+      sub_step(sub_step()+1)
+      if(show_internal_modal()){
+        THE_MODAL_RCODE(FALSE)
+      }
       
-      THE_MODAL_RCODE(FALSE)
       
     })
     
-    observeEvent(input$"download_RCode", {
-      # print("HOLA")
+    ###-------------------------------------------------------------------------
+    observe({
+      req(sub_step() == 3)
+      
+      
     })
+    
+    ###-------------------------------------------------------------------------
+    
     
     
     # Crear un reactiveValues para almacenar el contador de clics
@@ -395,68 +422,30 @@ module_render_03_full_output_download_server <- function(id, step_pos, number_cu
     
     
     ##############################################################################
-    # Tab05 - RCode
-    # Botón para mostrar modal con visualización
-    observeEvent(input$show_RCode, {
-      
-      showModal(
-        tagList(
-          # CSS personalizado para este modal específico
-          tags$div(
-            tags$style(HTML("
-            .modal-dialog.modal-xl {
-              margin: 30px 60px; /* Ajusta el margen superior/inferior y izquierda/derecha */
-              width: calc(100% - 120px); /* Ancho ajustado para respetar los márgenes */
-              max-width: none; /* Sobrescribe el max-width predeterminado */
-            }
-            
-            .modal-body {
-              max-height: calc(100vh - 300px); /* Altura máxima con espacio para header y footer */
-              overflow-y: auto; /* Agrega scroll vertical cuando sea necesario */
-              padding: 20px; /* Ajusta el padding interno */
-            }
-          "))
-          ),
-          modalDialog(
-            title = "Visualización",
-            div(
-              htmlOutput(ns("visual_RLong"))
-            ),
-            size = "xl",
-            easyClose = TRUE,
-            footer = modalButton("Close")
-          )
-        )
-      )
-      
-      
-      
-      
-    })
     
-
     
-
+    
+    
     
     output$"visual_RLong" <- renderText({
       req(internal_01_FILE_RCODE$"check_output")
-
+      
       the_list <- reactiveValuesToList(internal_01_FILE_RCODE)
-      # print(the_list)
 
+      
       file_path_delivery <- internal_01_FILE_RCODE[["file_path_delivery"]]
+      
 
-      # print(file.exists(file_path_delivery))
-
+      
       file_name_html <- basename(file_path_delivery)
       dir_temp <- dirname(file_path_delivery)
-      # print(dir_temp)
 
+      
       # check_file_RReport()
       addResourcePath(prefix = "super_delivery_folder", directoryPath = dir_temp)
       my_local_file <- file.path("super_delivery_folder", file_name_html)
-
-
+      
+      
       # tags$iframe(
       #   src = my_local_file,
       #   width = "100%",
@@ -464,12 +453,13 @@ module_render_03_full_output_download_server <- function(id, step_pos, number_cu
       #   frameborder = 0
       # )
       armado_v <- paste('<div style="height: 100%; width: 100%; overflow: hidden;"><iframe style="height: 5000vh; width:100%; border: none;" src="', my_local_file, '"></iframe></div>', sep = "")
-
+      
       return(armado_v)
     })
     ################################################################################
     
     
+    return(reactive(ALL_DONE()))
   })
   
   

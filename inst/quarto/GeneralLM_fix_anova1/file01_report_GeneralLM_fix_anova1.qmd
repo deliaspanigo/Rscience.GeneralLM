@@ -9,7 +9,7 @@ format:
     toc: false
     embed-resources: true
     standalone: true
-    code-tools: true  # Añade un botón global para mostrar/ocultar código
+    code-tools: false  # Añade un botón global para mostrar/ocultar código
     code-fold: false   # Código plegado por defecto
     code-summary: "Options"  # Texto para el botón de despliegue
     css: style.css
