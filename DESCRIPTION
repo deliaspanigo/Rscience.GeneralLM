@@ -16,6 +16,7 @@ Imports:
     EnvStats,
     fontawesome,
     openxlsx,
+    plotly,
     quarto,
     readxl,
     Rscience.import,

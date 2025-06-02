@@ -91,8 +91,8 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     # Crear el mensaje en inglés
     mensaje <- paste0(
-      blue("Welcome to Rscience!"), "\n",
-      yellow("Current date and time:"), " ", green(timestamp)
+      crayon::blue("Welcome to Rscience!"), "\n",
+      crayon::yellow("Current date and time:"), " ", crayon::green(timestamp)
     )
     
     # Mostrar en la consola con el color
@@ -252,18 +252,18 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         id = "mynav",  # Con ns() porque estás en un módulo
         height = "100%",  # Especificar altura explícitamente
         
-        # bslib::nav_panel(title = "cy_01_totem",
-        #                  uiOutput(ns("cy_01_totem"))
-        # ),
-        # bslib::nav_panel(title = "cy_02_internal",
-        #                  uiOutput(ns("cy_02_internal"))
-        # ),
-        # bslib::nav_panel(title = "cy_03_temp",
-        #                  uiOutput(ns("cy_03_temp"))
-        # ),
-        # bslib::nav_panel(title = "cy_04_output",
-        #                  uiOutput(ns("cy_04_output"))
-        # ),
+        bslib::nav_panel(title = "cy_01_totem",
+                         uiOutput(ns("cy_01_totem"))
+        ),
+        bslib::nav_panel(title = "cy_02_internal",
+                         uiOutput(ns("cy_02_internal"))
+        ),
+        bslib::nav_panel(title = "cy_03_temp",
+                         uiOutput(ns("cy_03_temp"))
+        ),
+        bslib::nav_panel(title = "cy_04_output",
+                         uiOutput(ns("cy_04_output"))
+        ),
         bslib::nav_panel(title = "user_selection",
                          uiOutput(ns("card01_user_selection"))
         ),

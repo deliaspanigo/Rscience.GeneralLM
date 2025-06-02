@@ -20,7 +20,7 @@ format:
 #| warning: false
 #| echo: false  # Oculta el código
 
-# library("Rscience.GeneralLM")
+library("Rscience.GeneralLM")
 database <- mtcars
 var_name_factor <- "cyl"
 var_name_rv <- "mpg"

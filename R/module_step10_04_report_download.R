@@ -323,7 +323,7 @@ module_step10_04_report_download_server <- function(id, step_pos, number_current
       
       quarto::quarto_render(input = file_name_work, 
                             output_file = file_name_delivery,
-                            quiet = TRUE)
+                            quiet = FALSE)
       
       message(green("Process completed!"))
       message("")
