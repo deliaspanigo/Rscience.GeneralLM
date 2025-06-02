@@ -336,8 +336,8 @@ module_step10_02_all_download_server <- function(id, step_pos, number_current_st
         file_path_delivery <- internal_01_FILE_RCODE[["file_path_delivery"]]
         
         check_output <- file.exists(file_path_delivery)
-        print(reactiveValuesToList(internal_01_FILE_RCODE))
-        print(check_output)
+        # print(reactiveValuesToList(internal_01_FILE_RCODE))
+        # print(check_output)
         internal_01_FILE_RCODE[["check_output"]] <- check_output
       })
       
@@ -357,7 +357,7 @@ module_step10_02_all_download_server <- function(id, step_pos, number_current_st
     })
     
     observeEvent(input$"download_RCode", {
-      print("HOLA")
+      # print("HOLA")
     })
     
     
@@ -442,15 +442,15 @@ module_step10_02_all_download_server <- function(id, step_pos, number_current_st
       req(internal_01_FILE_RCODE$"check_output")
 
       the_list <- reactiveValuesToList(internal_01_FILE_RCODE)
-      print(the_list)
+      # print(the_list)
 
       file_path_delivery <- internal_01_FILE_RCODE[["file_path_delivery"]]
 
-      print(file.exists(file_path_delivery))
+      # print(file.exists(file_path_delivery))
 
       file_name_html <- basename(file_path_delivery)
       dir_temp <- dirname(file_path_delivery)
-      print(dir_temp)
+      # print(dir_temp)
 
       # check_file_RReport()
       addResourcePath(prefix = "super_delivery_folder", directoryPath = dir_temp)

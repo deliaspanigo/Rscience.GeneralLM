@@ -331,7 +331,7 @@ module_step10_01_script_download_server <- function(id, step_pos, number_current
     })
     
     observeEvent(input$"download_RCode", {
-      print("HOLA")
+      # print("HOLA")
     })
     
     

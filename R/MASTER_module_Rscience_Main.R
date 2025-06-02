@@ -19,7 +19,7 @@ MASTER_module_Rscience_Main_ui <- function(id) {
   div(
     style = "height: 100vh; display: flex; flex-direction: column;",
     card(
-      style = "flex: 1; display: flex; flex-direction: column;",
+      style = "height: 100vh, flex: 1; display: flex; flex-direction: column;",
       card_header(
         h4("Rscience", class = "btn-sidebar")
       ),
@@ -29,7 +29,7 @@ MASTER_module_Rscience_Main_ui <- function(id) {
           title = "Main menu",
           open = "open",
           div(
-            style = "height: 80vh; overflow-y: auto; padding-right: 10px;",  # Aquí le das altura y scroll independiente
+            style = "overflow-y: auto; padding-right: 10px; margin-top: 0px;",  # Aquí le das altura y scroll independiente
             div(
               uiOutput(ns("the_toggle")),
               conditionalPanel(
@@ -45,14 +45,15 @@ MASTER_module_Rscience_Main_ui <- function(id) {
         ),
         # El resto del layout puede seguir igual
         div(
-          style = "margin-top: 20px;",
+          style = "height: 100vh, margin-top: 0px;",
           conditionalPanel(
             condition = "input.toggle == false", ns = ns,
             uiOutput(ns("soft_visual_input"))
           ),
           conditionalPanel(
             condition = "input.toggle == true", ns = ns,
-            uiOutput(ns("soft_visual_output"))
+            uiOutput(ns("soft_visual_output")),
+            uiOutput(ns("soft_visual_output22"))
           )
         )
       )
@@ -192,7 +193,35 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
             class = "d-flex flex-column align-items-center",  # Para centrar horizontalmente
             style = "gap: 20px; height: 100%;",  # Altura del cuerpo de la card (100%)
             actionButton(
-              ns("btn_dataset33"),
+              ns("btn_output_report"),
+              tagList(
+                icon("file-alt", style = "font-size: 75px; display: block; margin-bottom: 8px;"),
+                span()
+              ),
+              # class = btn_class, 
+              style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
+              title = "Report"
+            )
+          ),
+          div(
+            class = "d-flex flex-column align-items-center",  # Para centrar horizontalmente
+            style = "gap: 20px; height: 100%;",  # Altura del cuerpo de la card (100%)
+            actionButton(
+              ns("btn_output"),
+              tagList(
+                icon("file-alt", style = "font-size: 75px; display: block; margin-bottom: 8px;"),
+                span()
+              ),
+              # class = btn_class, 
+              style = "height: 100px; width: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px;",
+              title = "Import dataset"
+            )
+          ),
+          div(
+            class = "d-flex flex-column align-items-center",  # Para centrar horizontalmente
+            style = "gap: 20px; height: 100%;",  # Altura del cuerpo de la card (100%)
+            actionButton(
+              ns("btn_dataset55"),
               tagList(
                 icon("database", style = "font-size: 75px; display: block; margin-bottom: 8px;"),
                 span()
@@ -210,52 +239,77 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     output$"soft_visual_input" <- renderUI({
       bslib::navset_card_tab(
         title = "R for Science",
-        id = ns("mynav"),
+        id = "mynav",  # Con ns() porque estás en un módulo
         
-        bslib::nav_panel(title = "cy_01_totem",
-                         uiOutput(ns("cy_01_totem"))
-        ),
-        bslib::nav_panel(title = "cy_02_internal",
-                         uiOutput(ns("cy_02_internal"))
-        ),
-        bslib::nav_panel(title = "cy_03_temp",
-                         uiOutput(ns("cy_03_temp"))
-        ),
-
+        # bslib::nav_panel(title = "cy_01_totem",
+        #                  uiOutput(ns("cy_01_totem"))
+        # ),
+        # bslib::nav_panel(title = "cy_02_internal",
+        #                  uiOutput(ns("cy_02_internal"))
+        # ),
+        # bslib::nav_panel(title = "cy_03_temp",
+        #                  uiOutput(ns("cy_03_temp"))
+        # ),
+        # bslib::nav_panel(title = "cy_04_output",
+        #                  uiOutput(ns("cy_04_output"))
+        # ),
         bslib::nav_panel(title = "user_selection",
                          uiOutput(ns("card01_user_selection"))
         ),
         bslib::nav_panel(title = "dataset",
                          uiOutput(ns("card02_dataset"))
         ),
-        
-        bslib::nav_panel(title = "experiment",
-                         uiOutput(ns("experiment"))
-        ),
-      )
-    })
-    
-    output$"soft_visual_output" <- renderUI({
-      bslib::navset_card_tab(
-        title = "R for Science",
-        id = ns("mynav"),
-        
-        
-        bslib::nav_panel(title = "cy_04_output",
-                         uiOutput(ns("cy_04_output"))
-        ),
-        bslib::nav_panel(title = "output",
-                         module_step10_04_report_download_ui(id = ns("f04_report"))#uiOutput(ns("card03_output"))
+        bslib::nav_panel(title = "report",
+                         module_step10_04_report_download_ui(id = ns("f04_report"))
         ),
         bslib::nav_panel(title = "theory",
                          module_extra_theory_ui(id = ns("extra_theory"))
         ),
         bslib::nav_panel(title = "download",
                          uiOutput(ns("card04_download"))
+        ),
+        bslib::nav_panel(title = "experiment",
+                         uiOutput(ns("experiment"))
         )
-        
       )
     })
+    
+ 
+    
+    # button_output <- reactiveVal()
+    # observeEvent(input$"btn_output_report", {
+    #   button_output("output_report")
+    # })
+    # output$"soft_visual_output" <- renderUI({
+    #   
+    #   if(button_output() == "output_report"){
+    #   module_step10_04_report_download_ui(id = ns("f04_report"))
+    #   } else NULL
+    #   
+    # })
+    # 
+    # 
+    # output$"soft_visual_output22" <- renderUI({
+    #   bslib::navset_card_tab(
+    #     title = "R for Science",
+    #     id = ns("mynav"),
+    #     
+    #     
+    #     bslib::nav_panel(title = "cy_04_output",
+    #                      uiOutput(ns("cy_04_output"))
+    #     ),
+    #     bslib::nav_panel(title = "output",
+    #                      module_step10_04_report_download_ui(id = ns("f04_report"))#uiOutput(ns("card03_output"))
+    #     ),
+    #     bslib::nav_panel(title = "theory",
+    #                      module_extra_theory_ui(id = ns("extra_theory"))
+    #     ),
+    #     bslib::nav_panel(title = "download",
+    #                      uiOutput(ns("card04_download"))
+    #     )
+    #     
+    #   )
+    # })
     ############################################################################
     
     # List steps
