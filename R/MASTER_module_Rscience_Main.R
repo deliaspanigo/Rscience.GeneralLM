@@ -603,7 +603,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
           if (startsWith(nombre, "plot")) {
             local({
               nm <- nombre
-              output[[nm]] <- plotly::plotly::renderPlotly({ resultados[[nm]]} )  # Corrección de cierre
+              output[[nm]] <- plotly::renderPlotly({ resultados[[nm]]} )  # Corrección de cierre
             })
           } else {
             local({
@@ -619,7 +619,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
           if (startsWith(nombre, "plot")) {
             new_ui <- div(
               HTML(paste0("<b><u>R plot object:</u></b> ", nombre)),
-              shinycssloaders::withSpinner(plotlyOutput(ns(nombre)))
+              shinycssloaders::withSpinner(plotly::plotlyOutput(ns(nombre)))
               )
           } else {
             new_ui <- div(
@@ -769,7 +769,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
           }
           
           # if(el_render == "plotly"){
-          #   output[[id]] <- plotly::plotly::plotly::renderPlotly({
+          #   output[[id]] <- plotly::plotly::renderPlotly({
           #     req(mis_valores_reactive())
           #     mis_valores_reactive()[[obj]]
           #   })
@@ -799,7 +799,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         #     fluidRow(
         #     HTML(paste0("<b><u>R plot object:</u></b> ", obj_name)),
         #     #h4(list_objetos[[i]]$"title"),
-        #     plotlyOutput(ns(id_output)),
+        #     plotly::plotlyOutput(ns(id_output)),
         #     br()
         #     )
         #   )
@@ -827,7 +827,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
           if (startsWith(nombre, "plot")) {
             local({
               nm <- nombre
-              output[[nm]] <- plotly::plotly::renderPlotly({ resultados[[nm]]} )  # Corrección de cierre
+              output[[nm]] <- plotly::renderPlotly({ resultados[[nm]]} )  # Corrección de cierre
             })
           } else {
             local({
@@ -843,7 +843,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
           if (startsWith(nombre, "plot")) {
             new_ui <- div(
               HTML(paste0("<b><u>R plot object:</u></b> ", nombre)),
-              shinycssloaders::withSpinner(plotlyOutput(ns(nombre)))
+              shinycssloaders::withSpinner(plotly::plotlyOutput(ns(nombre)))
             )
           } else {
             new_ui <- div(
