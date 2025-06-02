@@ -15,6 +15,7 @@ Imports:
     DT,
     EnvStats,
     fontawesome,
+    kableExtra,
     openxlsx,
     plotly,
     quarto,
