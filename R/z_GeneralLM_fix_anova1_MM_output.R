@@ -95,7 +95,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, mis_valores, active_TOOLS_
           div(
             HTML(paste0("<b><u>R plot object:</u></b> ", obj_name_plot)),
             fluidRow(
-              column(6, shinycssloaders::withSpinner(plotlyOutput(ns(id_output_plot)))),
+              column(6, shinycssloaders::withSpinner(plotly::plotlyOutput(ns(id_output_plot)))),
               column(6, shinycssloaders::withSpinner(verbatimTextOutput(ns(id_output_table))))
             ),
             hr()
@@ -132,7 +132,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, mis_valores, active_TOOLS_
       )
     })
     
-    output$the_plot <- renderPlotly({
+    output$the_plot <- plotly::renderPlotly({
       req(mis_valores())
       my_plot <- mis_valores()$"plot007_factor"
       my_plot
@@ -174,7 +174,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, mis_valores, active_TOOLS_
           card_header("Plot"),
           card_body(
             div(
-              plotlyOutput(ns("the_plot"))
+              plotly::plotlyOutput(ns("the_plot"))
             )
           )
         )
@@ -404,7 +404,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, mis_valores, active_TOOLS_
         if (startsWith(nombre, "plot")) {
           local({
             nm <- nombre
-            output[[nm]] <- renderPlotly({ resultados[[nm]]} )  # Corrección de cierre
+            output[[nm]] <- plotly::renderPlotly({ resultados[[nm]]} )  # Corrección de cierre
           })
         } else {
           local({
@@ -420,7 +420,7 @@ GeneralLM_fix_anova1_MM_output_server <- function(id, mis_valores, active_TOOLS_
         if (startsWith(nombre, "plot")) {
           new_ui <- div(
             HTML(paste0("<b><u>R plot object:</u></b> ", nombre)),
-            shinycssloaders::withSpinner(plotlyOutput(ns(nombre)))
+            shinycssloaders::withSpinner(plotly::plotlyOutput(ns(nombre)))
           )
         } else {
           new_ui <- div(
