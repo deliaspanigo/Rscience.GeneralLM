@@ -306,8 +306,8 @@ module_step10_03_report_download_server <- function(id, step_pos, number_current
       file_path_from <- file.path(folder_path_work, file_name_delivery)
       ###
       
-      message(green("Starting process..."))
-      message(green("Please, wait..."))
+      message(crayon::green("Starting process..."))
+      message(crayon::green("Please, wait..."))
       
       dir_actual <- getwd()
       my_temporal_folder <- folder_path_work
@@ -324,7 +324,7 @@ module_step10_03_report_download_server <- function(id, step_pos, number_current
                             output_file = file_name_delivery,
                             quiet = FALSE)
       
-      message(green("Process completed!"))
+      message(crayon::green("Process completed!"))
       message("")
       
       setwd(dir_actual)
