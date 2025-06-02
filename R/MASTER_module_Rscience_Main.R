@@ -18,11 +18,7 @@ MASTER_module_Rscience_Main_ui <- function(id) {
   div(
     style = "height: 100vh; display: flex; flex-direction: column;",
     # La tarjeta ocupa todo el espacio disponible
-    card(
-      style = "flex: 1; display: flex; flex-direction: column; height: 100%;",
-      card_header(
-        h4("Rscience", class = "btn-sidebar")
-      ),
+
       layout_sidebar(
         sidebar = sidebar(
           id = "sidebar_izquierdo",
@@ -65,7 +61,7 @@ MASTER_module_Rscience_Main_ui <- function(id) {
           )
         )
       )
-    )
+    
   )
 )
 
@@ -249,7 +245,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
 
       bslib::navset_card_tab(
         title = "R for Science",
-        id = "mynav",  # Con ns() porque estás en un módulo
+        id = ns("mynav"),  # Con ns() porque estás en un módulo
         height = "100%",  # Especificar altura explícitamente
         
         bslib::nav_panel(title = "cy_01_totem",
@@ -261,17 +257,11 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         bslib::nav_panel(title = "cy_03_temp",
                          uiOutput(ns("cy_03_temp"))
         ),
-        bslib::nav_panel(title = "cy_04_output",
-                         uiOutput(ns("cy_04_output"))
-        ),
         bslib::nav_panel(title = "user_selection",
                          uiOutput(ns("card01_user_selection"))
         ),
         bslib::nav_panel(title = "dataset",
                          uiOutput(ns("card02_dataset"))
-        ),
-        bslib::nav_panel(title = "report",
-                         module_step10_04_report_download_ui(id = ns("f04_report"))
         ),
         bslib::nav_panel(title = "theory",
                          module_extra_theory_ui(id = ns("extra_theory"))
@@ -279,13 +269,16 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         bslib::nav_panel(title = "download",
                          uiOutput(ns("card04_download"))
         ),
-        bslib::nav_panel(title = "experiment",
-                         uiOutput(ns("experiment"))
+        bslib::nav_panel(title = "report",
+                         uiOutput(ns("card03_report"))
+        ),
+        bslib::nav_panel(title = "script",
+                         uiOutput(ns("card04_script"))
         )
       )
     })
     
- 
+   
     
     
     ############################################################################
@@ -299,17 +292,20 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     # 6) Choosing settings...
     # 8) Press PLAY and pass internal to active
     # 9) Create temporal folder
-    # 7) Make script for user and quarto
-    # 10) Execute fn to obtain R objets
-    # 11) Download
+    # 10) Make script for user and quarto
+    # 11) Run report
+    # 12) Download
     # -----------------------------------------
     # Theory
     # Reset
+    
+    # Module Extra - Theory ----------------------------------------------------
     module_extra_theory_server(id = "extra_theory")
-
+    # --------------------------------------------------------------------------
+    
+    # Initial values
     number_current_step  <- reactiveVal(1)
     APP_TOTEM <- reactiveValues()
-    
     STR_STEP_NAME <- "step"
     
     default_list_step <- list(
@@ -330,18 +326,28 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       "check_output" = FALSE,
       "button_state" = "initial")
 
-    # Button 01 - Import Dataset     
+    # --------------------------------------------------------------------------
     
-    
-    # Reset button -------------------------------------------------------------
+    # --------------------------------------------------------------------------
+
+    # Reset button 
     Sbutton_reset2_server(id = "reset2", number_current_step, default_list_button, 
                           internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR, internal_CFG,
                           internal_SETTINGS,
                           internal_PLAY)
+
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     
+    
+
     # List steps
     # Step 01) Initial ---------------------------------------------------------
-    module_step01_init_server(id = "step01", step_pos = 1, 
+    step01_id <- paste0(STR_STEP_NAME, "01")
+    module_step01_init_server(id = step01_id, step_pos = 1, 
+                              current_label = "Step 01 - Initial",     
+                              str_key = "initial",
                               number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM)
     
     # Step 02) Upload ----------------------------------------------------------
@@ -349,17 +355,26 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
                                 number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM)
     
     # Step 03) Dataset Selector ------------------------------------------------
+    ### Internal - dataset selector
     internal_DATASET_SELECTOR <- do.call(reactiveValues, default_list_button)
+    
+    ### Button and options - Data selector
     Sbutton_01_dataselector_server(id = "dataset_selector2", step_pos = 3, number_current_step, internal_DATASET_SELECTOR)
+    
+    ### Modulo - Data selector
     module_step03_import_dataset_server(id = "step03", step_pos = 3,
                                 number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM, internal_DATASET_SELECTOR)
 
 
     # Step 04) Tool Selector ---------------------------------------------------
+    ### Internal - Tools Selector
     internal_TOOLS_SELECTOR <- do.call(reactiveValues, default_list_button)
-    MY_SELECTED_TOOL <- reactiveVal(NULL)
+
+    ### Button and options - Tools selector
     Sbutton_02_tools_server(id = "tools_selector2", step_pos = 4, number_current_step, internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR)
-    # Observe - MY_SELECTED_TOOL()
+    
+    ### Reactive value for selected tool
+    MY_SELECTED_TOOL <- reactiveVal(NULL)
     observe({
       req(internal_TOOLS_SELECTOR, internal_TOOLS_SELECTOR)
       req(internal_TOOLS_SELECTOR$"check_output")
@@ -373,27 +388,39 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
       MY_SELECTED_TOOL(info_output$"selected_tool")
     })
+    
+    ### Modulo - Tools selector
     module_step04_tools_server(id = "step04", step_pos = 4,
                                         number_current_step, STR_STEP_NAME, default_list_step, APP_TOTEM, internal_TOOLS_SELECTOR)
     
+    
     # Step 05) CFG from selected tool ------------------------------------------
+    ### Internal - CFG
     internal_CFG <- do.call(reactiveValues, default_list_button)
+    
+    ### Modulo - CFG
     module_step05_cfg_server(id = "step05", step_pos = 5,
                            number_current_step, STR_STEP_NAME, default_list_step, 
                            APP_TOTEM, internal_TOOLS_SELECTOR, internal_CFG)
     
+    
     # Step 06) Settings --------------------------------------------------------
+    ### Internal - Settings
     internal_SETTINGS <- do.call(reactiveValues, default_list_button)
+    
+    ### Button and options - Settings
     Sbutton_03_settings_server(id = "settings", step_pos = 6, number_current_step, 
                                internal_DATASET_SELECTOR, internal_TOOLS_SELECTOR, 
                                internal_CFG, internal_SETTINGS)
     
+    ### Module - Settings
     module_step06_settings_server(id = "step06", step_pos = 6,
                                   number_current_step,
                                   STR_STEP_NAME, default_list_step,
                                   APP_TOTEM, internal_SETTINGS)
     
     # Step 07) Script ----------------------------------------------------------
+    ### Module - Script
     module_step07_script_server(id = "step07", step_pos = 7,
                                 number_current_step, 
                                 STR_STEP_NAME, default_list_step, 
@@ -401,24 +428,25 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
    
     
     # Step 08) Play ------------------------------------------------------------
+    ### Internal - Play
     internal_PLAY <- do.call(reactiveValues, default_list_button)
+    
+    ### Button and options - Play
     Sbutton_04_play_server(id = "play2", internal_DATASET_SELECTOR, 
                            internal_TOOLS_SELECTOR, internal_CFG,
                            internal_SETTINGS,
                            internal_PLAY, APP_TOTEM, number_current_step)
+    
+    ### Module - Play
     module_step08_play_server(id = "step08", step_pos = 8, number_current_step, 
                               STR_STEP_NAME, default_list_step, 
                               APP_TOTEM, internal_CFG, internal_PLAY)
-    # Step 09) Run R code ------------------------------------------------------
-    module_step09_run_Rcode_server(id = "step09", step_pos = 9, number_current_step,
-                              STR_STEP_NAME, default_list_step,
-                              APP_TOTEM, internal_DATASET_SELECTOR,
-                              internal_SETTINGS)
-    # Step 10) Download --------------------------------------------------------
-    module_step10_download_server(id = "step10", step_pos = 10, number_current_step,
-                                  STR_STEP_NAME, default_list_step,
-                                  APP_TOTEM, internal_TOOLS_SELECTOR,
-                                  internal_CFG, internal_PLAY)
+    
+    # # Step 9) Download --------------------------------------------------------
+    # module_step09_download_server(id = "step09", step_pos = 10, number_current_step,
+    #                               STR_STEP_NAME, default_list_step,
+    #                               APP_TOTEM, internal_TOOLS_SELECTOR,
+    #                               internal_CFG, internal_PLAY)
     
     # --------------------------------------------------------------------------
     # --------------------------------------------------------------------------
@@ -588,55 +616,6 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     })
     
 
-    # --------------------------------------------------------------------------
-    #04 - Crystal 04 - All outputs
-    output$"cy_04_output" <- renderUI({
-
- 
-      
-        the_list <- reactiveValuesToList(APP_TOTEM)
-        the_output <-  the_list[["step9"]]
-        resultados <- the_output$"pack_output"
-        
-        # Asignar salidas dinámicas
-        for (nombre in names(resultados)) {
-          if (startsWith(nombre, "plot")) {
-            local({
-              nm <- nombre
-              output[[nm]] <- plotly::renderPlotly({ resultados[[nm]]} )  # Corrección de cierre
-            })
-          } else {
-            local({
-              nm <- nombre
-              output[[nm]] <- renderPrint({ resultados[nm]} )
-            })
-          }
-        }
-        
-        ui_list <- list()
-        for (nombre in names(resultados)) {
-          new_ui <- c()
-          if (startsWith(nombre, "plot")) {
-            new_ui <- div(
-              HTML(paste0("<b><u>R plot object:</u></b> ", nombre)),
-              shinycssloaders::withSpinner(plotly::plotlyOutput(ns(nombre)))
-              )
-          } else {
-            new_ui <- div(
-              shinycssloaders::withSpinner(verbatimTextOutput(ns(nombre)))
-              )
-          }
-          
-          new_ui<- div(new_ui, hr())
-          
-          ui_list[[length(ui_list) + 1]] <- new_ui
-        }
-        do.call(tagList, ui_list)
-
-    })
-    # --------------------------------------------------------------------------
-    
-   
     ############################################################################
     ############################################################################
     ############################################################################
@@ -734,218 +713,166 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     })
     #---------------------------------------------------------------------------
     
-    # Card 03) output
-    crear_outputs_y_ui33 <- function(prefix, mis_valores_reactive, output, ns) {
+  
       
-      the_names <- names(mis_valores_reactive())
-      the_names <- na.omit(the_names)
-      # the_names <- the_names[1:10]
-      # Identifico plot y text
-      dt_plots <- grepl("^plot", the_names)
-      dt_text <- !dt_plots
+    # Card 03) Report
+    id_report01 <- "f01_report"
+    output$"card03_report" <- renderUI({
       
-      vector_render <- rep(NA, length(the_names))
-      vector_render[dt_plots] <- "plotly"
-      vector_render[dt_text] <- "text"
+      module_render_01_report_download_ui(id = ns(id_report01))
       
-      
-      # Crea los outputs en bucle, en ámbitos independientes para evitar sobrescrituras
-      for (i in seq_along(the_names)) {
-        id_output <- paste0(prefix, i)
-        obj_name <- the_names[i]
-        el_render <- vector_render[i]
-        
-        # Crear un ámbito local para que cada output sea independiente
-        local({
-          n <- i
-          id <- id_output
-          obj <- obj_name
-          
-          if(el_render == "text"){
-            output[[id]] <- renderPrint({
-              req(mis_valores_reactive())
-              mis_valores_reactive()[obj]
-            })
-          }
-          
-          # if(el_render == "plotly"){
-          #   output[[id]] <- plotly::plotly::renderPlotly({
-          #     req(mis_valores_reactive())
-          #     mis_valores_reactive()[[obj]]
-          #   })
-          # }
-          
-        })
-        
-      }
-      
-      # Crear UI dinámicamente
-      ui_list <- lapply(seq_along(the_names), function(i) {
-        id_output <- paste0(prefix, i)
-        el_render <- vector_render[i]
-        obj_name <- the_names[i]
-        
-        if(el_render == "text"){
-          list(
-            fluidRow(
-              #h4(list_objetos[[i]]$"title"),
-              verbatimTextOutput(ns(id_output)),
-              br()
-            )
-          )
-        }
-        # if(el_render == "plotly"){
-        #   list(
-        #     fluidRow(
-        #     HTML(paste0("<b><u>R plot object:</u></b> ", obj_name)),
-        #     #h4(list_objetos[[i]]$"title"),
-        #     plotly::plotlyOutput(ns(id_output)),
-        #     br()
-        #     )
-        #   )
-        # }
-        
-      })
-      
-      return(do.call(tagList, ui_list))
-    }
-    output$"card03_output" <- renderUI({
-      
-      
-      
-      if(FALSE){
-        the_list <- reactiveValuesToList(APP_TOTEM)
-        the_output <-  the_list[["step9"]]
-        resultados <- the_output$"pack_output"
-        
-        vector_opt <- names(resultados)
-        str_grepl  <- "^plot"
-        
-        list_groups <- fn_R_separate_vector2list_groups(vector_opt, str_grepl)
-        # Asignar salidas dinámicas
-        for (nombre in names(resultados)) {
-          if (startsWith(nombre, "plot")) {
-            local({
-              nm <- nombre
-              output[[nm]] <- plotly::renderPlotly({ resultados[[nm]]} )  # Corrección de cierre
-            })
-          } else {
-            local({
-              nm <- nombre
-              output[[nm]] <- renderPrint({ resultados[nm]} )
-            })
-          }
-        }
-        
-        ui_list <- list()
-        for (nombre in names(resultados)) {
-          new_ui <- c()
-          if (startsWith(nombre, "plot")) {
-            new_ui <- div(
-              HTML(paste0("<b><u>R plot object:</u></b> ", nombre)),
-              shinycssloaders::withSpinner(plotly::plotlyOutput(ns(nombre)))
-            )
-          } else {
-            new_ui <- div(
-              shinycssloaders::withSpinner(verbatimTextOutput(ns(nombre)))
-            )
-          }
-          
-          new_ui<- div(new_ui, hr())
-          
-          ui_list[[length(ui_list) + 1]] <- new_ui
-        }
-        do.call(tagList, ui_list)
-      }
-    })
-    #---------------------------------------------------------------------------
-    
-    # Card 04) Download
-    output$card04_download <- renderUI({
-    
-      # req(my_list_str_rv())
-      module_step10_download_ui(id=ns("step10"))
-    })
-
-    #---------------------------------------------------------------------------
-    
-    output$"experiment" <- renderUI({
-      
-      module_extra01_output_ui(id =ns("experiment"))
     })
     
-    module_extra01_output_server(id ="experiment", 
-                                 APP_TOTEM = APP_TOTEM, 
-                                 internal_TOOLS_SELECTOR = internal_TOOLS_SELECTOR)
-    ############################################################################
-    
-    module_step10_04_report_download_server(id ="f04_report", step_pos = 10, number_current_step, 
+    run_render01 <- reactiveVal(FALSE)
+    show_internal_modal01 <- reactive({FALSE})
+    ALL_DONE_report <- module_render_01_report_download_server(id = id_report01, step_pos = 9, number_current_step, 
                                             STR_STEP_NAME, default_list_step, 
                                             APP_TOTEM, internal_TOOLS_SELECTOR,
-                                            internal_CFG, internal_PLAY)
-    ############################################################################
-    if(FALSE){
+                                            internal_CFG, internal_PLAY, 
+                                            show_internal_modal = reactive(show_internal_modal01()), 
+                                            run_render = reactive(run_render01()))
     
     
- 
-  
-    
-    
-   
- 
-    ############################################################################
-    
-    THE_MODAL <- reactiveVal(NULL)
-    
-    observeEvent(THE_MODAL(),{
-      
-      if(THE_MODAL()){
-       
-      }
-      
-      if(!THE_MODAL()){
-        shinyjs::delay(2000, {
-          removeModal()
-        })
-        THE_MODAL(NULL)
-      }
-      
-    })
-    
-   
-    showModal(
-      modalDialog(
-        id = "miModalEspecifico2",  # Asignar un ID al modal
-        title = "Processing R code file...",
-        # Definición CSS de la animación incluida directamente
-        tags$head(
-          tags$style("
+    #---------------------------------------------------------------------------
+    # Clic en play
+    # Abrir modal
+    # run_render
+    # Confirm file exists
+    # Close modal
+    #---------------------------------------------------------------------------
+    fn_my_modal <- function(){
+      showModal(
+        modalDialog(
+          id = "miModalEspecifico2",  # Asignar un ID al modal
+          title = "Processing R code file...",
+          # Definición CSS de la animación incluida directamente
+          tags$head(
+            tags$style("
             @keyframes spin {
               0% { transform: rotate(0deg); }
               100% { transform: rotate(360deg); }
             }
           ")
-        ),
-        tags$div(
-          style = "text-align: center;",
-          tags$div(
-            class = "spinner",
-            style = "border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto;"
           ),
-          tags$p("This may take a few moments. Please wait.")
-        ),
-        footer = NULL,  # No incluir botones en el modal
-        easyClose = FALSE  # Evitar que el usuario cierre el modal manualmente
+          tags$div(
+            style = "text-align: center;",
+            tags$div(
+              class = "spinner",
+              style = "border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto;"
+            ),
+            tags$p("This may take a few moments. Please wait.")
+          ),
+          footer = NULL,  # No incluir botones en el modal
+          easyClose = FALSE  # Evitar que el usuario cierre el modal manualmente
+        )
       )
-    )
-   
+    }
+    SHOW_MODAL <- reactiveVal(NULL)
+    observeEvent(SHOW_MODAL(),{
+      
+      if(SHOW_MODAL()){
+        # Mostrar el modal de carga
+        # Mostrar el modal de carga con un spinner
+        
+      }
+      
+      if(!SHOW_MODAL()){
+        shinyjs::delay(2000, {
+          removeModal()
+        })
+        SHOW_MODAL(NULL)
+      }
+      
+    })
+    #---------------------------------------------------------------------------
     
+    sss <- reactiveVal(0)
+    play_activado <- reactive({
+      my_list <- reactiveValuesToList(internal_PLAY)
+      my_list$"check_output"
+    })
     
+    #---------------------------------------------------------------------------
     
-    ############################################################################
 
     
+    observe({
+      if(sss() == 0){
+        if(play_activado()) sss(sss()+1)
+      }
+      
+      if(sss() == 1){
+        if(is.null(SHOW_MODAL())){
+          # SHOW_MODAL(TRUE)
+          updateTabsetPanel(session, "mynav", selected = "report") 
+          
+          sss(sss()+1)
+          
+      }
+        }
+
+      
+      if(sss() == 2){
+        req(!run_render01())
+        if(!run_render01()){ 
+          fn_my_modal()
+            run_render01(TRUE)
+         
+          sss(sss()+1)
+        }
+      }
+      
+      if(sss() == 3){
+        req(ALL_DONE_report())
+        if(ALL_DONE_report()){ 
+          
+          sss(sss()+1)
+        }
+      }
+      
+      if(sss() == 4){
+          SHOW_MODAL(FALSE)
+          sss(sss()+1)
+      }
+      
+    })    
+
+    #---------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
+    
+    id_report02 <- "f02_report"
+    output$"card04_script" <- renderUI({
+
+      module_render_02_script_download_ui(id = ns(id_report02))
+
+    })
+    
+    run_render02 <- reactiveVal(FALSE)
+    show_internal_modal02 <- reactive({TRUE})
+    ALL_DONE_report02 <- module_render_02_script_download_server(id = id_report02, step_pos = 9, number_current_step,
+                                                               STR_STEP_NAME, default_list_step,
+                                                               APP_TOTEM, internal_TOOLS_SELECTOR,
+                                                               internal_CFG, internal_PLAY,
+                                                               show_internal_modal = reactive(show_internal_modal02()),
+                                                               run_render = reactive(run_render02()))
+    #---------------------------------------------------------------------------
+
+
+    
+    #---------------------------------------------------------------------------
+    if(FALSE){
+    # Card 04) Download
+    output$card04_download <- renderUI({
+    
+      # req(my_list_str_rv())
+      module_step09_download_ui(id=ns("step09"))
+    })
+
     }
+    #---------------------------------------------------------------------------
+
     
   })
 }

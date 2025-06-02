@@ -6,7 +6,7 @@ module_step01_init_ui <- function(id) {
 }
 
 #' @export
-module_step01_init_server <- function(id, step_pos, number_current_step, 
+module_step01_init_server <- function(id, step_pos, current_label, str_key, number_current_step, 
                                       STR_STEP_NAME, default_list_step, APP_TOTEM) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
@@ -17,7 +17,7 @@ module_step01_init_server <- function(id, step_pos, number_current_step,
       req(number_current_step() == step_pos)
       
       # Hardcoded --------------------------------------------------------------
-      current_label <- "Step 01 - Initial"
+
       current_step <- number_current_step()
       # print(paste0("Adentro del: ", current_label))
       
@@ -29,12 +29,12 @@ module_step01_init_server <- function(id, step_pos, number_current_step,
       new_list_step <- default_list_step
       new_list_step$"current_step"   <- current_step
       new_list_step$"current_label"  <- current_label
-      new_list_step$"key"        <- "initial"#sys.function()
+      new_list_step$"key"            <- str_key
       new_list_step$"check_previous" <- TRUE
       new_list_step$"pack_output"    <- "Good Luck!"
       new_list_step$"check_output"   <- TRUE
       new_list_step$"button_state"   <- "confirmed"
-      new_list_step$"the_time"           <- fn_R_the_time_beauty()
+      new_list_step$"the_time"       <- fn_R_the_time_beauty()
       new_list_step$"error_message"  <- ""
       
 

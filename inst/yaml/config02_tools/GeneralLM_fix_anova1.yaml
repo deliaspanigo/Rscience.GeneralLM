@@ -18,24 +18,19 @@ config:
     file01:
       on_work_folder: TRUE
       show_render: TRUE
-      file_name_work: "file01_Rscript_GeneralLM_fix_anova1.R"
-      file_name_delivery: "file01_Rscript_GeneralLM_fix_anova1.R"
+      file_name_work: "file01_report_GeneralLM_fix_anova1.qmd"
+      file_name_delivery: "file01_report_GeneralLM_fix_anova1.html"
     file02:
       on_work_folder: TRUE
       show_render: TRUE
-      file_name_work: "file02_RLong_GeneralLM_fix_anova1.qmd"
-      file_name_delivery: "file02_RLong_GeneralLM_fix_anova1.html"
+      file_name_work: "file02_Rscript_GeneralLM_fix_anova1.R"
+      file_name_delivery: "file02_Rscript_GeneralLM_fix_anova1.R"
     file03:
       on_work_folder: TRUE
       show_render: TRUE
-      file_name_work: "file03_report_GeneralLM_fix_anova1.qmd"
-      file_name_delivery: "file03_report_GeneralLM_fix_anova1.html"
-    file04:
-      on_work_folder: TRUE
-      show_render: TRUE
-      file_name_work: "file04_report_GeneralLM_fix_anova1.qmd"
-      file_name_delivery: "file04_report_GeneralLM_fix_anova1.html"
-  version: "1.0.0"
-  date_version: "2025-05-24"
+      file_name_work: "file03_RLong_GeneralLM_fix_anova1.qmd"
+      file_name_delivery: "file03_RLong_GeneralLM_fix_anova1.html"
+  version: "1.0.1"
+  date_version: "2025-06-03"
     
   
