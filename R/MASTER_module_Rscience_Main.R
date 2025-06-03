@@ -152,7 +152,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     # Muestra "input" o "output" según el estado del toggle
     output$toggle_state <- renderUI({
-      the_selection <- ifelse(test = input$toggle, yes = "output", no = "input")
+      the_selection <- ifelse(test = input$toggle, yes = "HELP!", no = "input")
       span(the_selection, class = "fw-bold")
     })
     
