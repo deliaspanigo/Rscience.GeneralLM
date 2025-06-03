@@ -1,0 +1,61 @@
+/* Fondo y estilo general del cuerpo */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f8f9fa;
+  color: #2C3E50;
+  line-height: 1.6;
+  padding: 20px 40px;
+}
+
+/* Encabezados */
+h1, h2, h3 {
+  color: #34495E;
+}
+
+/* Cajas de contenido con sombra y borde refinado */
+.box-modelo, .box-grafico, .box-interpretacion {
+  background: #ffffff;
+  padding: 20px 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+  border-left: 6px solid #2980B9;
+  transition: transform 0.3s ease;
+}
+
+.box-modelo:hover, .box-grafico:hover, .box-interpretacion:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.15);
+}
+
+/* Código inline, con fondo suave y tipografía moderna */
+code {
+  background: #dfe6e9; /* gris suave claro */
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #d35400;
+  font-weight: 600;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.95em;
+}
+
+/* Bloques de código (pre) con fondo elegante y contraste elevado */
+pre {
+  background: #2c3e50; /* fondo oscuro */
+  color: #ecf0f1; /* texto claro */
+  border-radius: 8px;
+  padding: 15px;
+  overflow-x: auto;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.95em;
+  border: 1px solid #34495e; /* borde sutil en el mismo tono que fondo */
+}
+
+/* Estilo para salidas o divs específicos, si quieres un fondo distinto para resultados */
+.output-box {
+  background: #fef3e0; /* tono cálido suave */
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  margin-top: 10px;
+}

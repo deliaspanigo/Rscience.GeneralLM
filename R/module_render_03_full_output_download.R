@@ -11,6 +11,11 @@ module_render_03_full_output_download_ui <- function(id) {
         });
       ")))
     ),
+    tags$script(HTML("
+        Shiny.addCustomMessageHandler('show_RCode', function(message) {
+          window.open(message.url, '_blank');
+        });
+      ")),
     uiOutput(ns("set01_RCode")),
     htmlOutput(ns("visual_RLong"))
     
@@ -373,6 +378,33 @@ module_render_03_full_output_download_server <- function(id, step_pos, number_cu
       if(show_internal_modal()){
         THE_MODAL_RCODE(FALSE)
       }
+      
+      
+    })
+    
+    
+    ###-------------------------------------------------------------------------
+    active_page <- reactiveVal(0)
+    observeEvent(input$"show_RCode", {
+      print("CLIC")
+      active_page(active_page()+1)
+    })
+    
+    observeEvent(active_page(),{
+      
+      req(sub_step() >= 2)
+      file_path_delivery <- internal_01_FILE_RCODE[["file_path_delivery"]]
+      
+      
+      file_name_html <- basename(file_path_delivery)
+      dir_temp <- dirname(file_path_delivery)
+      
+      
+      # check_file_RReport()
+      addResourcePath(prefix = "super_delivery_folder", directoryPath = dir_temp)
+      my_local_file <- file.path("super_delivery_folder", file_name_html)
+      
+      session$sendCustomMessage("show_RCode", list(url = my_local_file))
       
       
     })

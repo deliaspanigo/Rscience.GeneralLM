@@ -20,6 +20,29 @@ params:
   alpha_value: NULL
 ---
 
+<br>
+<br>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var title = document.querySelector('h1.title');
+  var author = document.querySelector('.author');
+  var date = document.querySelector('.date');
+  
+  title.style.display = 'none';
+  author.style.display = 'none';
+  date.style.display = 'none';
+});
+</script>
+
+<div style="display: flex; justify-content: center; gap: 10px;">
+  <img src="logo_01_unc_master.png" alt="Imagen 1" style="height: 100px;">
+  <img src="logo_02_fcefyn_master.png" alt="Imagen 2" style="height: 100px;">
+  <img src="logo_03_efadoc_master.png" alt="Imagen 3" style="height: 100px;">
+  <img src="logo_04_rscience_master.png" alt="Imagen 4" style="height: 100px;">
+</div>
+<div style="font-size:30px; font-weight: bold; text-decoration: underline;"> Report - Anova 1 Way - Fixed Model - General Linear Models</div>
+
+
 ```{r}
 #| label: code
 #| warning: false

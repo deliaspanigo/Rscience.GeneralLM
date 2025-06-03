@@ -9,7 +9,12 @@ module_render_01_report_download_ui <- function(id) {
         $(document).on('click', '#", ns("download_RCode"), "', function() {
           Shiny.setInputValue('", ns("clic_descarga"), "', true);
         });
-      ")))
+      "))),
+      tags$script(HTML("
+        Shiny.addCustomMessageHandler('show_RCode', function(message) {
+          window.open(message.url, '_blank');
+        });
+      "))
     ),
     uiOutput(ns("set01_RCode")),
     htmlOutput(ns("visual_RLong"))
@@ -143,7 +148,7 @@ module_render_01_report_download_server <- function(id, step_pos, number_current
                             label = NULL, 
                             icon = icon("play", class = "fa-2x"),
                             class = btn_class_render),
-               actionButton(ns("show_RCode"), 
+               actionButton(inputId = ns("show_RCode"), 
                             label = NULL,
                             icon = icon("binoculars", class = "fa-2x"),  # Cambiado a un ojo grande
                             class = "btn-info",
@@ -342,15 +347,15 @@ module_render_01_report_download_server <- function(id, step_pos, number_current
       
       my_bag02 <- reactiveValuesToList(APP_TOTEM)[["step6"]]$"pack_output"
       vector_all_names <- names(my_bag02)
-      print(vector_all_names)
-      print(vector_fn_param_names)
+      # print(vector_all_names)
+      # print(vector_fn_param_names)
       vector_pos <- na.omit(match(vector_fn_param_names, vector_all_names))
       vector_selection <- vector_all_names[vector_pos]
-      print(vector_selection)
+      # print(vector_selection)
       my_bag02 <- my_bag02[vector_selection]
 
       my_bag <- append(my_bag01, my_bag02)
-      print(my_bag)
+      # print(my_bag)
       
       quarto::quarto_render(input = file_name_work, 
                             output_file = file_name_delivery,
@@ -394,6 +399,31 @@ module_render_01_report_download_server <- function(id, step_pos, number_current
       
     })
     
+    
+    active_page <- reactiveVal(0)
+    observeEvent(input$"show_RCode", {
+      print("CLIC")
+      active_page(active_page()+1)
+    })
+    
+    observeEvent(active_page(),{
+      
+      req(sub_step() >= 2)
+      file_path_delivery <- internal_01_FILE_RCODE[["file_path_delivery"]]
+     
+      
+      file_name_html <- basename(file_path_delivery)
+      dir_temp <- dirname(file_path_delivery)
+      
+      
+      # check_file_RReport()
+      addResourcePath(prefix = "super_delivery_folder", directoryPath = dir_temp)
+      my_local_file <- file.path("super_delivery_folder", file_name_html)
+      
+      session$sendCustomMessage("show_RCode", list(url = my_local_file))
+      
+   
+    })
     ###-------------------------------------------------------------------------
     observe({
       req(sub_step() == 3)
@@ -469,7 +499,7 @@ module_render_01_report_download_server <- function(id, step_pos, number_current
       #   height = "800px",
       #   frameborder = 0
       # )
-      armado_v <- paste('<div style="height: 100%; width: 100%; overflow: hidden;"><iframe style="height: 5000vh; width:100%; border: none;" src="', my_local_file, '"></iframe></div>', sep = "")
+      armado_v <- paste('<div style="height: 100%; width: 100%; overflow: hidden;"><iframe style="height: 750vh; width:100%; border: none;" src="', my_local_file, '"></iframe></div>', sep = "")
       
       return(armado_v)
     })

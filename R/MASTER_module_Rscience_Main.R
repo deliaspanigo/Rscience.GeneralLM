@@ -16,7 +16,7 @@ MASTER_module_Rscience_Main_ui <- function(id) {
   ),
   # Contenedor que ocupa toda la ventana
   div(
-    style = "height: 100vh; display: flex; flex-direction: column;",
+    style = "height: 100vh; display: flex; flex-direction: column; overflow-y: hidden;",
     # La tarjeta ocupa todo el espacio disponible
 
       layout_sidebar(
@@ -43,9 +43,9 @@ MASTER_module_Rscience_Main_ui <- function(id) {
         ),
         # Resto del layout. Para que ocupe todo el espacio, también usa flex y height
         div(
-          style = "margin-top: 5px; flex: 1; display: flex; flex-direction: column;",
+          style = "overflow-y: hidden; margin-top: 5px; flex: 1; display: flex; flex-direction: column; height: 100vh",
           div(
-            style = "flex: 1; display: flex; flex-direction: column;",
+            style = "overflow-y: hidden; flex: 1; display: flex; flex-direction: column;",
             # Estos contenidos ahora llenan el espacio restante
             conditionalPanel(
               condition = "input.toggle == false",
@@ -248,27 +248,27 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         id = ns("mynav"),  # Con ns() porque estás en un módulo
         height = "100%",  # Especificar altura explícitamente
         
-        bslib::nav_panel(title = "cy_01_totem",
-                         uiOutput(ns("cy_01_totem"))
-        ),
-        bslib::nav_panel(title = "cy_02_internal",
-                         uiOutput(ns("cy_02_internal"))
-        ),
-        bslib::nav_panel(title = "cy_03_temp",
-                         uiOutput(ns("cy_03_temp"))
-        ),
+        # bslib::nav_panel(title = "cy_01_totem",
+        #                  uiOutput(ns("cy_01_totem"))
+        # ),
+        # bslib::nav_panel(title = "cy_02_internal",
+        #                  uiOutput(ns("cy_02_internal"))
+        # ),
+        # bslib::nav_panel(title = "cy_03_temp",
+        #                  uiOutput(ns("cy_03_temp"))
+        # ),
         bslib::nav_panel(title = "user_selection",
                          uiOutput(ns("card01_user_selection"))
         ),
         bslib::nav_panel(title = "dataset",
                          uiOutput(ns("card02_dataset"))
         ),
-        bslib::nav_panel(title = "theory",
-                         module_extra_theory_ui(id = ns("extra_theory"))
-        ),
-        bslib::nav_panel(title = "download",
-                         uiOutput(ns("card04_download"))
-        ),
+        # bslib::nav_panel(title = "theory",
+        #                  module_extra_theory_ui(id = ns("extra_theory"))
+        # ),
+        # bslib::nav_panel(title = "download",
+        #                  uiOutput(ns("card04_download"))
+        # ),
         bslib::nav_panel(title = "report",
                          uiOutput(ns("card03_report"))
         ),
