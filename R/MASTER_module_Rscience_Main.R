@@ -22,7 +22,7 @@ MASTER_module_Rscience_Main_ui <- function(id) {
       layout_sidebar(
         sidebar = sidebar(
           id = "sidebar_izquierdo",
-          title = "Main menu",
+          title = h1("Main menu", style = "font-weight: bold;"),
           open = "open",
           div(
             style = "overflow-y: auto; padding-right: 10px; height: 100%;",
@@ -244,7 +244,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
 
       bslib::navset_card_tab(
-        title = "R for Science",
+        title = h1("R for science", style = "font-weight: bold;"),
         id = ns("mynav"),  # Con ns() porque estás en un módulo
         height = "100%",  # Especificar altura explícitamente
         
