@@ -386,7 +386,7 @@ module_render_03_full_output_download_server <- function(id, step_pos, number_cu
     ###-------------------------------------------------------------------------
     active_page <- reactiveVal(0)
     observeEvent(input$"show_RCode", {
-      print("CLIC")
+      # print("CLIC")
       active_page(active_page()+1)
     })
     
