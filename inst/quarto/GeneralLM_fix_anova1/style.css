@@ -1,10 +1,10 @@
 /* Fondo y estilo general del cuerpo */
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f8f9fa;
-  color: #2C3E50;
-  line-height: 1.6;
-  padding: 20px 40px;
+  font-family: 'Arial', 'Helvetica Neue', Helvetica, sans-serif; /* Fuentes alternativas */
+  background-color: #eaeaea; /* Color de fondo más suave */
+  color: #333333; /* Texto en gris oscuro en lugar de negro */
+  line-height: 1.5; /* Línea un poco más ajustada */
+  padding: 15px 30px; /* Menos padding para un espacio más compacto */
 }
 
 /* Encabezados */
