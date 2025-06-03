@@ -105,6 +105,7 @@ module_render_01_report_download_server <- function(id, step_pos, number_current
         THE_CAPSULE$"folder_path_delivery" = APP_TOTEM[["step8"]]$"pack_output"$"path_folder_output"
         THE_CAPSULE$"Rcode_quarto"  = APP_TOTEM[["step7"]]$"pack_output"$"Rcode_quarto"
         THE_CAPSULE$"Rcode_script"  = APP_TOTEM[["step7"]]$"pack_output"$"Rcode_script"
+        THE_CAPSULE$"Rcode_fn_name"  = paste0(internal_CFG$"pack_output"$"id", "_RCode")
       })
       
       
@@ -330,9 +331,30 @@ module_render_01_report_download_server <- function(id, step_pos, number_current
       my_temporal_folder <- folder_path_work
       setwd(my_temporal_folder)
       
+      Rcode_fn_name <- THE_CAPSULE$"Rcode_fn_name"
+      vector_fn_param_names <- formalArgs(Rcode_fn_name)
+      
+      # Bolsa 01 - El database
+      my_bag01 <- list()
+      my_bag01[["database"]] <- reactiveValuesToList(APP_TOTEM)[["step3"]]$"pack_output"$"database"
+      
+      # Bolsa 02 - El resto
+      
+      my_bag02 <- reactiveValuesToList(APP_TOTEM)[["step6"]]$"pack_output"
+      vector_all_names <- names(my_bag02)
+      print(vector_all_names)
+      print(vector_fn_param_names)
+      vector_pos <- na.omit(match(vector_fn_param_names, vector_all_names))
+      vector_selection <- vector_all_names[vector_pos]
+      print(vector_selection)
+      my_bag02 <- my_bag02[vector_selection]
+
+      my_bag <- append(my_bag01, my_bag02)
+      print(my_bag)
       
       quarto::quarto_render(input = file_name_work, 
                             output_file = file_name_delivery,
+                            execute_params = my_bag,
                             quiet = FALSE)
       
       message(crayon::green("Process completed!"))
