@@ -1307,7 +1307,8 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   ._result_list <- mget(._obj_to_keep)
 
   # #._ Intentar ordenamiento por aparicion
-  # ._vector_orden <- fn_R_obj_name_in_order_from_fn(sys.function())
+  ._vector_orden <- fn_R_obj_name_in_order_from_fn(sys.function())
+  ._result_list <- ._result_list[._vector_orden]
   # check_all <- identical(sort(._vector_orden), sort(._obj_to_keep))
   # print(check_all)
   # 
