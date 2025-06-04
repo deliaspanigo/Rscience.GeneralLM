@@ -43,7 +43,7 @@ GeneralLM_fix_anova1_MM_settings_server <- function(id, my_dataset) {
         ns("var_name_rv"),
         "Response variable:",
         choices = choices,
-        selected = choices[2]
+        selected = choices[1]
         # selected = if (length(choices) > 0) choices[1] else NULL
       )
     })
@@ -58,7 +58,7 @@ GeneralLM_fix_anova1_MM_settings_server <- function(id, my_dataset) {
         ns("var_name_factor"),
         "Factor:",
         choices = choices,
-        selected = choices[3]
+        selected = choices[1]
         # selected = if (length(choices) > 0) choices[1] else NULL
       )
     })
