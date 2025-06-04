@@ -771,6 +771,37 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
         )
       )
     }
+    #---------------------------------------------------------------------------
+    
+    fn_my_modal01 <- function(){
+      showModal(
+        div(
+        tags$head(
+          tags$style(
+            HTML("
+        .blue-icon {
+          color: blue;
+        }
+        .green-icon {
+          color: green;
+        }
+      ")
+          )
+        ),
+        modalDialog(
+          title = "Proceso",
+          "Anova 1 Way - Fixed Model - General Linear Models",
+          tags$ul(
+            tags$li(span(id = "line1_icon", icon("spinner", class = "fas fa-spinner fa-spin blue-icon fa-2x")), " R script"),
+            tags$li(span(id = "line2_icon", icon("spinner", class = "fas fa-spinner fa-spin blue-icon fa-2x")), " Plots: 20"),
+            tags$li(span(id = "line3_icon", icon("spinner", class = "fas fa-spinner fa-spin blue-icon fa-2x")), " Test: 4"),
+            tags$li(span(id = "line4_icon", icon("spinner", class = "fas fa-spinner fa-spin blue-icon fa-2x")), " Auto Analysis")
+          ),
+          footer = modalButton("Cerrar") # Agrega un botón para cerrar el modal
+        )
+        )
+      )
+    }
     SHOW_MODAL <- reactiveVal(NULL)
     observeEvent(SHOW_MODAL(),{
       
@@ -819,7 +850,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       if(sss() == 2){
         req(!run_render01())
         if(!run_render01()){ 
-          fn_my_modal()
+          fn_my_modal01()
             run_render01(TRUE)
          
           sss(sss()+1)
@@ -835,6 +866,24 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       }
       
       if(sss() == 4){
+        # JavaScript para cambiar los iconos después de 3 segundos
+        runjs('
+      setTimeout(function() {
+        $("#line1_icon").html("<i class=\\"fas fa-check-circle green-icon fa-2x\\"></i>");
+      }); // 2 segundos
+
+      setTimeout(function() {
+        $("#line2_icon").html("<i class=\\"fas fa-check-circle green-icon fa-2x\\"></i>");
+      }); // 6 segundos
+
+      setTimeout(function() {
+        $("#line3_icon").html("<i class=\\"fas fa-check-circle green-icon fa-2x\\"></i>");
+      }); // 9 segundos
+      
+        setTimeout(function() {
+        $("#line4_icon").html("<i class=\\"fas fa-check-circle green-icon fa-2x\\"></i>");
+      }); // 9 segundos
+    ')
           SHOW_MODAL(FALSE)
           sss(sss()+1)
       }
