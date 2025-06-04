@@ -35,8 +35,11 @@ GeneralLM_fix_anova1_MM_settings_server <- function(id, my_dataset) {
     
     # Generar UI para el selector de variable respuesta
     output$rv_selector <- renderUI({
+      req(my_dataset)
       ns <- session$ns
-      choices <- names(my_dataset)
+      choices <- colnames(my_dataset)
+      names(choices) <- paste0("(", openxlsx::int2col(1:length(choices)), ") - ", choices)
+      # names(choices) <- paste0(choices - "(", openxlsx::int2col(1:length(choices)), ")")
       choices <- c("Select one..." = "", choices)
       
       selectInput(
@@ -51,7 +54,9 @@ GeneralLM_fix_anova1_MM_settings_server <- function(id, my_dataset) {
     # Generar UI para el selector de factor
     output$factor_selector <- renderUI({
       ns <- session$ns
-      choices <- names(my_dataset)
+      
+      choices <- colnames(my_dataset)
+      names(choices) <- paste0("(", openxlsx::int2col(1:length(choices)), ") - ", choices)
       choices <- c("Select one..." = "", choices)
       
       selectInput(
