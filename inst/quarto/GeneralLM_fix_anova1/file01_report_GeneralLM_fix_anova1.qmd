@@ -98,5 +98,5 @@ my_super_list <- Rscience.GeneralLM::GeneralLM_fix_anova1_RCode(database = datab
 {{< include file00_06_R_summary.qmd >}}
 
 <!-- End TabPanel -->
-:::
+
 
