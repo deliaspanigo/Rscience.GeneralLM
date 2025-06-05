@@ -3,6 +3,8 @@ module_render_01_report_download_ui <- function(id) {
   ns <- NS(id)
   
   div(
+    style = "height: 100vh; width: 100%; overflow: hidden;", # Asegurar que el contenedor tenga altura suficiente
+    
     # Agregar el código JavaScript
     tags$head(
       tags$script(HTML(paste0("
@@ -15,10 +17,14 @@ module_render_01_report_download_ui <- function(id) {
           window.open(message.url, '_blank');
         });
       "))
+      
     ),
     uiOutput(ns("set01_RCode")),
+    div(
+      style = "height: 100vh; width: 100%; overflow: hidden;", # Asegurar que el contenedor tenga altura suficiente
+      
     htmlOutput(ns("visual_RLong"))
-    
+    )
     
   )
 }
@@ -499,7 +505,10 @@ module_render_01_report_download_server <- function(id, step_pos, number_current
       #   height = "800px",
       #   frameborder = 0
       # )
-      armado_v <- paste('<div style="height: 100%; width: 100%; overflow: hidden;"><iframe style="height: 750vh; width:100%; border: none;" src="', my_local_file, '"></iframe></div>', sep = "")
+      # armado_v <- paste('<div style="height: 100%; width: 100%; overflow: hidden;"><iframe style="height: 750vh; width:100%; border: none;" src="', my_local_file, '"></iframe></div>', sep = "")
+      # armado_v <- paste('<div style="min-height: 100%; width: 100%; overflow: hidden;"><iframe style="min-height: 100%; width:100%; border: none;" src="', my_local_file, '"></iframe></div>', sep = "")
+       # armado_v <- paste('<div style="height: 100vh; width: 100%; overflow: hidden;"><iframe style="width:100%; border: none;" src="', my_local_file, '" onload="onIframeLoad(this)"></iframe></div>', sep = "")
+      armado_v <- paste('<div style="height: 85%; width: 100%; "><iframe style="height: 85%; width:100%; border: none;" src="', my_local_file, '"></iframe></div>', sep = "")
       
       return(armado_v)
     })

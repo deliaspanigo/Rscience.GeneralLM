@@ -43,9 +43,8 @@ MASTER_module_Rscience_Main_ui <- function(id) {
         ),
         # Resto del layout. Para que ocupe todo el espacio, también usa flex y height
         div(
-          style = "overflow-y: hidden; margin-top: 5px; flex: 1; display: flex; flex-direction: column; height: 100vh",
-          div(
-            style = "overflow-y: hidden; flex: 1; display: flex; flex-direction: column;",
+          # style = "overflow-y: hidden; margin-top: 5px; flex: 1; display: flex; flex-direction: column; min-height: 100%",
+          style = "overflow-y: hidden; flex: 1; display: flex; flex-direction: column; min-height: 100%;",
             # Estos contenidos ahora llenan el espacio restante
             conditionalPanel(
               condition = "input.toggle == false",
@@ -59,7 +58,7 @@ MASTER_module_Rscience_Main_ui <- function(id) {
               uiOutput(ns("soft_visual_output22"))
             )
           )
-        )
+        
       )
     
   )
@@ -627,15 +626,15 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     # Card 01) User selection
     output$card01_user_selection <- renderUI({
       div(
-        style = "height: 100%; display: flex;",  # Altura del contenedor (100% del contenedor padre)
+        style = "display: flex;",  # Altura del contenedor (100% del contenedor padre)
         div(
-          style = "flex: 1 1 50%; max-width: 50%; padding: 10px; box-sizing: border-box; height: 100%;",  # Altura del 100%
+          style = "flex: 1 1 50%; max-width: 50%; padding: 10px; box-sizing: border-box;",  # Altura del 100%
           uiOutput(ns("tarjeta01_dataset")),
           uiOutput(ns("agregado_tools")),
           uiOutput(ns("tarjeta02_tools"))
         ),
         div(
-          style = "flex: 1 1 50%; max-width: 50%; height: 100%; overflow-y: auto; padding: 10px; box-sizing: border-box;",  # Altura del 100%
+          style = "flex: 1 1 50%; max-width: 50%; ; padding: 10px; box-sizing: border-box;",  # Altura del 100%
           uiOutput(ns("tarjeta03_vars"))
         )
       )
