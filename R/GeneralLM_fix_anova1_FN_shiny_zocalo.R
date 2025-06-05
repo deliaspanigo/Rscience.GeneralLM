@@ -6,8 +6,8 @@ GeneralLM_fix_anova1_FN_shiny_zocalo <- function(internal_VARIABLE_SELECTOR){
   
   # print(info_output)
   
-  value_factor <- info_VS$"factor"
-  value_rv <-     info_VS$"respuesta"
+  value_factor <- info_VS$"var_name_factor"
+  value_rv <-     info_VS$"var_name_rv"
   vector_selected_vars <- info_VS$"vector_selected_vars"
   new_ncol <-  info_VS$"ncol_minidataset"
   new_nrow <-  info_VS$"nrow_minidataset"
