@@ -366,7 +366,7 @@ module_render_01_report_download_server <- function(id, step_pos, number_current
       quarto::quarto_render(input = file_name_work, 
                             output_file = file_name_delivery,
                             execute_params = my_bag,
-                            quiet = TRUE)
+                            quiet = FALSE)
       
       message(crayon::green("Process completed!"))
       message("")

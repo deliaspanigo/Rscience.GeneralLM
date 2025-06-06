@@ -7,22 +7,12 @@ vector_obj <- c("test_residuals_normality")
 my_super_list[vector_obj]
 ```
 
-# 2) Requeriment - Homogeneity test - Residuals
+# 2) Requeriment - Homogeneity visual evaluation - Residuals
 ```{r}
 #| warning: false
 #| echo: false
 
-vector_obj <- c("test_residuals_homogeneity")
-my_super_list[vector_obj]
+vector_obj <- c("plot002")
+my_super_list[[vector_obj]]
 ```
-
-# 3) Estimated variances - Residuals
-```{r}
-#| warning: false
-#| echo: false
-
-vector_obj <- c("df_model_error", "df_raw_error", "phrase_info_errors")
-my_super_list[vector_obj]
-```
-
 

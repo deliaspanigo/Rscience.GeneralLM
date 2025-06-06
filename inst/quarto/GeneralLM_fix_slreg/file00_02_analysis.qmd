@@ -7,42 +7,40 @@ vector_obj <- c("df_selected_vars")
 my_super_list[vector_obj]
 ```
 
-# 2) Summary Factor
+# 2) Linear Regresion - Table
 ```{r}
 #| warning: false
 #| echo: false
 
-vector_obj <- c("df_factor_info", 
-                "check_unbalanced_reps", 
-                "phrase_selected_check_unbalanced")
+vector_obj <- c("df_table_reg")
 my_super_list[vector_obj]
 ```
 
-# 3) Anova 1 way - Table
+# 3) R^2 and Ajusted R^2
 ```{r}
 #| warning: false
 #| echo: false
 
-vector_obj <- c("df_table_anova")
+vector_obj <- c("df_table_det_coef")
 my_super_list[vector_obj]
 ```
 
-# 4) Multiple comparation test (Tukey)
+# 4) Position
 ```{r}
 #| warning: false
 #| echo: false
 
-vector_obj <- c("df_tukey_table")
+vector_obj <- c("df_position")
 my_super_list[vector_obj]
 ```
 
 
-# 5) Model Error
+# 5) Dispersion
 ```{r}
 #| warning: false
 #| echo: false
 
-vector_obj <- c("df_model_error")
+vector_obj <- c("df_dispersion")
 my_super_list[vector_obj]
 ```
 
