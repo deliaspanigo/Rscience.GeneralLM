@@ -148,7 +148,7 @@ Sbutton_01_dataselector_server <- function(id, step_pos, number_current_step, in
       # 3) Cerrar el modal
       # Verificar que se haya seleccionado un dataset primero
       # print(my_info_dataset())
-      if (is.null(my_info_dataset()$"database")) {
+      if (is.null(my_info_dataset()$"my_dataset")) {
         # print(my_info_dataset())
         showNotification(
           "Please, select a dataset.",

@@ -1,6 +1,6 @@
 
 #' @export
-GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, alpha_value){
+GeneralLM_fix_anova1_RCode <- function(my_dataset, var_name_factor, var_name_rv, alpha_value){
   
   ### INIT CODE ###
   # # # # # Section 01 - Libraries ---------------------------------------------
@@ -13,8 +13,8 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   library("plotly")    # Advanced graphical functions
   
   # # # # # Section 02 - Import dataset ----------------------------------------
-  #---database <- _A_my_import_sentence_A_
-  head(x = database, n = 5)
+  #---my_dataset <- _A_my_import_sentence_A_
+  head(x = my_dataset, n = 5)
   
   # # # # # Section 03 - Settings ----------------------------------------------
   #---var_name_rv     <- "_B_var_name_rv_B_"
@@ -23,7 +23,7 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   
   # # # # # Section 04 - Standard actions --------------------------------------
   # The factor must be factor data type on R.
-  database[,var_name_factor] <- as.factor(as.character(database[,var_name_factor]))
+  my_dataset[,var_name_factor] <- as.factor(as.character(my_dataset[,var_name_factor]))
   
   # # # # # Section 05 - Alpha and confidence value ----------------------------
   confidence_value <- 1 - alpha_value
@@ -37,7 +37,7 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   df_alpha_confidence
   
   # # # # # Section 06 - Selected variables and roles  -------------------------
-  vector_all_var_names <- colnames(database)
+  vector_all_var_names <- colnames(my_dataset)
   vector_name_selected_vars <- c(var_name_rv, var_name_factor)
   vector_rol_vars <- c("VR", "FACTOR")
   
@@ -56,7 +56,7 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   # Only selected variabless. 
   # Only completed rows. 
   # Factor columns as factor object in R.
-  minibase <- na.omit(database[vector_name_selected_vars])
+  minibase <- na.omit(my_dataset[vector_name_selected_vars])
   colnames(minibase) <- vector_rol_vars
   minibase[,"FACTOR"] <- as.factor(minibase[,"FACTOR"])
   head(x = minibase, n = 5)
@@ -76,12 +76,12 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   
   
   
-  # # # database and minibase reps
+  # # # my_dataset and minibase reps
   # Our 'n' is from minibase
   df_show_n <- data.frame(
-    "object" = c("database", "minibase"),
-    "n_col" = c(ncol(database), ncol(minibase)),
-    "n_row" = c(nrow(database), nrow(minibase))
+    "object" = c("my_dataset", "minibase"),
+    "n_col" = c(ncol(my_dataset), ncol(minibase)),
+    "n_row" = c(nrow(my_dataset), nrow(minibase))
   )
   df_show_n
   
@@ -144,8 +144,8 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   
   
   # # # # # Section 07 - minibase_mod --------------------------------------------
-  # # # Detect rows on database there are on minibase
-  dt_rows_database_ok <- rowSums(!is.na(database[vector_name_selected_vars])) == ncol(minibase)
+  # # # Detect rows on my_dataset there are on minibase
+  dt_rows_my_dataset_ok <- rowSums(!is.na(my_dataset[vector_name_selected_vars])) == ncol(minibase)
   
   
   
@@ -155,7 +155,7 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   minibase_mod$"lvl_color" <- df_factor_info$color[minibase_mod$"lvl_order_number"]
   minibase_mod$"fitted.values" <- df_factor_info$"mean"[minibase_mod$"lvl_order_number"]
   minibase_mod$"residuals" <- lm_anova$residuals
-  minibase_mod$"id_database" <- c(1:nrow(database))[dt_rows_database_ok]
+  minibase_mod$"id_my_dataset" <- c(1:nrow(my_dataset))[dt_rows_my_dataset_ok]
   minibase_mod$"id_minibase" <- 1:nrow(minibase)
   minibase_mod$"studres" <- minibase_mod$"residuals"/model_error_sd
   
@@ -1307,7 +1307,8 @@ GeneralLM_fix_anova1_RCode <- function(database, var_name_factor, var_name_rv, a
   ._result_list <- mget(._obj_to_keep)
   
   # #._ Intentar ordenamiento por aparicion
-  # ._vector_orden <- fn_R_obj_name_in_order_from_fn(sys.function())
+  ._vector_orden <- fn_R_obj_name_in_order_from_fn(sys.function())
+  ._result_list <- ._result_list[._vector_orden]
   # check_all <- identical(sort(._vector_orden), sort(._obj_to_keep))
   # print(check_all)
   # 

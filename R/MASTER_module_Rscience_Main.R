@@ -704,8 +704,8 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       
       # Intentar acceder al dataset
       my_dataset <- NULL
-      if (!is.null(the_list[[3]]$"pack_output"$"database")) {
-        my_dataset <- the_list[[3]]$"pack_output"$"database"
+      if (!is.null(the_list[[3]]$"pack_output"$"my_dataset")) {
+        my_dataset <- the_list[[3]]$"pack_output"$"my_dataset"
       }
       
       # Solo continuar si my_dataset existe y es válido

@@ -110,7 +110,7 @@ Sbutton_03_settings_server <- function(id,
       
       #-------------------------------------------------------------------------
       # Basics
-      my_dataset <- internal_DATASET_SELECTOR$"pack_output"$"database"
+      my_dataset <- internal_DATASET_SELECTOR$"pack_output"$"my_dataset"
       
       #
       #-------------------------------------------------------------------------

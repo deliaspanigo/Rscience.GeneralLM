@@ -347,7 +347,7 @@ module_render_01_report_download_server <- function(id, step_pos, number_current
       
       # Bolsa 01 - El database
       my_bag01 <- list()
-      my_bag01[["database"]] <- reactiveValuesToList(APP_TOTEM)[["step3"]]$"pack_output"$"database"
+      my_bag01[["my_dataset"]] <- reactiveValuesToList(APP_TOTEM)[["step3"]]$"pack_output"$"my_dataset"
       
       # Bolsa 02 - El resto
       

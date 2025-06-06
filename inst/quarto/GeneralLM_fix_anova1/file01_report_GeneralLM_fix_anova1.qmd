@@ -14,7 +14,7 @@ format:
     code-summary: "Options"  # Texto para el botón de despliegue
     css: style.css
 params:
-  database: NULL
+  my_dataset: NULL
   var_name_factor: NULL
   var_name_rv: NULL
   alpha_value: NULL
@@ -53,12 +53,12 @@ library("Rscience.GeneralLM")
 # var_name_factor <- "cyl"
 # var_name_rv <- "mpg"
 # alpha_value <- 0.05
-database <- do.call(cbind.data.frame, params$"database")
+my_dataset <- do.call(cbind.data.frame, params$"my_dataset")
 var_name_factor <- params$"var_name_factor"
 var_name_rv <- params$"var_name_rv"
 alpha_value <- as.numeric(as.character(params$"alpha_value"))
 
-my_super_list <- Rscience.GeneralLM::GeneralLM_fix_anova1_RCode(database = database,
+my_super_list <- Rscience.GeneralLM::GeneralLM_fix_anova1_RCode(my_dataset = my_dataset,
                            var_name_factor = var_name_factor,
                            var_name_rv = var_name_rv, alpha_value = alpha_value)
 
