@@ -1,5 +1,5 @@
 ---
-title: "Anova 1 Way - Fixed Model - General Linear Models"
+title: "Simple Linear Regresion - Fixed Model - General Linear Models"
 format: 
   html:
     page-layout: custom

@@ -1,0 +1,51 @@
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot001")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_plot001")
+my_super_list[vector_obj]
+```
+:::
+:::
+
+***
+
+
+
+::: {.columns}
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("plot002")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_plot002")
+my_super_list[vector_obj]
+```
+:::
+:::
+
+***
+
+
