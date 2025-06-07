@@ -1,0 +1,37 @@
+config:
+  id: "Rs_LM_fix_reg_02_double"
+  name: "General Linear Model - Fixed Effects Double Linear Regresion"
+  description: "This tool performs a double linear regresion with fixed effects using a general linear model."
+  Rcode_fn_name: "Rs_LM_fix_reg_02_double_RCode"
+  zocalo_fn_name: "Rs_LM_fix_reg_02_double_FN_shiny_zocalo"
+  settings:
+    type: "module"
+    module_ui: "Rs_LM_fix_reg_02_double_MM_settings_ui"
+    module_server: "Rs_LM_fix_reg_02_double_MM_settings_server"
+    fn_control: "Rs_LM_fix_reg_02_double_FN_validate_vars"
+  script:
+    copie_file_name: "Rs_LM_fix_reg_02_double_RCode.R"
+  output:
+    type: "module"
+    module_ui: "Rs_LM_fix_reg_02_double_MM_output_ui"
+    module_server: "Rs_LM_fix_reg_02_double_MM_output_server"
+  download:
+    file01:
+      on_work_folder: TRUE
+      show_render: TRUE
+      file_name_work: "file01_report_Rs_LM_fix_reg_02_double.qmd"
+      file_name_delivery: "file01_report_Rs_LM_fix_reg_02_double.html"
+    file02:
+      on_work_folder: TRUE
+      show_render: TRUE
+      file_name_work: "file02_Rscript_Rs_LM_fix_reg_02_double.R"
+      file_name_delivery: "file02_Rscript_Rs_LM_fix_reg_02_double.R"
+    file03:
+      on_work_folder: TRUE
+      show_render: TRUE
+      file_name_work: "file03_RLong_Rs_LM_fix_reg_02_double.qmd"
+      file_name_delivery: "file03_RLong_Rs_LM_fix_reg_02_double.html"
+  version: "1.0.1"
+  date_version: "2025-06-07"
+    
+  

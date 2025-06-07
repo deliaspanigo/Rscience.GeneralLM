@@ -1,5 +1,5 @@
 #' @export
-GeneralLM_fix_dlreg_MM_settings_ui <- function(id) {
+Rs_LM_fix_reg_02_double_MM_settings_ui <- function(id) {
   ns <- NS(id)
   tagList(
     # Información sobre los datos
@@ -9,8 +9,8 @@ GeneralLM_fix_dlreg_MM_settings_ui <- function(id) {
     fluidRow(
       column(3,
              uiOutput(ns("rv_selector")),
-             uiOutput(ns("x01_selector")),
-             uiOutput(ns("x02_selector"))
+             uiOutput(ns("reg01_selector")),
+             uiOutput(ns("reg02_selector"))
       ),
       column(3, 
              uiOutput(ns("alpha_value"))
@@ -25,7 +25,7 @@ GeneralLM_fix_dlreg_MM_settings_ui <- function(id) {
 }
 
 #' @export
-GeneralLM_fix_dlreg_MM_settings_server <- function(id, my_dataset) {
+Rs_LM_fix_reg_02_double_MM_settings_server <- function(id, my_dataset) {
   moduleServer(id, function(input, output, session) {
     # Mostrar información sobre el dataset
     output$dataset_info <- renderText({
@@ -43,44 +43,40 @@ GeneralLM_fix_dlreg_MM_settings_server <- function(id, my_dataset) {
       # names(choices) <- paste0(choices - "(", openxlsx::int2col(1:length(choices)), ")")
       choices <- c("Select one..." = "", choices)
       
-      selectInput(
-        ns("var_name_rv"),
-        "Y (response variable - dependent):",
-        choices = choices,
-        selected = choices[1]
-        # selected = if (length(choices) > 0) choices[1] else NULL
+      selectInput(inputId = ns("var_name_rv"), 
+                  label = "Response Variable (Y - dependent):",
+                  choices = choices,
+                  selected = choices[1]
+       
       )
     })
     
     # Generar UI para el selector de factor
-    output$x01_selector <- renderUI({
+    output$reg01_selector <- renderUI({
       ns <- session$ns
       
       choices <- colnames(my_dataset)
       names(choices) <- paste0("(", openxlsx::int2col(1:length(choices)), ") - ", choices)
       choices <- c("Select one..." = "", choices)
       
-      selectInput(
-        ns("var_name_x01"),
-        "X01 (regresor - independent):",
-        choices = choices,
-        selected = choices[1]
-        # selected = if (length(choices) > 0) choices[1] else NULL
+      selectInput(inputId = ns("var_name_reg01"), 
+                  label = "Regresor 01 (X01 - independent):",
+                  choices = choices,
+                  selected = choices[1]
       )
     })
     
-    output$x02_selector <- renderUI({
+    output$reg02_selector <- renderUI({
       ns <- session$ns
       
       choices <- colnames(my_dataset)
       names(choices) <- paste0("(", openxlsx::int2col(1:length(choices)), ") - ", choices)
       choices <- c("Select one..." = "", choices)
       
-      selectInput(
-        ns("var_name_x02"),
-        "X02 (regresor - independent):",
-        choices = choices,
-        selected = choices[1]
+      selectInput(inputId = ns("var_name_reg02"), 
+                  label = "Regresor 02 (X02 - independent):",
+                  choices = choices,
+                  selected = choices[1]
         # selected = if (length(choices) > 0) choices[1] else NULL
       )
     })
@@ -96,11 +92,10 @@ GeneralLM_fix_dlreg_MM_settings_server <- function(id, my_dataset) {
       
       
       
-      selectInput(
-        ns("alpha_value"),
-        "Alpha value:",
-        choices = vector_choices_alpha,
-        selected = vector_choices_alpha[2]
+      selectInput(inputId = ns("alpha_value"), 
+                  label = "Alpha value:",
+                  choices = vector_choices_alpha,
+                  selected = vector_choices_alpha[2]
       )
       
     })
@@ -109,23 +104,23 @@ GeneralLM_fix_dlreg_MM_settings_server <- function(id, my_dataset) {
       # Crear el objeto inicialmente con valores NA
       result <- list(
         var_name_rv = NA,
-        var_name_x01 = NA,
-        var_name_x02 = NA,
-        vector_selected_vars = c("RV" = NA, "X01" = NA, "X02" = NA),
+        var_name_reg01 = NA,
+        var_name_reg02 = NA,
+        vector_selected_vars = c("RV" = NA, "Reg01" = NA, "Reg02" = NA),
         check_not_equal = NA,
         alpha_value = NA,
         external_alpha_value = NA
       )
       
-      req(input$var_name_x01, input$var_name_x02, input$var_name_rv, input$alpha_value)
+      req(input$var_name_reg01, input$var_name_reg02, input$var_name_rv, input$alpha_value)
       
       result$var_name_rv <- input$var_name_rv
-      result$var_name_x01 <- input$var_name_x01
-      result$var_name_x02 <- input$var_name_x02
+      result$var_name_reg01 <- input$var_name_reg01
+      result$var_name_reg02 <- input$var_name_reg02
       
       result$vector_selected_vars[1] <- input$var_name_rv
-      result$vector_selected_vars[2] <- input$var_name_x01
-      result$vector_selected_vars[3] <- input$var_name_x02
+      result$vector_selected_vars[2] <- input$var_name_reg01
+      result$vector_selected_vars[3] <- input$var_name_reg02
       
       
 

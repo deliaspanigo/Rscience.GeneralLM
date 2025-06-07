@@ -679,6 +679,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       # Hardcoded
       
       full_name_FN <- internal_CFG$"pack_output"$"zocalo_fn_name"
+      print(full_name_FN)
       # ------------------------------------------------------------------------
       #
       # Running fn for obtain zocalo

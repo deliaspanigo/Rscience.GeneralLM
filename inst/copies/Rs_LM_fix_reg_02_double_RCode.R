@@ -1,6 +1,6 @@
 
 #' @export
-GeneralLM_fix_dlreg_RCode <- function(my_dataset, var_name_rv, var_name_x01, var_name_x02, alpha_value){
+Rs_LM_fix_reg_02_double_RCode <- function(my_dataset, var_name_rv, var_name_reg01, var_name_reg02, alpha_value){
   
   ### INIT CODE ###
   # # # # # Section 01 - Libraries ---------------------------------------------
@@ -18,15 +18,15 @@ GeneralLM_fix_dlreg_RCode <- function(my_dataset, var_name_rv, var_name_x01, var
   
   # # # # # Section 03 - Settings ----------------------------------------------
   #---var_name_rv     <- "_B_var_name_rv_B_"
-  #---var_name_x01     <- "_B_var_name_x01_B_"
-  #---var_name_x02     <- "_B_var_name_x02_B_"
+  #---var_name_reg01     <- "_B_var_name_reg01_B_"
+  #---var_name_reg02     <- "_B_var_name_reg02_B_"
   #---alpha_value    <- _B_alpha_value_B_
   
   
   # # # # # Section 04 - Var rols and minibase -----------------------------------
   # # # Selected vars
   vector_all_var_names <- colnames(my_dataset)
-  vector_name_selected_vars <- c(var_name_rv, var_name_x01, var_name_x02)
+  vector_name_selected_vars <- c(var_name_rv, var_name_reg01, var_name_reg02)
   vector_rol_vars <- c("VR", "X01", "X02")
   
   

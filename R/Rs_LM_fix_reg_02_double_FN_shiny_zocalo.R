@@ -1,13 +1,13 @@
 #' @export
-GeneralLM_fix_dlreg_FN_shiny_zocalo <- function(internal_VARIABLE_SELECTOR){
+Rs_LM_fix_reg_02_double_FN_shiny_zocalo <- function(internal_VARIABLE_SELECTOR){
   valores_list_variable_selector <- reactiveValuesToList(internal_VARIABLE_SELECTOR)
   info_VS <- valores_list_variable_selector$"pack_output"
   req(info_VS)
   
   # print(info_output)
-  
-  value_factor <- info_VS$"var_name_factor"
   value_rv <-     info_VS$"var_name_rv"
+  value_reg01 <- info_VS$"var_name_reg01"
+  value_reg02 <- info_VS$"var_name_reg02"
   vector_selected_vars <- info_VS$"vector_selected_vars"
   new_ncol <-  info_VS$"ncol_minidataset"
   new_nrow <-  info_VS$"nrow_minidataset"
@@ -47,14 +47,18 @@ GeneralLM_fix_dlreg_FN_shiny_zocalo <- function(internal_VARIABLE_SELECTOR){
     div(
       class = "d-flex flex-column",
       div(class = "me-4 mb-2",
-          span(class = "fw-bold", "Factor: "),
-          span(value_factor, style = "font-family: monospace;")
-          ),
-      
-      div(class = "me-4 mb-2",
           span(class = "fw-bold", "Response Variable: "),
           span(value_rv, style = "font-family: monospace;")
-          ),
+      ),
+      div(class = "me-4 mb-2",
+          span(class = "fw-bold", "Regresor 01: "),
+          span(value_reg01, style = "font-family: monospace;")
+      ),
+      div(class = "me-4 mb-2",
+          span(class = "fw-bold", "Regresor 02: "),
+          span(value_reg02, style = "font-family: monospace;")
+      ),
+ 
       
       div(class = "me-4 mb-2",
         span(class = "fw-bold", "Shape: "),
