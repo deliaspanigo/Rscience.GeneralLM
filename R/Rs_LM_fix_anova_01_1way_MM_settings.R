@@ -34,7 +34,7 @@ Rs_LM_fix_anova_01_1way_MM_settings_server <- function(id, my_dataset) {
     
     
     # Generar UI para el selector de variable respuesta
-    output$rv_selector <- renderUI({
+    output$"rv_selector" <- renderUI({
       req(my_dataset)
       ns <- session$ns
       choices <- colnames(my_dataset)
@@ -43,16 +43,15 @@ Rs_LM_fix_anova_01_1way_MM_settings_server <- function(id, my_dataset) {
       choices <- c("Select one..." = "", choices)
       
       selectInput(
-        ns("var_name_rv"),
-        "Response variable:",
-        choices = choices,
+        inputId  = ns("var_name_rv"), 
+        label    = "Response variable:",
+        choices  = choices,
         selected = choices[1]
-        # selected = if (length(choices) > 0) choices[1] else NULL
       )
     })
     
     # Generar UI para el selector de factor
-    output$factor_selector <- renderUI({
+    output$"factor_selector" <- renderUI({
       ns <- session$ns
       
       choices <- colnames(my_dataset)
@@ -60,11 +59,10 @@ Rs_LM_fix_anova_01_1way_MM_settings_server <- function(id, my_dataset) {
       choices <- c("Select one..." = "", choices)
       
       selectInput(
-        ns("var_name_factor"),
-        "Factor:",
+        inputId = ns("var_name_factor"), 
+        label = "Factor:",
         choices = choices,
         selected = choices[1]
-        # selected = if (length(choices) > 0) choices[1] else NULL
       )
     })
     
@@ -76,14 +74,14 @@ Rs_LM_fix_anova_01_1way_MM_settings_server <- function(id, my_dataset) {
                               "0.10 (10%)" = "0.10")
     
     # Generar UI para el selector de variable respuesta
-    output$alpha_value <- renderUI({
+    output$"alpha_value" <- renderUI({
       ns <- session$ns
       
       
       
       selectInput(
-        ns("alpha_value"),
-        "Alpha value:",
+        inputId = ns("alpha_value"), 
+        label = "Alpha value:",
         choices = vector_choices_alpha,
         selected = vector_choices_alpha[2]
       )
@@ -93,32 +91,33 @@ Rs_LM_fix_anova_01_1way_MM_settings_server <- function(id, my_dataset) {
     output_list <- reactive({
       # Crear el objeto inicialmente con valores NA
       result <- list(
-        var_name_factor = NA,
         var_name_rv = NA,
-        vector_selected_vars = c("FACTOR" = NA, "RV" = NA),
+        var_name_factor = NA,
+        vector_selected_vars = NA, #c("RV" = NA, "FACTOR" = NA),
         check_not_equal = NA,
         alpha_value = NA,
         external_alpha_value = NA
       )
       
-      req(input$var_name_factor, input$var_name_rv, input$alpha_value)
+      req(input$"var_name_factor", input$"var_name_rv", input$"alpha_value")
+      
+      result$"var_name_rv" <- input$"var_name_rv"
+      result$"var_name_factor" <- input$"var_name_factor"
+      
+      result$"vector_selected_vars" <- c("RV" = input$"var_name_rv",
+                                         "FACTOR" = input$"var_name_factor")
+
       
       
-      result$var_name_factor <- input$var_name_factor
-      result$vector_selected_vars[1] <- input$var_name_factor
+      result$"check_not_equal" <- input$"var_name_rv" != input$"var_name_factor"
       
-      result$var_name_rv <- input$var_name_rv
-      result$vector_selected_vars[2] <- input$var_name_rv
+      minidataset <- na.omit(my_dataset[result$"vector_selected_vars"])
       
-      result$check_not_equal <- input$var_name_rv != input$var_name_factor
+      result$"nrow_minidataset" <- nrow(minidataset)
+      result$"ncol_minidataset" <- ncol(minidataset)
       
-      minidataset <- na.omit(my_dataset[result$vector_selected_vars])
-      
-      result$nrow_minidataset <- nrow(minidataset)
-      result$ncol_minidataset <- ncol(minidataset)
-      
-      result$alpha_value      <- as.numeric(as.character(input$alpha_value))
-      result$external_alpha_value  <- names(vector_choices_alpha)[grepl(input$alpha_value, vector_choices_alpha)]
+      result$"alpha_value"      <- as.numeric(as.character(input$"alpha_value"))
+      result$"external_alpha_value"  <- names(vector_choices_alpha)[grepl(input$"alpha_value", vector_choices_alpha)]
       
       return(result)
     })

@@ -1,6 +1,6 @@
 
 #' @export
-GeneralLM_fix_slreg_RCode <- function(my_dataset, var_name_y, var_name_x, alpha_value){
+Rs_LM_fix_reg_01_simple_RCode <- function(my_dataset, var_name_y, var_name_x, alpha_value){
   
   ### INIT CODE ###
   # # # # # Section 01 - Libraries ---------------------------------------------

@@ -1,6 +1,6 @@
 
 #' @export
-Rs_LM_fix_anova_01_1way_RCode_RCode <- function(my_dataset, var_name_factor, var_name_rv, alpha_value){
+Rs_LM_fix_anova_01_1way_RCode <- function(my_dataset, var_name_rv, var_name_factor, alpha_value){
   
   ### INIT CODE ###
   # # # # # Section 01 - Libraries ---------------------------------------------

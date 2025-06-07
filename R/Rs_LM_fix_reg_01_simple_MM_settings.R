@@ -1,5 +1,5 @@
 #' @export
-GeneralLM_fix_slreg_MM_settings_ui <- function(id) {
+Rs_LM_fix_reg_01_simple_MM_settings_ui <- function(id) {
   ns <- NS(id)
   tagList(
     # Información sobre los datos
@@ -24,7 +24,7 @@ GeneralLM_fix_slreg_MM_settings_ui <- function(id) {
 }
 
 #' @export
-GeneralLM_fix_slreg_MM_settings_server <- function(id, my_dataset) {
+Rs_LM_fix_reg_01_simple_MM_settings_server <- function(id, my_dataset) {
   moduleServer(id, function(input, output, session) {
     # Mostrar información sobre el dataset
     output$dataset_info <- renderText({
