@@ -671,13 +671,14 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
     
     output$tarjeta03_vars <- renderUI({
       req(internal_SETTINGS$"check_output")
-      mi_super_lista <- reactiveValuesToList(internal_SETTINGS) 
+      req(internal_CFG$"check_output")
+      # mi_super_lista <- reactiveValuesToList(internal_SETTINGS) 
       
       # ------------------------------------------------------------------------
       #
       # Hardcoded
       
-      full_name_FN <- "GeneralLM_fix_anova1_FN_shiny_zocalo"
+      full_name_FN <- internal_CFG$"pack_output"$"zocalo_fn_name"
       # ------------------------------------------------------------------------
       #
       # Running fn for obtain zocalo

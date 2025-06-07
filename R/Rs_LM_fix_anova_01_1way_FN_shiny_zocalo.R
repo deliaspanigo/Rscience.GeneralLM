@@ -1,5 +1,5 @@
 #' @export
-GeneralLM_fix_anova1_FN_shiny_zocalo <- function(internal_VARIABLE_SELECTOR){
+Rs_LM_fix_anova_01_1way_FN_shiny_zocalo <- function(internal_VARIABLE_SELECTOR){
   valores_list_variable_selector <- reactiveValuesToList(internal_VARIABLE_SELECTOR)
   info_VS <- valores_list_variable_selector$"pack_output"
   req(info_VS)

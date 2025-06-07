@@ -60,8 +60,8 @@ var_name_x01 <- params$"var_name_x01"
 var_name_x02 <- params$"var_name_x02"
 alpha_value <- as.numeric(as.character(params$"alpha_value"))
 
-my_super_list <- Rscience.GeneralLM::GeneralLM_fix_slreg_RCode(my_dataset = my_dataset,
-                           var_name_y = var_name_y,
+my_super_list <- Rscience.GeneralLM::GeneralLM_fix_dlreg_RCode(my_dataset = my_dataset,
+                           var_name_rv = var_name_rv,
                            var_name_x01 = var_name_x01,
                            var_name_x02 = var_name_x02,
                            alpha_value = alpha_value)

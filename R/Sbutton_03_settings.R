@@ -68,7 +68,6 @@ Sbutton_03_settings_server <- function(id,
     ### Initialization objects
     my_str_MM_server <- reactiveVal(NULL)
     my_str_MM_ui <- reactiveVal(NULL)
-    my_str_FN <- reactiveVal(NULL)
     local_id <- reactiveVal(NULL)
     
     ### And for module output
@@ -89,13 +88,11 @@ Sbutton_03_settings_server <- function(id,
       # Preparing delivery
       full_name_MM_server <- sub_list_settings$"module_server"
       full_name_MM_ui     <- sub_list_settings$"module_ui"
-      full_name_FN        <- sub_list_settings$"fn_control"
       # ------------------------------------------------------------------------
       # Filling ReactiveValues
       isolate({
         my_str_MM_server(full_name_MM_server)
         my_str_MM_ui(full_name_MM_ui)
-        my_str_FN(full_name_FN)
         local_id(str_local_id)
       })
       # ------------------------------------------------------------------------
