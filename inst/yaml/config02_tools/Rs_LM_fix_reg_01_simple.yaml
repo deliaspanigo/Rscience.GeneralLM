@@ -3,6 +3,7 @@ config:
   name: "General Linear Model - Fixed Effects Simple Linear Regresion"
   description: "This tool performs a simple linear regresion with fixed effects using a general linear model."
   Rcode_fn_name: "Rs_LM_fix_reg_01_simple_RCode"
+  zocalo_fn_name: "Rs_LM_fix_reg_01_simple_FN_shiny_zocalo"
   settings:
     type: "module"
     module_ui: "Rs_LM_fix_reg_01_simple_MM_settings_ui"

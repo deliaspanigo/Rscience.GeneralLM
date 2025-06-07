@@ -6,7 +6,7 @@ Rs_LM_fix_reg_01_simple_FN_shiny_zocalo <- function(internal_VARIABLE_SELECTOR){
   
 
   value_rv <-     info_VS$"var_name_rv"  
-  value_factor <- info_VS$"var_name_factor"
+  value_reg <- info_VS$"var_name_reg"
   vector_selected_vars <- info_VS$"vector_selected_vars"
   new_ncol <-  info_VS$"ncol_minidataset"
   new_nrow <-  info_VS$"nrow_minidataset"
@@ -50,8 +50,8 @@ Rs_LM_fix_reg_01_simple_FN_shiny_zocalo <- function(internal_VARIABLE_SELECTOR){
             span(value_rv, style = "font-family: monospace;")
         ),
         div(class = "me-4 mb-2",
-            span(class = "fw-bold", "Factor: "),
-            span(value_factor, style = "font-family: monospace;")
+            span(class = "fw-bold", "Regresor: "),
+            span(value_reg, style = "font-family: monospace;")
         ),
       
 

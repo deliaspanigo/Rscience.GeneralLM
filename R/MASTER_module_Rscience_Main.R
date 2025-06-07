@@ -683,7 +683,7 @@ MASTER_module_Rscience_Main_server <-  function(id, show_dev) {
       #
       # Running fn for obtain zocalo
       args <- list(internal_VARIABLE_SELECTOR = internal_SETTINGS)
-      the_zocalo <- do.call(full_name_FN, args)
+      the_zocalo <- do.call(get(full_name_FN), args)
       the_zocalo
       # ------------------------------------------------------------------------
       

@@ -14,9 +14,9 @@ format:
     code-summary: "Options"  # Texto para el botón de despliegue
     css: style.css
 params:
-  my_dataset: NULL
-  var_name_y: NULL
-  var_name_x: NULL
+  database: NULL
+  var_name_rv: NULL
+  var_name_reg: NULL
   alpha_value: NULL
 ---
 
@@ -49,18 +49,18 @@ document.addEventListener('DOMContentLoaded', function() {
 #| echo: false  # Oculta el código
 
 library("Rscience.GeneralLM")
-# database <- mtcars
-# var_name_factor <- "cyl"
-# var_name_rv <- "mpg"
-# alpha_value <- 0.05
-my_dataset <- do.call(cbind.data.frame, params$"my_dataset")
-var_name_y <- params$"var_name_y"
-var_name_x <- params$"var_name_x"
-alpha_value <- as.numeric(as.character(params$"alpha_value"))
+my_dataset <- mtcars
+var_name_rv <- "mpg"
+var_name_reg <- "cyl"
+alpha_value <- 0.05
+# database <- do.call(cbind.data.frame, params$"database")
+# var_name_factor <- params$"var_name_factor"
+# var_name_rv <- params$"var_name_rv"
+# alpha_value <- as.numeric(as.character(params$"alpha_value"))
 
-my_super_list <- Rscience.GeneralLM::GeneralLM_fix_slreg_RCode(my_dataset = my_dataset,
-                           var_name_y = var_name_y,
-                           var_name_x = var_name_x, 
+my_super_list <- Rscience.GeneralLM::Rs_LM_fix_reg_01_simple_RCode(my_dataset = my_dataset,
+                           var_name_rv = var_name_rv,
+                           var_name_reg = var_name_reg, 
                            alpha_value = alpha_value)
 
 # my_super_list <- do.call(Rscience.GeneralLM::GeneralLM_fix_anova1_RCode, params) 
@@ -91,9 +91,12 @@ my_super_list <- Rscience.GeneralLM::GeneralLM_fix_slreg_RCode(my_dataset = my_d
 
 
 
+<!-- ### Plots - Residuals -->
+<!-- {{< include file00_05_residuals_raw_plots.qmd >}} -->
+
+
 <!-- ### R Summary -->
 <!-- {{< include file00_06_R_summary.qmd >}} -->
 
 <!-- End TabPanel -->
-
-
+:::

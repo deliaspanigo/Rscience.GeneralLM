@@ -8,11 +8,11 @@ Rs_LM_fix_reg_01_simple_MM_settings_ui <- function(id) {
     hr(),
     fluidRow(
       column(3,
-             uiOutput(ns("y_selector")),
-             uiOutput(ns("x_selector"))
+             uiOutput(ns("rv_selector")),
+             uiOutput(ns("reg_selector"))
       ),
       column(3, 
-             uiOutput(ns("alpha_value"))
+             uiOutput(ns("alpha_value_selector"))
              )
       )
   )
@@ -34,7 +34,7 @@ Rs_LM_fix_reg_01_simple_MM_settings_server <- function(id, my_dataset) {
     
     
     # Generar UI para el selector de variable respuesta
-    output$y_selector <- renderUI({
+    output$"rv_selector" <- renderUI({
       req(my_dataset)
       ns <- session$ns
       choices <- colnames(my_dataset)
@@ -43,8 +43,8 @@ Rs_LM_fix_reg_01_simple_MM_settings_server <- function(id, my_dataset) {
       choices <- c("Select one..." = "", choices)
       
       selectInput(
-        ns("var_name_y"),
-        "Y (response variable - dependent):",
+        inputId = ns("var_name_rv"), 
+        label = "Response Variable (Y - dependent):",
         choices = choices,
         selected = choices[1]
         # selected = if (length(choices) > 0) choices[1] else NULL
@@ -52,7 +52,7 @@ Rs_LM_fix_reg_01_simple_MM_settings_server <- function(id, my_dataset) {
     })
     
     # Generar UI para el selector de factor
-    output$x_selector <- renderUI({
+    output$"reg_selector" <- renderUI({
       ns <- session$ns
       
       choices <- colnames(my_dataset)
@@ -60,8 +60,8 @@ Rs_LM_fix_reg_01_simple_MM_settings_server <- function(id, my_dataset) {
       choices <- c("Select one..." = "", choices)
       
       selectInput(
-        ns("var_name_x"),
-        "X (regresor - independent):",
+        inputId = ns("var_name_reg"), 
+        label = "Regresor (X - independent):",
         choices = choices,
         selected = choices[1]
         # selected = if (length(choices) > 0) choices[1] else NULL
@@ -76,14 +76,14 @@ Rs_LM_fix_reg_01_simple_MM_settings_server <- function(id, my_dataset) {
                               "0.10 (10%)" = "0.10")
     
     # Generar UI para el selector de variable respuesta
-    output$alpha_value <- renderUI({
+    output$"alpha_value_selector" <- renderUI({
       ns <- session$ns
       
       
       
       selectInput(
-        ns("alpha_value"),
-        "Alpha value:",
+        inputId = ns("alpha_value"), 
+        label = "Alpha value:",
         choices = vector_choices_alpha,
         selected = vector_choices_alpha[2]
       )
@@ -93,35 +93,33 @@ Rs_LM_fix_reg_01_simple_MM_settings_server <- function(id, my_dataset) {
     output_list <- reactive({
       # Crear el objeto inicialmente con valores NA
       result <- list(
-        var_name_x = NA,
-        var_name_y = NA,
-        vector_selected_vars = c("X" = NA, "Y" = NA),
+        var_name_reg = NA,
+        var_name_rv = NA,
+        vector_selected_vars = NA,
         check_not_equal = NA,
         alpha_value = NA,
         external_alpha_value = NA
       )
       
-      req(input$var_name_x, input$var_name_y, input$alpha_value)
+      req(input$"var_name_reg", input$"var_name_rv", input$"alpha_value")
       
+      result$"var_name_rv"  <- input$"var_name_rv"
+      result$"var_name_reg" <- input$"var_name_reg"
       
-      result$var_name_x <- input$var_name_x
-      result$vector_selected_vars[1] <- input$var_name_x
+      result$"vector_selected_vars" <- c("RV" = input$"var_name_rv", "REG" = input$"var_name_reg")
+      result$"check_not_equal" <- input$"var_name_rv" != input$"var_name_reg"
       
-      result$var_name_y <- input$var_name_y
-      result$vector_selected_vars[2] <- input$var_name_y
+      minidataset <- na.omit(my_dataset[result$"vector_selected_vars"])
       
-      result$check_not_equal <- input$var_name_y != input$var_name_x
+      result$"nrow_minidataset" <- nrow(minidataset)
+      result$"ncol_minidataset" <- ncol(minidataset)
       
-      minidataset <- na.omit(my_dataset[result$vector_selected_vars])
-      
-      result$nrow_minidataset <- nrow(minidataset)
-      result$ncol_minidataset <- ncol(minidataset)
-      
-      result$alpha_value      <- as.numeric(as.character(input$alpha_value))
-      result$external_alpha_value  <- names(vector_choices_alpha)[grepl(input$alpha_value, vector_choices_alpha)]
+      result$"alpha_value"      <- as.numeric(as.character(input$"alpha_value"))
+      result$"external_alpha_value"  <- names(vector_choices_alpha)[grepl(input$"alpha_value", vector_choices_alpha)]
       
       return(result)
     })
+    
     
     return(output_list)
     
