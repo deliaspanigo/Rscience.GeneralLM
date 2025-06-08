@@ -1,0 +1,46 @@
+# 1) References
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_selected_vars")
+my_super_list[vector_obj]
+```
+
+# 2) Linear Regresion - Table
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_reg")
+my_super_list[vector_obj]
+```
+
+# 3) R^2 and Ajusted R^2
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_table_det_coef")
+my_super_list[vector_obj]
+```
+
+# 4) Position
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_position")
+my_super_list[vector_obj]
+```
+
+
+# 5) Dispersion
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_dispersion")
+my_super_list[vector_obj]
+```
+

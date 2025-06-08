@@ -1,0 +1,57 @@
+::: {.columns}
+::: {.column width="48%"}
+# 1) Anova test
+```{r}
+#| warning: false
+#| echo: false
+vector_obj <- c("df_summary_anova")
+
+
+my_df <- my_super_list[[vector_obj]]
+library(knitr)
+library(kableExtra)
+# Mostrar con kable para mejor estética
+kable(my_df, format = "html", caption = "") %>%
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = FALSE)
+
+```
+
+
+```{r}
+#| warning: false
+#| echo: false
+vector_obj <- c("plot007_factor")
+my_super_list[[vector_obj]]
+```
+:::
+
+::: {.column width="4%"}
+:::
+
+::: {.column width="48%"}
+# Rscience - AI Report (Auto Report)
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("phrase_shapiro_selected", 
+                "phrase_bartlett_selected",
+                "phrase_requeriments_selected",
+                "phrase_anova_selected")
+
+my_text <- my_super_list[vector_obj]
+my_text <- unlist(my_text)
+
+# Unir cada elemento en una línea separada
+# my_text <- paste(my_text, collapse = "  ")
+
+# Mostrar en Quarto
+# knitr::asis_output(my_text)
+```
+`r my_text[1]`  
+`r my_text[2]`  
+`r my_text[3]`  
+`r my_text[4]`
+:::
+:::
+

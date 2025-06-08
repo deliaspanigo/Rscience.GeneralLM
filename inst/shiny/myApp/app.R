@@ -21,7 +21,8 @@ library(shinycssloaders)
 library(EnvStats)
 library(crayon)
 library(yaml)
-
+library(Hmisc)
+library(reshape2)
 # library(fontawesome)
 # source("global.R")
 # 

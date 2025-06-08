@@ -20,6 +20,9 @@ usethis::use_package("crayon")
 usethis::use_package("stringi")
 usethis::use_package("plotly")
 usethis::use_package("kableExtra")
+usethis::use_package("Hmisc")
+usethis::use_package("reshape2")
+
 
 usethis::use_package("dplyr")
 usethis::use_package("ggplot2")
