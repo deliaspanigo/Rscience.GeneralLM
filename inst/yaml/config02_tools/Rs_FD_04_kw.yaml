@@ -1,0 +1,32 @@
+config:
+  id: "Rs_FD_04_kw"
+  name: "KW en el yaml config tools"
+  description: "This tool performs Kruskall-Wallis test."
+  Rcode_fn_name: "Rs_FD_04_kw_RCode"
+  zocalo_fn_name: "Rs_FD_04_kw_FN_shiny_zocalo"
+  settings:
+    type: "module"
+    module_ui: "Rs_FD_04_kw_MM_settings_ui"
+    module_server: "Rs_FD_04_kw_MM_settings_server"
+  script:
+    copie_file_name: "Rs_FD_04_kw_RCode.R"
+  download:
+    file01:
+      on_work_folder: TRUE
+      show_render: TRUE
+      file_name_work: "file01_report_Rs_FD_04_kw.qmd"
+      file_name_delivery: "file01_report_Rs_FD_04_kw.html"
+    file02:
+      on_work_folder: TRUE
+      show_render: TRUE
+      file_name_work: "file02_Rscript_Rs_FD_04_kw.R"
+      file_name_delivery: "file02_Rscript_Rs_FD_04_kw.R"
+    file03:
+      on_work_folder: TRUE
+      show_render: TRUE
+      file_name_work: "file03_RLong_Rs_FD_04_kw.qmd"
+      file_name_delivery: "file03_RLong_Rs_FD_04_kw.html"
+  version: "1.0.0"
+  date_version: "2025-06-08"
+    
+  

@@ -1,0 +1,31 @@
+# 1) Summary Anova 1 way
+```{r}
+#| warning: false
+#| echo: false
+
+vector_obj <- c("df_summary_anova", 
+                "phrase_shapiro_selected", 
+                "phrase_bartlett_selected",
+                "phrase_requeriments_selected",
+                "phrase_anova_selected")
+
+my_super_list[vector_obj]
+```
+
+# 2) Tukey
+```{r}
+#| warning: false
+#| echo: false
+vector_obj <- c("plot007_factor")
+my_super_list[[vector_obj]]
+```
+:::
+
+```{r}
+#| warning: false
+#| echo: false
+
+# Forzar una línea en blanco final para evitar el warning de readLines()
+cat("\n")
+```
+

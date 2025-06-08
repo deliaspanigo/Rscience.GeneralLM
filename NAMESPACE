@@ -2,6 +2,10 @@
 
 export(MASTER_module_Rscience_Main_server)
 export(MASTER_module_Rscience_Main_ui)
+export(Rs_FD_04_kw_FN_shiny_zocalo)
+export(Rs_FD_04_kw_MM_settings_server)
+export(Rs_FD_04_kw_MM_settings_ui)
+export(Rs_FD_04_kw_RCode)
 export(Rs_LM_fix_ancova_01_with_FN_shiny_zocalo)
 export(Rs_LM_fix_ancova_01_with_MM_settings_server)
 export(Rs_LM_fix_ancova_01_with_MM_settings_ui)
