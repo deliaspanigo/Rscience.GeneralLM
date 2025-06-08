@@ -1,0 +1,106 @@
+---
+title: "Anova 1 Way and 1 Block - Fixed Model - General Linear Models"
+format: 
+  html:
+    page-layout: custom
+    margin-left: 0%
+    margin-right: 0%
+    theme: cosmo
+    toc: false
+    embed-resources: true
+    standalone: true
+    code-tools: false  # Añade un botón global para mostrar/ocultar código
+    code-fold: false   # Código plegado por defecto
+    code-summary: "Options"  # Texto para el botón de despliegue
+    css: style.css
+params:
+  my_dataset: NULL
+  var_name_rv: NULL
+  var_name_factor: NULL
+  var_name_block: NULL
+  alpha_value: NULL
+---
+
+<br>
+<br>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var title = document.querySelector('h1.title');
+  var author = document.querySelector('.author');
+  var date = document.querySelector('.date');
+  
+  title.style.display = 'none';
+  author.style.display = 'none';
+  date.style.display = 'none';
+});
+</script>
+
+<div style="display: flex; justify-content: center; gap: 10px;">
+  <img src="logo_01_unc_master.png" alt="Imagen 1" style="height: 100px;">
+  <img src="logo_02_fcefyn_master.png" alt="Imagen 2" style="height: 100px;">
+  <img src="logo_03_efadoc_master.png" alt="Imagen 3" style="height: 100px;">
+  <img src="logo_04_rscience_master.png" alt="Imagen 4" style="height: 100px;">
+</div>
+<div style="font-size:30px; font-weight: bold; text-decoration: underline;"> Report - Anova 1 Way - Fixed Model - General Linear Models</div>
+
+
+```{r}
+#| label: code
+#| warning: false
+#| echo: false  # Oculta el código
+
+library("Rscience.GeneralLM")
+# database <- mtcars
+# var_name_factor <- "cyl"
+# var_name_rv <- "mpg"
+# alpha_value <- 0.05
+my_dataset <- do.call(cbind.data.frame, params$"my_dataset")
+var_name_rv <- params$"var_name_rv"
+var_name_factor <- params$"var_name_factor"
+var_name_block <- params$"var_name_block"
+alpha_value <- as.numeric(as.character(params$"alpha_value"))
+
+my_super_list <- Rscience.GeneralLM::Rs_LM_fix_anova_02_1way1block_RCode(my_dataset = my_dataset,
+                                  var_name_rv = var_name_rv,
+                                  var_name_factor = var_name_factor,
+                                  var_name_block = var_name_block,
+                                  alpha_value = alpha_value)
+
+# my_super_list <- do.call(Rscience.GeneralLM::GeneralLM_fix_anova1_RCode, params) 
+#                            var_name_factor = var_name_factor, 
+#                            var_name_rv = var_name_rv, alpha_value = alpha_value)
+```
+
+
+
+<!-- Inicio TabPanel -->
+::: {.panel-tabset}
+
+
+<!-- Inicio Tab01 -->
+### Summary
+{{< include file00_01_summary.qmd >}}
+
+### Analysis
+{{< include file00_02_analysis.qmd >}}
+
+
+### Requeriments
+{{< include file00_03_requeriments.qmd >}}
+
+
+### Plots - Raw Data
+{{< include file00_04_data_raw_plots.qmd >}}
+
+
+
+### Plots - Residuals
+{{< include file00_05_residuals_raw_plots.qmd >}}
+
+
+### R Summary
+{{< include file00_06_R_summary.qmd >}}
+
+<!-- End TabPanel -->
+
+

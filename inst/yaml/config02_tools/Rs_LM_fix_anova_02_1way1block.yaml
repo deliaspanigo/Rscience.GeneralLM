@@ -1,0 +1,32 @@
+config:
+  id: "Rs_LM_fix_anova_02_1way1block"
+  name: "General Linear Model - Fixed Effects ANOVA 1 way and 1 block"
+  description: "This tool performs a one-way and one-block ANOVA with fixed effects using a general linear model."
+  Rcode_fn_name: "Rs_LM_fix_anova_02_1way1block_RCode"
+  zocalo_fn_name: "Rs_LM_fix_anova_02_1way1block_FN_shiny_zocalo"
+  settings:
+    type: "module"
+    module_ui: "Rs_LM_fix_anova_02_1way1block_MM_settings_ui"
+    module_server: "Rs_LM_fix_anova_02_1way1block_MM_settings_server"
+  script:
+    copie_file_name: "Rs_LM_fix_anova_02_1way1block_RCode.R"
+  download:
+    file01:
+      on_work_folder: TRUE
+      show_render: TRUE
+      file_name_work: "file01_report_Rs_LM_fix_anova_02_1way1block.qmd"
+      file_name_delivery: "file01_report_Rs_LM_fix_anova_02_1way1block.html"
+    file02:
+      on_work_folder: TRUE
+      show_render: TRUE
+      file_name_work: "file02_Rscript_Rs_LM_fix_anova_02_1way1block.R"
+      file_name_delivery: "file02_Rscript_Rs_LM_fix_anova_02_1way1block.R"
+    file03:
+      on_work_folder: TRUE
+      show_render: TRUE
+      file_name_work: "file03_RLong_Rs_LM_fix_anova_02_1way1block.qmd"
+      file_name_delivery: "file03_RLong_Rs_LM_fix_anova_02_1way1block.html"
+  version: "1.0.2"
+  date_version: "2025-06-07"
+    
+  
